@@ -12,9 +12,10 @@ long_short_name_dict = {
     "2m_temperature": "t2m",
 }
 
-csv_col_names_dict = {
+col_names_dict = {
     "var": "variable",
-    "res": "resolution",
+    "t_res": "temporal_resolution",
+    "s_res":"spatial_resolution",
     "max_lat": "max_latitude",
     "min_lat": "min_latitude",
     "max_long": "max_longitude",
