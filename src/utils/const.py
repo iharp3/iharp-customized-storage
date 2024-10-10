@@ -29,5 +29,6 @@ col_name = {
     "max_long": "max_longitude",
     "min_long": "min_longitude",
     "start_t": "start_time",
-    "end_t": "end_time"
+    "end_t": "end_time",
+    "t_r_id": "time_range_id",
 }

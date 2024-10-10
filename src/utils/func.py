@@ -11,8 +11,6 @@ import pandas as pd
 
 from const import col_name
 
-
-
 '''
 FUNC: get_time_range_ids
 
@@ -21,13 +19,14 @@ OUT: df (pandas data frame) - df with new range_id col
 '''
 def get_time_range_ids(df):
 
-    s = col_name["start_t"]
-    e = col_name["end_t"]
+    s = col_name['start_t']
+    e = col_name['end_t']
+    r_id = col_name['t_r_id']
 
     df = df.sort_values(by=s).reset_index(drop=True)
     cur_end = df.iloc[0][e]
     cur_range_id = 1
-    df["range_id"] = cur_range_id
+    df[r_id] = cur_range_id
 
     for i in range(1, len(df)):
         next_start = df.iloc[i][s]
@@ -35,10 +34,10 @@ def get_time_range_ids(df):
 
         if next_start <= cur_end:
             cur_end = max(cur_end, next_end)
-            df.loc[i, "range_id"] = cur_range_id
+            df.loc[i, r_id] = cur_range_id
         else:
             cur_range_id += 1
             cur_end = next_end
-            df.loc[i, "range_id"] = cur_range_id
+            df.loc[i, r_id] = cur_range_id
 
     return df
