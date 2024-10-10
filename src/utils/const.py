@@ -1,3 +1,11 @@
+'''
+const.py
+
+DESCRIPTION: Contains constant values that are used in customized_storage.py
+
+Author: Ana Uribe
+'''
+
 # RAW_DATA_PATH = "/data/customized/raw/"
 # AGG_DATA_PATH = "/data/customized/agg/"
 
@@ -12,7 +20,7 @@ long_short_name_dict = {
     "2m_temperature": "t2m",
 }
 
-col_names_dict = {
+col_name = {
     "var": "variable",
     "t_res": "temporal_resolution",
     "s_res":"spatial_resolution",
@@ -20,6 +28,6 @@ col_names_dict = {
     "min_lat": "min_latitude",
     "max_long": "max_longitude",
     "min_long": "min_longitude",
-    "start_time": "start_time",
-    "end_time": "end_time"
+    "start_t": "start_time",
+    "end_t": "end_time"
 }

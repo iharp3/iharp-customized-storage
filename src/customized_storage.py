@@ -13,28 +13,39 @@ Author: Ana Uribe
 
 '''Imports'''
 import pandas as pd
+from datetime import datetime
 
 from utils.const import (
                         USER_INPUT_FILE_PATH, 
                         RAW_DATA_PATH, 
                         AGG_DATA_PATH,
-                        col_names_dict,
+                        col_name,
                         )
+
+from utils.func import (get_time_range_ids)
 
 
 '''Upload user input csv'''
 user_input_df = pd.read_csv(USER_INPUT_FILE_PATH)
+unique_vars = user_input_df[col_name["var"]].unique()
+
+# turn start and end time into datetime objects
+user_input_df['start_time'] = pd.to_datetime(user_input_df[col_name["start_t"]], format='%d-%m-%Y')
+user_input_df['end_time'] = pd.to_datetime(user_input_df[col_name["end_t"]], format='%d-%m-%Y')
+
 
 '''Get necessary API calls and keep track of resolutions needed'''
-
-unique_vars = user_input_df[col_names_dict["var"]].unique()
+api_calls = []
+to_delete = []
 
 for var in unique_vars:
 
     # get all rows with this variable
-    var_df = user_input_df[user_input_df[col_names_dict["var"]] == var]
+    var_df = user_input_df[user_input_df[col_name["var"]] == var]
     
-    # 
+    # check if times overlap
+    var_time_ranges_df = get_time_range_ids(var_df)
+
 
     
 
