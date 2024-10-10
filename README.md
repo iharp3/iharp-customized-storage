@@ -34,31 +34,47 @@ To get from the user input to the downloaded data, these are the steps to follow
 
 Currently, we take a user input to be a CSV with information regarding the time and spatial resoultion, location (in latitude and longitude degrees), and time range needed for a variable.
 
-| **row** |   **variable**   | **time resolution** | **spatial resolution** | **max_latitude** | **min_latitude** | **max_longitude** | **min_longitude** | **start_time** | **end_time** |      **relation**      |
-|:-------:|:----------------:|:-------------------:|:----------------------:|:----------------:|:----------------:|:-----------------:|:-----------------:|:--------------:|:------------:|:----------------------:|
-|    1    |    temperature   |         hour        |          0.25          |        30        |        20        |         30        |         20        |    1-1-2020    |   1-1-2023   |                        |
-|    2    |    temperature   |         hour        |           0.5          |        20        |        10        |         20        |         10        |    1-1-1980    |   1-1-2020   |                        |
-|    3    |    temperature   |         day         |          0.25          |        20        |        10        |         10        |         0         |    6-1-2000    |   6-1-2020   |                        |
-|    4    |    temperature   |        month        |           0.5          |        20        |        10        |         30        |         20        |    1-1-1970    |   1-1-2024   |                        |
-|    5    |    temperature   |         year        |          0.25          |        10        |         0        |         10        |         0         |    1-1-2000    |   1-1-2020   |                        |
-|    6    |    temperature   |        month        |           0.5          |        20        |        10        |         20        |         10        |    1-1-1980    |   1-1-2020   |     agg. of row 3      |
-|    7    |    temperature   |         hour        |          0.25          |        25        |        20        |         25        |         20        |    1-1-2020    |  31-12-2020  |     subset of row 1    |
-|    8    |    temperature   |         year        |            1           |        10        |        -10       |         10        |        -10        |    1-1-1970    |   1-1-2024   |  agg. of part of row 5 |
-|    9    |    temperature   |         day         |           0.5          |        20        |        10        |         25        |         20        |    1-1-2020    |   1-1-2023   |  agg. of part of row 8 |
-|    10   |    temperature   |         year        |           0.5          |        30        |         0        |         30        |         0         |     1-1970     |   1-1-2024   |  agg. of part of row 1 |
-|    12   | u-component wind |         hour        |          0.25          |        30        |        20        |         30        |         20        |    1-1-2020    |   1-1-2023   |     row 1 for wind     |
-|    13   | v-component wind |         hour        |          0.25          |        30        |        20        |         30        |         20        |    1-1-2020    |   1-1-2023   |     row 1 for wind     |
-|    14   | u-component wind |        month        |           0.5          |        20        |        10        |         20        |         10        |    1-1-2000    |   1-1-2020   | part of row 6 for wind |
-|    15   | v-component wind |        month        |           0.5          |        20        |        10        |         20        |         10        |    1-1-2000    |   1-1-2020   | part of row 6 for wind |
+Example user input:
+
+|   **variable**   | **time resolution** | **spatial resolution** | **max_latitude** | **min_latitude** | **max_longitude** | **min_longitude** | **start_time** | **end_time** |
+|:----------------:|:-------------------:|:----------------------:|:----------------:|:----------------:|:-----------------:|:-----------------:|:--------------:|:------------:|
+|    temperature   |         hour        |          0.25          |        30        |        20        |         30        |         20        |    1-1-2020    |   1-1-2023   |
+|    temperature   |         hour        |           0.5          |        20        |        10        |         20        |         10        |    1-1-1980    |   1-1-2020   |
+|    temperature   |         day         |          0.25          |        20        |        10        |         10        |         0         |    6-1-2000    |   6-1-2020   |
+|    temperature   |        month        |           0.5          |        20        |        10        |         30        |         20        |    1-1-1970    |   1-1-2024   |
+|    temperature   |         year        |          0.25          |        10        |         0        |         10        |         0         |    1-1-2000    |   1-1-2020   |
+|    temperature   |        month        |           0.5          |        20        |        10        |         20        |         10        |    1-1-1980    |   1-1-2020   |
+|    temperature   |         hour        |          0.25          |        25        |        20        |         25        |         20        |    1-1-2020    |  31-12-2020  |
+|    temperature   |         year        |            1           |        10        |        -10       |         10        |        -10        |    1-1-1970    |   1-1-2024   |
+|    temperature   |         day         |           0.5          |        20        |        10        |         25        |         20        |    1-1-2020    |   1-1-2023   |
+|    temperature   |         year        |           0.5          |        30        |         0        |         30        |         0         |     1-1970     |   1-1-2024   |
+| u-component wind |         hour        |          0.25          |        30        |        20        |         30        |         20        |    1-1-2020    |   1-1-2023   |
+| v-component wind |         hour        |          0.25          |        30        |        20        |         30        |         20        |    1-1-2020    |   1-1-2023   |
+| u-component wind |        month        |           0.5          |        20        |        10        |         20        |         10        |    1-1-2000    |   1-1-2020   |
+| v-component wind |        month        |           0.5          |        20        |        10        |         20        |         10        |    1-1-2000    |   1-1-2020   |
 
 #### Condensing user input
-Once user input is given, we need to figure out the necessary subset of data that satisfies all the user needs. 
+Once user input is given, we need to figure out the necessary subset of data that satisfies all the user needs. Our goal in this is to download the minimal amount of data needed.
 
 Since we will query the data at the highest temporal and spatial resolution from CDS (hourly and 0.25 degrees respectively), we only need to figure out if, for any variable, there is any overlap in the location and time range.
 
-Goal: determine the minimal number of API calls, download the minimal amount of data, do not download duplicates of the data.
+If there is, we can merge the row requests, and later on, delete the extra data we do not need if there is data that is just needed at a coarser resolution. If there is not, each row will correspond to an API call to CDS.
 
+The overlap needs to be strictly for both location and time range. If only one of these dimensions overlap, creating calls for each one individually downloads less data overall and thus is more efficient.
 
+To condense the user input we:
+
+1. Create an empty table, `api_calls`, that will be used to generate the API calls.
+2. Create an empty table, `to_delete`, that will be used to prune the dataset after aggregation.
+3. Group rows by variable.
+4. For each variable, determine if any time ranges overlap.
+5. For the rows whose time ranges overlap, determine if any latitude and longitude ranges overlap.
+6. If any rows overlap in location as well as time, create a new row in `api_calls` for the current variable, the minimum and maximum time of all the rows as the start and end time respectively, and the minimum bounding rectangle (MBR) that contains all the location ranges of the overlapping rows as the location range. Additionally, add the overlapping rows to the `to_delete` table. These will be used to determine what data needs to be deleted.
+7. Rows that do not overlap with others are added with their own time range and location range to the `api_calls` table.
+
+To consider in the future:
+* What if there are identical rows for different variables?
+* When there is location overlap, make it so you query only the necessary locations rather than the MBR (this will take some rectangle overlap calculations).
 
 #### Generating API calls
 
@@ -70,6 +86,12 @@ Goal: determine the minimal number of API calls, download the minimal amount of 
 #### Downloaded data
 
 #### Aggregating data
+
+Temporal Aggregation:
+
+
+Spatial Aggregation:
+
 
 #### Pruning local data
 
