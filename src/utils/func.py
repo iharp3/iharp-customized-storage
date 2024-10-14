@@ -179,11 +179,13 @@ def delete_files(names_csv, folder_path):
                 if not matching_files:
                     print(f"No files matched the pattern: {file_pattern}")
 
-def aggregation(input_csv, folder_path, dimension='temporal'):
+def aggregation(input_csv, input_folder_path, output_folder_path, dimension='temporal'):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
 
-        folder_path (str) - path to folder where new files
+        input_folder_path (str) - folder where the raw files are stored
+
+        output_folder_path (str) - folder where new files will be put
 
         dimension (str) - 'temporal' if aggregating in the temporal dimension, 
                           'spatial' if aggregating in the spatial dimension
@@ -194,4 +196,14 @@ def aggregation(input_csv, folder_path, dimension='temporal'):
     a new file with name pattern: temporal='agg_id_<temporal aggregation>.nc
                                   spatial='agg_id_<temporal aggregation>_<spatial aggregation>.nc
     '''
-    pass
+    with open(input_csv, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            file_name = row[col_name['path']]
+            file_path = os.path.join(input_folder_path, file_name)
+            if dimension == 'spatial':
+                agg_dim = row[col_name['s_res']]
+            else:
+                agg_dim = row[col_name['t_res']]
+            
+            
