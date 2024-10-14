@@ -17,17 +17,17 @@ from datetime import datetime
 
 from utils.const import (
                         V_ZERO_USER_INPUT_FILE_PATH, 
-                        RAW_DATA_PATH, 
-                        AGG_DATA_PATH,
-                        col_name,
+                        TEMPORAL_DELETES_CSV_FILE_PATH,
+                        SPATIAL_DELETES_CSV_FILE_PATH,
+                        RAW_DATA_PATH,
+                        AGG_DATA_PATH
                         )
 
 from utils.func import (
-                        download_data_from_csv
+                        download_data_from_csv,
+                        files_to_delete,
+                        delete_files,
                        )
-
-'''Upload user input csv'''
-user_input_df = pd.read_csv(V_ZERO_USER_INPUT_FILE_PATH)
 
 ''' Download data with API calls'''
 if __name__ == "__main__":
@@ -35,6 +35,18 @@ if __name__ == "__main__":
     download_data_from_csv(V_ZERO_USER_INPUT_FILE_PATH)
 
 ''' Process data'''
+files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, TEMPORAL_DELETES_CSV_FILE_PATH) # TODO: could add before download_data_from_csv in if statement
+files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, 'spatial') # TODO: same as above
 
+# Aggregate files temporally
+
+
+# Delete files in temporal_files_to_delete
+delete_files(TEMPORAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
+
+# Aggregate remaining files spatially and RENAME to include spatial files
+
+# Delete files in spatial_files_to_delete
+delete_files(SPATIAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
 
 ''' Store data and get metadata '''

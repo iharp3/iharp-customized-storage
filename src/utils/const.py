@@ -24,6 +24,8 @@ Author: Ana Uribe
 V_ZERO_USER_INPUT_FILE_PATH = "//export/scratch/iharp-custumized-storage/data/v0_user_input.csv"
 RAW_DATA_PATH = "/export/scratch/iharp-custumized-storage/data/raw/"
 AGG_DATA_PATH = "/export/scratch/iharp-custumized-storage/data/agg/"
+TEMPORAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
+SPATIAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
