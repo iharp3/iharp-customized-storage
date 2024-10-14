@@ -16,8 +16,8 @@ AGG_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/agg/"
 
 USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/user_input.csv"
 
-# V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/v0_user_input.csv"
-V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/test.csv"
+V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/v0_user_input.csv"
+# V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/test.csv"    # worked!
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
