@@ -101,4 +101,6 @@ def download_data_from_csv(csv_file):
             
             # Download the data
             print(f"Downloading {variable} data for {start_year}-{end_year} to {file_path}")
-            client.retrieve(dataset, request).download(file_path)
+
+            # client.retrieve(dataset, request).download(file_path)   # have to click download button on website
+            client.retrieve(dataset, request, file_path)
