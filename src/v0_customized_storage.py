@@ -26,7 +26,8 @@ from utils.const import (
 from utils.func import (
                         download_data_from_csv,
                         files_to_delete,
-                        delete_files,
+                        names_to_delete,
+                        # delete_files,
                        )
 
 ''' Download data with API calls'''
@@ -42,11 +43,11 @@ if __name__ == "__main__":
 
 
     # Delete files in temporal_files_to_delete
-    delete_files(TEMPORAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
+    names_to_delete(TEMPORAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
 
     # Aggregate remaining files spatially and RENAME to include spatial files
 
     # Delete files in spatial_files_to_delete
-    delete_files(SPATIAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
+    names_to_delete(SPATIAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
 
     ''' Store data and get metadata '''

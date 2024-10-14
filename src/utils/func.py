@@ -63,13 +63,27 @@ def get_location_range_ids(df):
 
         t_range_df = df[df[col_name['t_r_id']] == r]
 
-def generate_year_range(start_year, end_year):
+def get_year_range(start_year, end_year):
     '''
     IN: start_year, end_year (str?) - year range that need to be downloaded
 
     OUT: (list) - list of strings with range of all years needed
     '''
     return [str(i) for i in range(int(start_year), int(end_year) + 1)]
+
+def get_list_of_files_in_folder(folder_path):
+    '''
+    IN: folder_path (str) - path to folder where you want all your 
+
+    OUT: list_of_files (list) - list of all the file paths (full paths) in the folder
+    '''
+    list_of_files = []
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+        if os.path.isfile(file_path):
+            list_of_files.append()
+    
+    return list_of_files
 
 def download_data_from_csv(input_csv):
     '''
@@ -90,7 +104,7 @@ def download_data_from_csv(input_csv):
             file_path = row[col_name['path']]
 
             # Create year, month, day, and time ranges
-            year_range = generate_year_range(start_year, end_year)
+            year_range = get_year_range(start_year, end_year)
             month_range = api_request_settings['month']
             day_range = api_request_settings['day']
             time_range = api_request_settings['time']
@@ -157,7 +171,7 @@ def files_to_delete(input_csv, output_csv, resolution='temporal'):
                 # Write the 'id' and the file names as a comma-separated string
                 writer.writerow([id_number, ', '.join(file_names)])
 
-def delete_files(names_csv, folder_path):
+def names_to_delete(names_csv, folder_path):
     '''
     IN: names_csv (str) - file name of csv that has the names of files to delete
 
@@ -176,17 +190,25 @@ def delete_files(names_csv, folder_path):
                 file_pattern = os.path.join(folder_path, file_name)
                 matching_files = glob.glob(file_pattern)
 
-                for matched_file in matching_files:
-                    try:
-                        os.remove(matched_file)
-                        print(f"Deleted: {matched_file}")
-                    except OSError as e:
-                        print(f"Error deleting {matched_file}: {e}")
-
                 if not matching_files:
                     print(f"No files matched the pattern: {file_pattern}")
+                else:
+                    delete_files(matching_files)
 
-def aggregation(input_csv, input_folder_path, output_folder_path, dimension='temporal'):
+def delete_files(files_to_delete):
+    '''
+    IN: files_to_delete (list) - list of files to try to delete
+
+    Deletes files whose file paths are in files_to_delete list
+    '''
+    for file in files_to_delete:
+        try:
+            os.remove(file)
+            print(f"Deleted: {file}")
+        except OSError as e:
+            print(f"Error deleting {file}: {e}")
+
+def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
 
@@ -194,34 +216,50 @@ def aggregation(input_csv, input_folder_path, output_folder_path, dimension='tem
 
         output_folder_path (str) - folder where new files will be put
 
-        dimension (str) - 'temporal' if aggregating in the temporal dimension, 
-                          'spatial' if aggregating in the spatial dimension
-                          [default: 'temporal']
-
-    For every row in the csv file, get file name 'original_file_name' and aggregate data in this file.
-    For each aggregation (temporal={day, month, year}, spatial={0.5, 1}), aggregate the corresp. file and save to
-    a new file with name pattern: temporal='agg_<id>_<temporal aggregation>.nc' (where id comes from original_file_name)
-                                  spatial='agg_<id>_<temporal aggregation>_<spatial aggregation>.nc' (where id comes from original_file_name)
+    For every row in input_csv file, get file name 'original_file_name' and aggregate data in this file.
+    For each aggregation (temporal aggregation={day, month, year}), aggregate the corresp. file and save to
+    a new file with name pattern: 'agg_<id_number>_<temporal aggregation>.nc' (where id_number comes from original_file_name)
     '''
     with open(input_csv, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
             original_file_name = row[col_name['path']]
             finest_file_path = os.path.join(input_folder_path, original_file_name)
+            # assuming original_file_name has 'raw_<id_number>.nc' structure
+            id_number = original_file_name.split('_')[-1].split('.')[0]
 
-            if dimension == 'spatial':
-                # # create new file names for agg data
-                # file_050 = os.path.join(output_folder_path, f'agg_{id_number}_')
-                # # aggregate data in file_path
-                # get_res050(file_path, )
-                pass
-            else:
-                id_number = original_file_name.split('_')[-1].split('.')[0]
-                file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')    # new file name
-                get_res_d(finest_file_path, file_d)
+            file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')    # new file name
+            get_res_d(finest_file_path, file_d)
+            print(f'Aggregated data from {original_file_name} into daily resolution.\nSaving to {file_d}.')
 
-                file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
-                get_res_m(file_d, file_m)
+            file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
+            get_res_m(file_d, file_m)
+            print(f'Aggregated data from {original_file_name} into monthly resolution.\nSaving to {file_m}.')
 
-                file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
-                get_res_y(file_m, file_y)
+            file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
+            get_res_y(file_m, file_y)
+            print(f'Aggregated data from {original_file_name} into yearly resolution.\nSaving to {file_y}.')
+
+def spatial_aggregation(folder_path):
+    '''
+    IN: input_csv (str) - file name of csv that has the initial user input
+
+        folder_path (str) - folder where temporally aggregated files are stored
+
+    For all file_paths in folder, for each aggregation (spatial aggregation ={0.5, 1}), aggregate the file and save to
+    a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path)
+    '''
+    # TODO: decide if putting all files (raw and agg) in same folder or if going thorugh next loop for the raw folder and the agg folder.
+    temporal_files = get_list_of_files_in_folder(folder_path)   
+    for file_path in temporal_files:
+        # assuming file path has '*/*_<id_number>_<temporal_aggregation>.nc' structure
+        id_number = file_path.split('_')[-2]
+        temporal_aggregation = file_path.split('_')[-1].split('.')[0]
+
+        file_050 = os.path.join(folder_path, f'agg_{id_number}_{temporal_aggregation}_050.nc')
+        get_res_050(file_path, file_050)
+        print(f'Aggregated data form {file_path} into 0.5 degree spatial resolution.\nSaving to {file_050}.')
+
+        file_100 = os.path.join(folder_path, f'agg_{id_number}_{temporal_aggregation}_100.nc')
+        get_res_100(file_path, file_100)
+        print(f'Aggregated data form {file_path} into 1.0 degree spatial resolution.\nSaving to {file_100}.')
