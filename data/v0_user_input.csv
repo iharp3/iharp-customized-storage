@@ -1,4 +1,4 @@
-variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resolution,spatial_resolution,file_path
+variable,max_lat,min_lat,max_long,min_long,start_year,end_year,temporal_resolution,spatial_resolution,file_path
 2m_temperature,-30,-40,40,30,2003,2003,year,1,raw_1.nc
 2m_temperature,10,0,0,-20,2021,2023,day,0.5,raw_2.nc
 2m_temperature,30,10,-30,-40,2016,2018,hour,0.25,raw_3.nc
