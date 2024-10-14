@@ -28,7 +28,8 @@ This repository focuses on:
 ### Instructions:
 To get from the user input to the downloaded data, these are the steps to follow:
 
-1.
+1. In `const.py`: update `V_ZERO_USER_INPUT_FILE_PATH` variable to the file path of the user input.
+2. Run `v0_customized_storage.py`
 
 #### Getting user input
 
