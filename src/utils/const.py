@@ -11,13 +11,19 @@ Author: Ana Uribe
 
 # USER_INPUT_FILE_PATH = "/data/customized/user_input.csv"
 
-RAW_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/raw/"
-AGG_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/agg/"
+'''------------------------------------------------------------------ paths for computer 516'''
+# RAW_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/raw/"
+# AGG_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/agg/"
 
-USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/user_input.csv"
+# USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/user_input.csv"
 
-V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/v0_user_input.csv"
-# V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/test.csv"    # worked!
+# V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/v0_user_input.csv"
+# # V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/test.csv"    # worked!
+
+'''------------------------------------------------------------------ paths for computer 501'''
+V_ZERO_USER_INPUT_FILE_PATH = "//export/scratch/iharp-custumized-storage/data/v0_user_input.csv"
+RAW_DATA_PATH = "/export/scratch/iharp-custumized-storage/data/raw/"
+AGG_DATA_PATH = "/export/scratch/iharp-custumized-storage/data/agg/"
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
