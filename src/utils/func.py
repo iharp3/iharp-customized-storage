@@ -18,7 +18,7 @@ from utils.const import col_name, api_request_settings
 def get_time_range_ids(df):
     '''
     IN: df (pandas data frame) - rows with start and end datetimes
-    
+
     OUT: df (pandas data frame) - df with new range_id col
     '''
     s = col_name['start_t']
@@ -178,3 +178,20 @@ def delete_files(names_csv, folder_path):
                         print(f"Error deleting {matched_file}: {e}")
                 if not matching_files:
                     print(f"No files matched the pattern: {file_pattern}")
+
+def aggregation(input_csv, folder_path, dimension='temporal'):
+    '''
+    IN: input_csv (str) - file name of csv that has the initial user input
+
+        folder_path (str) - path to folder where new files
+
+        dimension (str) - 'temporal' if aggregating in the temporal dimension, 
+                          'spatial' if aggregating in the spatial dimension
+                          [default: 'temporal']
+
+    For every row in the csv file, get file name 'finest_file' and aggregate data in this file.
+    For each aggregation (temporal={day, month, year}, spatial={0.5, 1}), aggregate the corresp. file and save to
+    a new file with name pattern: temporal='agg_id_<temporal aggregation>.nc
+                                  spatial='agg_id_<temporal aggregation>_<spatial aggregation>.nc
+    '''
+    pass
