@@ -1,2 +1,11 @@
-variable ,max_lat,min_lat,max_long,min_long,,,start_year,start_month,start_day,start_time,end_year,end_month,end_day,end_time,file_path
-2m_temperature,30,20,30,20,1-1-2020,1-1-2023,2020,1,1,0:00,2023,1,1,24:00:00,raw_1.nc
+variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resolution,spatial_resolution,file_path
+temperature,-30,-40,40,30,2003,2003,year,1,raw_1.nc
+temperature,10,0,0,-20,2021,2023,day,0.5,raw_2.nc
+temperature,30,10,-30,-40,2016,2018,hour,0.25,raw_3.nc
+temperature,10,-10,-30,-40,2007,2009,month,0.5,raw_4.nc
+temperature,40,20,10,-10,2009,2011,year,0.25,raw_5.nc
+temperature,10,0,20,0,2020,2021,month,1,raw_6.nc
+temperature,40,10,40,20,2023,2023,day,0.5,raw_7.nc
+temperature,20,0,10,-10,2020,2022,hour,0.25,raw_8.nc
+temperature,40,10,-10,-40,2017,2020,hour,0.25,raw_9.nc
+temperature,40,20,30,0,2008,2010,hour,0.25,raw_10.nc
