@@ -131,11 +131,13 @@ def download_data_from_csv(input_csv):
             # client.retrieve(dataset, request).download(file_path)   # have to click download button on website
             client.retrieve(dataset, request, file_path)
 
-def files_to_delete(input_csv, output_csv, resolution='temporal'):
+def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal'):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
 
         output_csv (str) - file name of csv that will be created that will have file names of files to delete
+
+        output_folder (str) - path to folder where files to delete will be
 
         resolution (str) - type of resolution that is being pruned [default: 'temporal']
     '''
@@ -152,61 +154,42 @@ def files_to_delete(input_csv, output_csv, resolution='temporal'):
                 if resolution == 'spatial':
                     # Add file names based on the 'spatial_resolution' value
                     if row['spatial_resolution'] == '0.5':
-                        file_names.append(f'agg_{id_number}_*_025.nc')
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_025.nc'))
                     elif row['spatial_resolution'] == '1':
-                        file_names.append(f'agg_{id_number}_*_025.nc')
-                        file_names.append(f'agg_{id_number}_*_050.nc')
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_025.nc'))
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_050.nc'))
                 else:
                     # Add file names based on the 'temporal_resolution' value
                     if row['temporal_resolution'] == 'day':
-                        file_names.append(f'agg_{id_number}_hour.nc')
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
                     elif row['temporal_resolution'] == 'month':
-                        file_names.append(f'agg_{id_number}_hour.nc')
-                        file_names.append(f'agg_{id_number}_day.nc')
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
                     elif row['temporal_resolution'] == 'year':
-                        file_names.append(f'agg_{id_number}_hour.nc')
-                        file_names.append(f'agg_{id_number}_day.nc')
-                        file_names.append(f'agg_{id_number}_month.nc')
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_month.nc'))
 
                 # Write the 'id' and the file names as a comma-separated string
                 writer.writerow([id_number, ', '.join(file_names)])
 
-def names_to_delete(names_csv, folder_path):
-    '''
-    IN: names_csv (str) - file name of csv that has the names of files to delete
-
-        folder_path (str) - path to folder where files to be deleted can be found
-
-    Deletes the files whose names are listed in the input_csv
-    '''
-    with open(names_csv, mode='r') as file:
-        reader = csv.reader(file)
-        next(reader)  # Skip the header row
-        for row in reader:
-            # The second column contains the file names as a comma-separated string
-            file_names = row[1].split(', ')
-
-            for file_name in file_names:
-                file_pattern = os.path.join(folder_path, file_name)
-                matching_files = glob.glob(file_pattern)
-
-                if not matching_files:
-                    print(f"No files matched the pattern: {file_pattern}")
-                else:
-                    delete_files(matching_files)
-
 def delete_files(files_to_delete):
     '''
-    IN: files_to_delete (list) - list of files to try to delete
+    IN: files_to_delete (list) - list of files (with their full path) to try to delete
 
     Deletes files whose file paths are in files_to_delete list
     '''
     for file in files_to_delete:
-        try:
-            os.remove(file)
-            print(f"Deleted: {file}")
-        except OSError as e:
-            print(f"Error deleting {file}: {e}")
+        matching_files = glob.glob(file)
+        if not matching_files:
+            print(f"No files matched the pattern: {file}")
+        else:
+            for match in matching_files:
+                try:
+                    os.remove(match)
+                    print(f"Deleted: {match}")
+                except OSError as e:
+                    print(f"Error deleting {match}: {e}")
 
 def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
     '''
