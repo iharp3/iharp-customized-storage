@@ -20,7 +20,12 @@ V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-custumized-storage/data/v0_
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
-    "data_format": "netcdf"
+    "product_type": ["reanalysis"],
+    "data_format": "netcdf",
+    "download_format": "unarchived",
+    "month": [str(i).zfill(2) for i in range(1, 13)],
+    "day": [str(i).zfill(2) for i in range(1, 32)],
+    "time":[f"{str(i).zfill(2)}:00" for i in range(0, 24)]
 }
 
 long_short_name_dict = {
