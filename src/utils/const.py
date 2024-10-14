@@ -11,7 +11,7 @@ Author: Ana Uribe
 
 # USER_INPUT_FILE_PATH = "/data/customized/user_input.csv"
 
-'''------------------------------------------------------------------ paths for computer 516'''
+'''------------------------------------------------------------------ paths for computer 515'''
 # RAW_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/raw/"
 # AGG_DATA_PATH = "/home/uribe055/iharp-custumized-storage/data/agg/"
 
