@@ -14,6 +14,8 @@ import os
 import glob
 
 from utils.const import col_name, api_request_settings
+from utils.temporal_aggregation import get_res_d, get_res_m, get_res_y
+from utils.spatial_aggregation import get_res_050, get_res_100
 
 def get_time_range_ids(df):
     '''
@@ -132,6 +134,7 @@ def files_to_delete(input_csv, output_csv, resolution='temporal'):
                 file_path = row['file_path']
                 id_number = file_path.split('_')[-1].split('.')[0]
                 file_names = []
+
                 if resolution == 'spatial':
                     # Add file names based on the 'spatial_resolution' value
                     if row['spatial_resolution'] == '0.5':
@@ -150,6 +153,7 @@ def files_to_delete(input_csv, output_csv, resolution='temporal'):
                         file_names.append(f'agg_{id_number}_hour.nc')
                         file_names.append(f'agg_{id_number}_day.nc')
                         file_names.append(f'agg_{id_number}_month.nc')
+
                 # Write the 'id' and the file names as a comma-separated string
                 writer.writerow([id_number, ', '.join(file_names)])
 
@@ -167,15 +171,18 @@ def delete_files(names_csv, folder_path):
         for row in reader:
             # The second column contains the file names as a comma-separated string
             file_names = row[1].split(', ')
+
             for file_name in file_names:
                 file_pattern = os.path.join(folder_path, file_name)
                 matching_files = glob.glob(file_pattern)
+
                 for matched_file in matching_files:
                     try:
                         os.remove(matched_file)
                         print(f"Deleted: {matched_file}")
                     except OSError as e:
                         print(f"Error deleting {matched_file}: {e}")
+
                 if not matching_files:
                     print(f"No files matched the pattern: {file_pattern}")
 
@@ -191,19 +198,30 @@ def aggregation(input_csv, input_folder_path, output_folder_path, dimension='tem
                           'spatial' if aggregating in the spatial dimension
                           [default: 'temporal']
 
-    For every row in the csv file, get file name 'finest_file' and aggregate data in this file.
+    For every row in the csv file, get file name 'original_file_name' and aggregate data in this file.
     For each aggregation (temporal={day, month, year}, spatial={0.5, 1}), aggregate the corresp. file and save to
-    a new file with name pattern: temporal='agg_id_<temporal aggregation>.nc
-                                  spatial='agg_id_<temporal aggregation>_<spatial aggregation>.nc
+    a new file with name pattern: temporal='agg_<id>_<temporal aggregation>.nc' (where id comes from original_file_name)
+                                  spatial='agg_<id>_<temporal aggregation>_<spatial aggregation>.nc' (where id comes from original_file_name)
     '''
     with open(input_csv, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            file_name = row[col_name['path']]
-            file_path = os.path.join(input_folder_path, file_name)
+            original_file_name = row[col_name['path']]
+            finest_file_path = os.path.join(input_folder_path, original_file_name)
+
             if dimension == 'spatial':
-                agg_dim = row[col_name['s_res']]
+                # # create new file names for agg data
+                # file_050 = os.path.join(output_folder_path, f'agg_{id_number}_')
+                # # aggregate data in file_path
+                # get_res050(file_path, )
+                pass
             else:
-                agg_dim = row[col_name['t_res']]
-            
-            
+                id_number = original_file_name.split('_')[-1].split('.')[0]
+                file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')    # new file name
+                get_res_d(finest_file_path, file_d)
+
+                file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
+                get_res_m(file_d, file_m)
+
+                file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
+                get_res_y(file_m, file_y)

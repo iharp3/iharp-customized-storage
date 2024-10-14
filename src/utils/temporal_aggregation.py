@@ -8,3 +8,12 @@ DESCRIPTION: Contains functions used in func.py that aggregate data from
              FUTURE: Aggregation function code comes from Yuchuan Huang's code for quick aggregation (prev. in iharp-quick-aggregation GitHub repo).
 Author: Ana Uribe
 '''
+
+def get_res_d(file, agg_file_name):
+    pass
+
+def get_res_m(file, agg_file_name):
+    pass
+
+def get_res_y(file, agg_file_name):
+    pass
