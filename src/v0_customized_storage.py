@@ -37,7 +37,7 @@ if __name__ == "__main__":
     files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH, resolution='spatial') 
 
 #     ''' Download data with API calls'''
-# #     download_data_from_csv(V_ZERO_USER_INPUT_FILE_PATH)
+    download_data_from_csv(V_ZERO_USER_INPUT_FILE_PATH)
 
 #     ''' Process data'''
 #     # Aggregate files temporally
