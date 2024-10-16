@@ -147,25 +147,25 @@ def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal')
             writer = csv.writer(outfile)
             writer.writerow(['id', 'file_names'])
             for row in reader:
-                file_path = row['file_path']
+                file_path = row[col_name['path']]
                 id_number = file_path.split('_')[-1].split('.')[0]
                 file_names = []
 
                 if resolution == 'spatial':
                     # Add file names based on the 'spatial_resolution' value
-                    if row['spatial_resolution'] == '0.5':
+                    if row[col_name['s_res']] == '0.5':
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_025.nc'))
-                    elif row['spatial_resolution'] == '1':
+                    elif row[col_name['s_res']] == '1':
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_025.nc'))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_050.nc'))
                 else:
                     # Add file names based on the 'temporal_resolution' value
-                    if row['temporal_resolution'] == 'day':
+                    if row[col_name['t_res']] == 'day':
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
-                    elif row['temporal_resolution'] == 'month':
+                    elif row[col_name['t_res']] == 'month':
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
-                    elif row['temporal_resolution'] == 'year':
+                    elif row[col_name['t_res']] == 'year':
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_month.nc'))
