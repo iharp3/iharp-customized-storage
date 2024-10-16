@@ -97,7 +97,11 @@ def download_data_from_csv(input_csv):
             variable = row[col_name['var']]
             max_lat, min_lat = row[col_name['max_lat']], row[col_name['min_lat']]
             max_long, min_long = row[col_name['max_long']], row[col_name['min_long']]
-            start_year, end_year = row[col_name['s_y']], row[col_name['e_y']]
+            
+            # v0: years in v0_user_input.csv are in cols start_time and end_time
+            start_year, end_year = row[col_name['s_t']], row[col_name['e_t']]
+
+            # start_year, end_year = row[col_name['s_y']], row[col_name['e_y']]
             # start_month, end_month = row[col_name['s_m']], row[col_name['e_m']]
             # start_day, end_day = row[col_name['s_d']], row[col_name['e_d']]
             # start_time, end_time = row[col_name['s_t']], row[col_name['e_t']]

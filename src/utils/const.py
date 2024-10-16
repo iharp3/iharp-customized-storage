@@ -5,28 +5,28 @@ DESCRIPTION: Contains constant values that are used in customized_storage.py
 
 Author: Ana Uribe
 '''
+cluster_501 = False
 
-# RAW_DATA_PATH = "/data/customized/raw/"
-# AGG_DATA_PATH = "/data/customized/agg/"
+if not cluster_501:
+    '''------------------------------------------------------------------ paths for computer 515'''
+    RAW_DATA_PATH = "/home/uribe055/iharp-customized-storage/data/raw/"
+    AGG_DATA_PATH = "/home/uribe055/iharp-customized-storage/data/agg/"
 
-# USER_INPUT_FILE_PATH = "/data/customized/user_input.csv"
+    USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/user_input.csv"
+    V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/v0_user_input.csv"
+    # V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/test.csv"    # worked!
 
-'''------------------------------------------------------------------ paths for computer 515'''
-RAW_DATA_PATH = "/home/uribe055/iharp-customized-storage/data/raw/"
-AGG_DATA_PATH = "/home/uribe055/iharp-customized-storage/data/agg/"
+    TEMPORAL_DELETES_CSV_FILE_PATH = "/home/uribe055/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
+    SPATIAL_DELETES_CSV_FILE_PATH = "/home/uribe055/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
+else:
+    '''------------------------------------------------------------------ paths for computer 501'''
+    RAW_DATA_PATH = "/export/scratch/iharp-customized-storage/data/raw/"
+    AGG_DATA_PATH = "/export/scratch/iharp-customized-storage/data/agg/"
 
-USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/user_input.csv"
-V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/v0_user_input.csv"
-# V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/test.csv"    # worked!
+    V_ZERO_USER_INPUT_FILE_PATH = "//export/scratch/iharp-customized-storage/data/v0_user_input.csv"
 
-TEMPORAL_DELETES_CSV_FILE_PATH = "/home/uribe055/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
-SPATIAL_DELETES_CSV_FILE_PATH = "/home/uribe055/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
-'''------------------------------------------------------------------ paths for computer 501'''
-# V_ZERO_USER_INPUT_FILE_PATH = "//export/scratch/iharp-customized-storage/data/v0_user_input.csv"
-# RAW_DATA_PATH = "/export/scratch/iharp-customized-storage/data/raw/"
-# AGG_DATA_PATH = "/export/scratch/iharp-customized-storage/data/agg/"
-# TEMPORAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
-# SPATIAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
+    TEMPORAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
+    SPATIAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",

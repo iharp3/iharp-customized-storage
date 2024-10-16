@@ -33,8 +33,8 @@ from utils.func import (
 if __name__ == "__main__":
     
     ''' Determine data that can be pruned from user input '''
-    files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, TEMPORAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH) # TODO: could add before download_data_from_csv in if statement
-    files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH, resolution='spatial') # TODO: same as above 
+    files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, TEMPORAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH)
+    files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH, resolution='spatial') 
 
 #     ''' Download data with API calls'''
 # #     download_data_from_csv(V_ZERO_USER_INPUT_FILE_PATH)
