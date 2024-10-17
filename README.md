@@ -23,9 +23,9 @@ This repository focuses on:
 - [User Input to Data](#user-input-to-data): Taking in the user input and determining the necessary data that needs to be downloaded.
 - [Data to Customized Storage](#data-to-customized-storage): Creating the customized storage with aggregated data.
 
-## User Input to Data
+## User Input to Customized Storage
 
-### Instructions:
+#### Instructions:
 To get from the user input to the downloaded data, these are the steps to follow:
 
 1. In `const.py`: update `V_ZERO_USER_INPUT_FILE_PATH` variable to the file path of the user input.
@@ -72,7 +72,7 @@ If there is, we can merge the row requests, and later on, delete the extra data 
 
 The overlap needs to be strictly for both location and time range. If only one of these dimensions overlap, creating calls for each one individually downloads less data overall and thus is more efficient.
 
-#### Generating API calls
+#### Generating API calls and downloading data
 **Current:** 
 For each row of the user input, we generate one API call. 
 
@@ -86,14 +86,14 @@ We have the following API call:
     dataset = api_request_settings['dataset']
                 request = {
                     'product_type': api_request_settings['product_type'],
-                    'variable': [row['variable'],
+                    'variable': [row['variable']],
                     'year': [2003],
                     'month': api_request_settings['month'],
                     'day': api_request_settings['day'],
                     'time': api_request_settings['time'],
                     'data_format': api_request_settings['data_format'],
                     'download_format': api_request_settings['download_format'],
-                    'area': [row['max_lat'], row['min_long'], row['min_lat'], row['max_long']]  # Order: [N, W, S, E]
+                    'area': [row['max_lat'], row['min_long'], row['min_lat'], row['max_long']] Order: [N, W, S, E]
                 }
                 
                 client = cdsapi.Client()
@@ -102,32 +102,109 @@ We have the following API call:
 where `row` is the example row, so the `row['variable']` corresponds to the value in the 'variable' column of the row, etc., and the `api_request_settings` dictionary is the following:
 
       api_request_settings = {
-      "dataset": "reanalysis-era5-single-levels",
-      "product_type": ["reanalysis"],
-      "data_format": "netcdf",
-      "download_format": "unarchived",
-      "month": [str(i).zfill(2) for i in range(1, 13)],
-      "day": [str(i).zfill(2) for i in range(1, 32)],
-      "time":[f"{str(i).zfill(2)}:00" for i in range(0, 24)]
-      }
-#### Downloading data
+                                "dataset": "reanalysis-era5-single-levels",
+                                "product_type": ["reanalysis"],
+                                "data_format": "netcdf",
+                                "download_format": "unarchived",
+                                "month": [str(i).zfill(2) for i in range(1, 13)],
+                                "day": [str(i).zfill(2) for i in range(1, 32)],
+                                "time":[f"{str(i).zfill(2)}:00" for i in range(0, 24)]
+                             }
+
+This downloads all the data asked for in the user input to our local storage, where it is ready to be processed. Each API call downloads one file unless the data requested is too large. For now, assume that each call produces one file, so each row in the user input has the corresponding data in the given file name.
+
+#### Creating customized storage
+When all the data is downloaded, we need to aggregate and prune it to create our customized storage. Below is a table of the data we compute for each downloaded file.
+
+|                   |  Computed Resolutions (Aggregations) |                                   Statistics Calculated                                  |
+|:-----------------:|:------------------------------------:|:----------------------------------------------------------------------------------------:|
+|      Temporal     | Hourly (raw), Daily, Monthly, Yearly | minimum, maximum, mean at each resolution, and the minimum and maximum of the whole file |
+| Spatial (degrees) |         0.25 (raw), 0.5, 1.0         | minimum, maximum, mean at each resolution, and the minimum and maximum of the whole file |
+
+For every desired subset of the data, we keep all coarser resolutions and prune the finer resolutions. For example, if a subset is needed at a monthly resolution, we delete the hourly and daily aggregations and keep the monthly and yearly ones. If a subset of the data is needed at the 0.5 degree resolution, we delete the 0.25 degree resolution and keep the 1.0 degree aggregation. 
+
+#### Aggregating temporal data
+We first aggregate all the data temporally, calculating the daily minimum, maximum, and mean from the raw (hourly) data, then the monthly minimum, maximum, and mean aggregation from the daily resolution, and finally the same statistics for the yearly resolution. Additionally (to increase scan speed), we save the maximum and minimum values of each file.
+
 **Currently:**
-We download the data to our local storage.
+Each aggregation is saved in a separate file with the following naming convention:
 
-## Data to Customized Storage
+`agg_<file path>_<temporal resolution>.nc`
 
-#### Downloaded data
-
-#### Aggregating data
-
-Temporal Aggregation:
-
-
-Spatial Aggregation:
-
+where `file path` is determined by the file assigned to the raw data, and `temporal resolution` is either `day, month`, or `year`.
 
 #### Pruning local data
 
+Once we have all the data at all the temporal resolutions, we can prune what we don't need.
+
+**Currently:**
+We determine what we do not need using the user input file, where the desired spatial and temporal resolutions for each row are specified. We take this information and determine the names of the aggregated files that can be deleted. Below is an example of the files that can be deleted for the first row in the example user input above.
+
+| id | file_names                                           |
+|----|------------------------------------------------------|
+| 1  |   agg_1_hour.nc,   agg_1_day.nc,   agg_1_month.nc    |
+<!-- | 2  |   agg_2_hour.nc                                      |
+| 3  |                                                      |
+| 4  |   agg_4_hour.nc,   agg_4_day.nc                      |
+| 5  |   agg_5_hour.nc,   agg_5_day.nc,   agg_5_month.nc    |
+| 6  |   agg_6_hour.nc,   agg_6_day.nc                      |
+| 7  |   agg_7_hour.nc                                      |
+| 8  |                                                      |
+| 9  |                                                      |
+| 10 |                                                      |
+| 11 |   agg_11_hour.nc,   agg_11_day.nc,   agg_11_month.nc |
+| 12 |   agg_12_hour.nc,   agg_12_day.nc                    |
+| 13 |   agg_13_hour.nc                                     |
+| 14 |                                                      |
+| 15 |   agg_15_hour.nc,   agg_15_day.nc,   agg_15_month.nc |
+| 16 |   agg_16_hour.nc,   agg_16_day.nc                    |
+| 17 |   agg_17_hour.nc                                     |
+| 18 |                                                      |
+|    |                                                      | -->
+
+Since row 1 asks for a yearly resolution, so we delete all the coarser resolutions.
+
+#### Aggregating spatial data
+Once we have pruned the data in terms of the temporal aggregation, we  calculate the coarser spatial resolutions of the remaining data. This is often called "re-gridding". To increase scan speed, we save the maximum and minimum values of each file.
+
+**Currently:**
+Like the temporal resolutions, each aggregation is saved in a separate file with the following naming convention:
+
+`agg_<file path>_<temporal resolution>_<spatial resolution>.nc`
+
+where `file path` is determined by the file assigned to the raw data, `temporal resolution` is the temporal resolution of the file, and `spatial resolution` is either 0.5 or 1.0 degrees.
+
+#### Pruning local data (part 2)
+
+Once we have all the temporaly aggregated data at all the spatial resolutions, we can prune what we don't need.
+
+**Currently:**
+We determine what we do not need using the user input file, where the desired spatial and temporal resolutions for each row are specified. We take this information and determine the names of the aggregated files that can be deleted. Below is an example of the files that can be deleted for the first row in the example user input above.
+
+| id | file_names                         |
+|----|------------------------------------|
+| 1  |  agg_1_\*\_025.nc,  agg_1_*_050.nc   |
+<!-- | 2  |  agg_2_*_025.nc                    |
+| 3  |                                    |
+| 4  |  agg_4_*_025.nc                    |
+| 5  |                                    |
+| 6  |  agg_6_\*\_025.nc,  agg_6_*_050.nc   |
+| 7  |  agg_7_*_025.nc                    |
+| 8  |                                    |
+| 9  |                                    |
+| 10 |                                    |
+| 11 |  agg_11_\*\_025.nc,  agg_11_*_050.nc |
+| 12 |  agg_12_*_025.nc                   |
+| 13 |  agg_13_*_025.nc                   |
+| 14 |                                    |
+| 15 |  agg_15_\*\_025.nc,  agg_15_*_050.nc |
+| 16 |  agg_16_*_025.nc                   |
+| 17 |  agg_17_*_025.nc                   |
+| 18 |                                    | -->
+
+Since the first row asks for 1.0 degree resolutions, the 0.25 and 0.5 degree files can be delted. The `*` signify that all temporal resolutions that have this spatial resolution should be deleted.
+
 #### Final data and metadata
+Now we have a storage customized for the user interest.
 
-
+We also have the following metadata for each file:

@@ -1,4 +1,1 @@
-variable,resolution,max_latitude,min_latitude,max_longitude,min_longitude,start_time,end_time
-2m_temperature,day,80,45,0,-75,1-1-2020,31-6-2024
-2m_temperature,month,70,60,-15,-30,1-1-2022,31-12-2022
-2m_temperature,year,90,75,180,-180,1-1-2000,1-1-2023
+variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resolution,spatial_resolution,file_path
