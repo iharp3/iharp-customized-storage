@@ -33,26 +33,27 @@ from utils.func import (
 
 if __name__ == "__main__":
     
-    ''' Determine data that can be pruned from user input '''
-    
-    # files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, TEMPORAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH)
-    # files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH, resolution='spatial') 
+    ''' Determine data that can be pruned from user input ''' 
     files_to_delete(user_input_f, t_deletes_f, output_folder=raw_p)
     files_to_delete(user_input_f, s_deletes_f, output_folder=raw_p, resolution='spatial') 
 
     ''' Download data with API calls'''
-    # download_data_from_csv(V_ZERO_USER_INPUT_FILE_PATH)
+    # download_data_from_csv(user_input_f)
 
     ''' Process data'''
     # Aggregate all raw files temporally
 
 
     # Delete files in temporal_files_to_delete
-    # temp_files = delete_files(TEMPORAL_DELETES_CSV_FILE_PATH)
+    delete_files(t_deletes_f)
 
-    # Aggregate remaining files (temp_files) spatially
+    # Aggregate remaining files spatially
 
     # Delete files in spatial_files_to_delete
-    # spatio_temp_files = delete_files(SPATIAL_DELETES_CSV_FILE_PATH)
+    spatio_temp_files = delete_files(s_deletes_f)
 
     ''' Store data and get metadata '''
+    # TODO: get list of all files after deletion. these are ones you want to keep
+    #       the metadata file is all of them. 
+    #       add variable, location and time range to the metadata table...based on id_number??
+    #       

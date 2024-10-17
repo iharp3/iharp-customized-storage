@@ -7,6 +7,10 @@ Author: Ana Uribe
 '''
 
 def get_res_050(file, agg_file_name):
+    '''
+    IN: 
+    OUT: f_min, f_max (float??) - min and max value found in the file
+    '''
     pass
 
 def get_res_100(file, agg_file_name):

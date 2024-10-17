@@ -232,13 +232,19 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
 
 def spatial_aggregation(folder_path):
     '''
-    IN: input_csv (str) - file name of csv that has the initial user input
+    IN: folder_path (str) - folder where temporally aggregated files are stored
 
-        folder_path (str) - folder where temporally aggregated files are stored
+        csv_p (str) - full path of csv that will be created
+
+    OUT: metadata (list) - list with <id_number, temporal_aggregation, spatial_aggregation, file_min_value, file_max_value>
+                          for each file created 
 
     For all file_paths in folder, for each aggregation (spatial aggregation ={0.5, 1}), aggregate the file and save to
-    a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path)
+    a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path).
+    Additionally, create a CSV file with information about the created file.
     '''
+    metadata = []
+
     # TODO: decide if putting all files (raw and agg) in same folder or if going thorugh next loop for the raw folder and the agg folder.
     temporal_files = get_list_of_files_in_folder(folder_path)   
     for file_path in temporal_files:
@@ -247,9 +253,15 @@ def spatial_aggregation(folder_path):
         temporal_aggregation = file_path.split('_')[-1].split('.')[0]
 
         file_050 = os.path.join(folder_path, f'agg_{id_number}_{temporal_aggregation}_050.nc')
-        get_res_050(file_path, file_050)
+        f_min, f_max = get_res_050(file_path, file_050)
+        metadata.append([id_number, temporal_aggregation, '0.5', f_min, f_max, file_050 ])
+
         print(f'Aggregated data form {file_path} into 0.5 degree spatial resolution.\nSaving to {file_050}.')
 
         file_100 = os.path.join(folder_path, f'agg_{id_number}_{temporal_aggregation}_100.nc')
-        get_res_100(file_path, file_100)
+        f_min, f_max = get_res_100(file_path, file_100)
+        metadata.append([id_number, temporal_aggregation, '1.0', f_min, f_max, file_100 ])
+
         print(f'Aggregated data form {file_path} into 1.0 degree spatial resolution.\nSaving to {file_100}.')
+
+    return metadata
