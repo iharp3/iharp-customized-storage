@@ -17,11 +17,11 @@ import pandas as pd
 from datetime import datetime
 
 from utils.const import (
-                        raw_p,
-                        agg_p,
-                        user_input_f,
-                        t_deletes_f,
-                        s_deletes_f
+                        RAW_P,
+                        AGG_P,
+                        U_IN_F,
+                        T_DEL_F,
+                        S_DEL_F
                         )
 
 from utils.func import (
@@ -37,26 +37,30 @@ from utils.func import (
 if __name__ == "__main__":
     
     ''' Determine data that can be pruned from user input ''' 
-    files_to_delete(user_input_f, t_deletes_f, output_folder=raw_p)
-    files_to_delete(user_input_f, s_deletes_f, output_folder=raw_p, resolution='spatial') 
+    files_to_delete(U_IN_F, T_DEL_F, output_folder=RAW_P)
+    files_to_delete(U_IN_F, S_DEL_F, output_folder=AGG_P, resolution='spatial') 
 
     ''' Download data with API calls'''
-    # download_data_from_csv(user_input_f)
+    # download_data_from_csv(U_IN_F)
 
     ''' Process data'''
     # Aggregate all raw files temporally
-    temporal_aggregation(user_input_f, raw_p, raw_p)    # input and output folder paths both raw_p so we spatially aggregate hourly files too
+    temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
 
     # Delete files in temporal_files_to_delete
-    delete_files(t_deletes_f)
+    delete_files(T_DEL_F)
 
     # Aggregate remaining files spatially
+    all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P)   # output_folder_path should match output_folder in files_to_delete function
 
     # Delete files in spatial_files_to_delete
-    spatio_temp_files = delete_files(s_deletes_f)
+    delete_files(S_DEL_F)
 
     ''' Store data and get metadata '''
     # TODO: get list of all files after deletion. these are ones you want to keep
     #       the metadata file is all of them. 
     #       add variable, location and time range to the metadata table...based on id_number??
-    #       
+    to_keep = get_list_of_files_in_folder(AGG_P)
+
+    final_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
+    

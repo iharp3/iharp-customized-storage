@@ -10,13 +10,13 @@ import os
 home_dir = os.path.expanduser('~')
 repo = 'iharp-customized-storage'
 
-raw_p = os.path.join(home_dir, repo, 'data/raw')
-agg_p = os.path.join(home_dir, repo, 'data/agg')
+RAW_P = os.path.join(home_dir, repo, 'data/raw')
+AGG_P = os.path.join(home_dir, repo, 'data/agg')
 
-user_input_f = os.path.join(home_dir, repo, 'data/user_input.csv')
+U_IN_F = os.path.join(home_dir, repo, 'data/user_input.csv')
 
-t_deletes_f = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
-s_deletes_f = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')
+T_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
+S_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
