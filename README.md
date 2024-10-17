@@ -208,3 +208,29 @@ Since the first row asks for 1.0 degree resolutions, the 0.25 and 0.5 degree fil
 Now we have a storage customized for the user interest.
 
 We also have the following metadata for each file:
+* All the information from the user input row: variable, location range, time range.
+* File path (simplified to file name here)
+* File minimum and maximum values
+
+For example, the output metadata for the first and second rows of the user input is shown below. 
+
+For row 1, which asked for yearly and 1.0 degree resolution, we only have one file where the data is aggregated to the coarsest values.
+
+For row 2, which asked for daily and 0.5 degree resolution, we have
+* Daily, monthly, and yearly resolutions at a 0.5 degree spatial resolution
+* Daily, monthly, and yearly resolutions at a 1.0 degree spatial resolution
+
+| Corresp. to user input row | variable       | max_lat | min_lat | max_long | min_long | start_time | end_time | temporal_resolution | spatial_resolution | file_path          | file_min | file_max |
+|----------------------------|----------------|---------|---------|----------|----------|------------|----------|---------------------|--------------------|--------------------|----------|----------|
+| 1                          | 2m_temperature | -30     | -40     | 40       | 30       | 2003       | 2003     | year                | 1                  | agg_1_year_100.nc  |          |          |
+| 2                          | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | day                 | 0.5                | agg_2_day_050.nc   |          |          |
+| 2                          | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month               | 0.5                | agg_2_month_050.nc |          |          |
+| 2                          | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year                | 0.5                | agg_2_year_050.nc  |          |          |
+| 2                          | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | day                 | 1                  | agg_2_day_100.nc   |          |          |
+| 2                          | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month               | 1                  | agg_2_month_100.nc |          |          |
+| 2                          | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year                | 1                  | agg_2_year_100.nc  |          |          |
+
+Thus, we can say that the number of files we get from one user-input row is the number of temporal resolutions we want to keep times the number of spatial resolutions we want to keep.
+
+**Future:**
+In the future, each "user-input" row might be a fraction of a user-input row, or a combination of several user-input rows. This is to minimize the amount of duplicate data in storage.
