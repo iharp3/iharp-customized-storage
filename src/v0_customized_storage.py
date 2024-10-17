@@ -28,6 +28,9 @@ from utils.func import (
                         download_data_from_csv,
                         files_to_delete,
                         delete_files,
+                        temporal_aggregation,
+                        spatial_aggregation,
+                        get_list_of_files_in_folder
                        )
 
 
@@ -42,7 +45,7 @@ if __name__ == "__main__":
 
     ''' Process data'''
     # Aggregate all raw files temporally
-
+    temporal_aggregation(user_input_f, raw_p, raw_p)    # input and output folder paths both raw_p so we spatially aggregate hourly files too
 
     # Delete files in temporal_files_to_delete
     delete_files(t_deletes_f)

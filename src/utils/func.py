@@ -12,6 +12,7 @@ import csv
 import cdsapi
 import os
 import glob
+import re
 
 from utils.const import col_name, api_request_settings
 from utils.temporal_aggregation import get_res_d, get_res_m, get_res_y
@@ -244,13 +245,19 @@ def spatial_aggregation(folder_path):
     Additionally, create a CSV file with information about the created file.
     '''
     metadata = []
-
-    # TODO: decide if putting all files (raw and agg) in same folder or if going thorugh next loop for the raw folder and the agg folder.
     temporal_files = get_list_of_files_in_folder(folder_path)   
+    hour_files_pattern = r'raw_(\d+)\.nc$'
+
     for file_path in temporal_files:
-        # assuming file path has '*/*_<id_number>_<temporal_aggregation>.nc' structure
-        id_number = file_path.split('_')[-2]
-        temporal_aggregation = file_path.split('_')[-1].split('.')[0]
+        try:    #TODO: check if this works
+            # hour files have initial file path names ('raw_*.nc' structure)
+            h_f = re.search(hour_files_pattern, os.path.basename(file_path))
+            id_number = h_f.group(1)
+            temporal_aggregation = 'hour'
+        except:
+            # assuming file path has '*/*_<id_number>_<temporal_aggregation>.nc' structure
+            id_number = file_path.split('_')[-2]
+            temporal_aggregation = file_path.split('_')[-1].split('.')[0]
 
         file_050 = os.path.join(folder_path, f'agg_{id_number}_{temporal_aggregation}_050.nc')
         f_min, f_max = get_res_050(file_path, file_050)
