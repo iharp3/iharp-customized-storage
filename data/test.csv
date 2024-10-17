@@ -1,2 +1,0 @@
-variable,max_lat,min_lat,max_long,min_long,start_year,end_year,temporal_resolution,spatial_resolution,file_path
-2m_temperature,-10,-10,10,10,2003,2003,year,1,raw_0.nc

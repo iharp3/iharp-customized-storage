@@ -5,28 +5,18 @@ DESCRIPTION: Contains constant values that are used in customized_storage.py
 
 Author: Ana Uribe
 '''
-cluster_501 = False
+import os
 
-if not cluster_501:
-    '''------------------------------------------------------------------ paths for computer 515'''
-    RAW_DATA_PATH = "/home/uribe055/iharp-customized-storage/data/raw/"
-    AGG_DATA_PATH = "/home/uribe055/iharp-customized-storage/data/agg/"
+home_dir = os.path.expanduser('~')
+repo = 'iharp-customized-storage'
 
-    USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/user_input.csv"
-    V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/v0_user_input.csv"
-    # V_ZERO_USER_INPUT_FILE_PATH = "//home/uribe055/iharp-customized-storage/data/test.csv"    # worked!
+raw_p = os.path.join(home_dir, repo, 'data/raw')
+agg_p = os.path.join(home_dir, repo, 'data/agg')
 
-    TEMPORAL_DELETES_CSV_FILE_PATH = "/home/uribe055/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
-    SPATIAL_DELETES_CSV_FILE_PATH = "/home/uribe055/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
-else:
-    '''------------------------------------------------------------------ paths for computer 501'''
-    RAW_DATA_PATH = "/export/scratch/iharp-customized-storage/data/raw/"
-    AGG_DATA_PATH = "/export/scratch/iharp-customized-storage/data/agg/"
+user_input_f = os.path.join(home_dir, repo, 'data/user_input.csv')
 
-    V_ZERO_USER_INPUT_FILE_PATH = "//export/scratch/iharp-customized-storage/data/v0_user_input.csv"
-
-    TEMPORAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_temporal.csv"
-    SPATIAL_DELETES_CSV_FILE_PATH = "/export/scratch/iharp-customized-storage/data/v0_files_to_delete_spatial.csv"
+t_deletes_f = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
+s_deletes_f = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",

@@ -12,15 +12,16 @@ Author: Ana Uribe
 '''
 
 '''Imports'''
+
 import pandas as pd
 from datetime import datetime
 
 from utils.const import (
-                        V_ZERO_USER_INPUT_FILE_PATH, 
-                        TEMPORAL_DELETES_CSV_FILE_PATH,
-                        SPATIAL_DELETES_CSV_FILE_PATH,
-                        RAW_DATA_PATH,
-                        AGG_DATA_PATH
+                        raw_p,
+                        agg_p,
+                        user_input_f,
+                        t_deletes_f,
+                        s_deletes_f
                         )
 
 from utils.func import (
@@ -33,22 +34,25 @@ from utils.func import (
 if __name__ == "__main__":
     
     ''' Determine data that can be pruned from user input '''
-    files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, TEMPORAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH)
-    files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH, resolution='spatial') 
+    
+    # files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, TEMPORAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH)
+    # files_to_delete(V_ZERO_USER_INPUT_FILE_PATH, SPATIAL_DELETES_CSV_FILE_PATH, output_folder=RAW_DATA_PATH, resolution='spatial') 
+    files_to_delete(user_input_f, t_deletes_f, output_folder=raw_p)
+    files_to_delete(user_input_f, s_deletes_f, output_folder=raw_p, resolution='spatial') 
 
-#     ''' Download data with API calls'''
+    ''' Download data with API calls'''
     # download_data_from_csv(V_ZERO_USER_INPUT_FILE_PATH)
 
-#     ''' Process data'''
-#     # Aggregate files temporally
+    ''' Process data'''
+    # Aggregate all raw files temporally
 
 
-#     # Delete files in temporal_files_to_delete
-#     delete_files(TEMPORAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
+    # Delete files in temporal_files_to_delete
+    # temp_files = delete_files(TEMPORAL_DELETES_CSV_FILE_PATH)
 
-#     # Aggregate remaining files spatially and RENAME to include spatial files
+    # Aggregate remaining files (temp_files) spatially
 
-#     # Delete files in spatial_files_to_delete
-#     delete_files(SPATIAL_DELETES_CSV_FILE_PATH, AGG_DATA_PATH)
+    # Delete files in spatial_files_to_delete
+    # spatio_temp_files = delete_files(SPATIAL_DELETES_CSV_FILE_PATH)
 
-#     ''' Store data and get metadata '''
+    ''' Store data and get metadata '''

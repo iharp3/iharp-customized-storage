@@ -179,10 +179,13 @@ def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal')
 
 def delete_files(files_to_delete):
     '''
-    IN: files_to_delete (list) - list of files (with their full path) to try to delete
+    IN: files_to_delete (list) - list of strings (names of files with their full path) to try to delete
 
-    Deletes files whose file paths are in files_to_delete list
+    OUT: leftovers (list) - list of files that are not deleted.
+
+    Deletes files in the list
     '''
+    # leftovers = 
     for file in files_to_delete:
         matching_files = glob.glob(file)
         if not matching_files:
