@@ -60,7 +60,8 @@ def get_temporal_agg(file_h, file_d, file_m, file_y, client):
     '''
     # DAILY AGGREGATION
     ds = xr.open_dataset(file_h, chunks={"valid_time": 24},)
-    day = ds.resample(time="D").max()
+    renamed_ds = ds.rename({'valid_time':'time'})
+    day = renamed_ds.resample(time="D").max()
 
     # days.append(day)
     # day_concet = xr.concat(days, dim="time")
