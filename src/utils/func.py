@@ -15,7 +15,7 @@ import glob
 import re
 
 from utils.const import col_name, api_request_settings
-from utils.temporal_aggregation import get_res_d, get_res_m, get_res_y
+from utils.temporal_aggregation import get_temporal_agg
 from utils.spatial_aggregation import get_res_050, get_res_100
 
 def get_time_range_ids(df):
@@ -216,17 +216,18 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
             # assuming original_file_name has 'raw_<id_number>.nc' structure
             id_number = original_file_name.split('_')[-1].split('.')[0]
 
+            # get all agg file names
             file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')    # new file name
-            get_res_d(finest_file_path, file_d)
-            print(f'\tAggregated data from {original_file_name} into daily resolution.\nSaving to {file_d}.')
-
             file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
-            get_res_m(file_d, file_m)
-            print(f'\tAggregated data from {original_file_name} into monthly resolution.\nSaving to {file_m}.')
-
             file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
-            get_res_y(file_m, file_y)
-            print(f'\tAggregated data from {original_file_name} into yearly resolution.\nSaving to {file_y}.')
+
+            get_temporal_agg(finest_file_path, file_d, file_m, file_y)
+            
+            print(f'\tAggregated data from {original_file_name} into daily, monthly, and yearly resolutions.')
+            print(f'\t\tDaily aggregations in: {file_d}.')
+            print(f'\t\tMonthly aggregations in: {file_m}.')
+            print(f'\t\tYearly aggregations in: {file_y}.')
+
 
 def spatial_aggregation(input_folder_path, output_folder_path):
     '''
