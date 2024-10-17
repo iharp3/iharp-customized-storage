@@ -55,17 +55,16 @@ if __name__ == "__main__":
 
     # Aggregate remaining files spatially
     print("\n\nTemporal pruning complete, starting spatial aggregation.")
-    all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P)   # output_folder_path should match output_folder in files_to_delete function
-    print("\n\nSpatial aggregation complete, starting pruning.")
+    # all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P)   # output_folder_path should match output_folder in files_to_delete function
+    # print("\n\nSpatial aggregation complete, starting pruning.")
     
-    # Delete files in spatial_files_to_delete
-    delete_files(S_DEL_F)
+    # # Delete files in spatial_files_to_delete
+    # delete_files(S_DEL_F)
 
-    ''' Store data and get metadata '''
-    to_keep = get_list_of_files_in_folder(AGG_P)
+    # ''' Store data and get metadata '''
+    # to_keep = get_list_of_files_in_folder(AGG_P)
 
-    filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
-    print(filtered_metadata)
+    # filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
     # # TODO:  add variable, location and time range from user input to the metadata table...based on id_number??
     # final_metadata = [[]]
 

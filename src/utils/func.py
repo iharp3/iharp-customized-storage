@@ -222,7 +222,7 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
             file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
 
             get_temporal_agg(finest_file_path, file_d, file_m, file_y)
-            
+
             print(f'\tAggregated data from {original_file_name} into daily, monthly, and yearly resolutions.')
             print(f'\t\tDaily aggregations in: {file_d}.')
             print(f'\t\tMonthly aggregations in: {file_m}.')
@@ -242,6 +242,7 @@ def spatial_aggregation(input_folder_path, output_folder_path):
     a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path).
     Additionally, create a CSV file with information about the created file.
     '''
+    return []
     metadata = []
     temporal_files = get_list_of_files_in_folder(input_folder_path)   
     hour_files_pattern = r'raw_(\d+)\.nc$'
