@@ -9,11 +9,11 @@ variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resoluti
 2m_temperature,20,0,10,-10,2020,2022,hour,0.25,raw_8.nc
 2m_temperature,40,10,-10,-40,2017,2020,hour,0.25,raw_9.nc
 2m_temperature,40,20,30,0,2008,2010,hour,0.25,raw_10.nc
-u-component wind,0,-30,-10,-40,2013,2016,year,1,raw_11.nc
-u-component wind,0,-30,30,-10,2013,2016,month,0.5,raw_12.nc
-u-component wind,30,0,30,-10,2013,2016,day,0.5,raw_13.nc
-u-component wind,30,0,-10,-40,2013,2016,hour,0.25,raw_14.nc
-v-component wind,0,-30,-10,-40,2013,2016,year,1,raw_15.nc
-v-component wind,0,-30,30,-10,2013,2016,month,0.5,raw_16.nc
-v-component wind,30,0,30,-10,2013,2016,day,0.5,raw_17.nc
-v-component wind,30,0,-10,-40,2013,2016,hour,0.25,raw_18.nc
+10m_u_component_of_wind,0,-30,-10,-40,2013,2016,year,1,raw_11.nc
+10m_u_component_of_wind,0,-30,30,-10,2013,2016,month,0.5,raw_12.nc
+10m_u_component_of_wind,30,0,30,-10,2013,2016,day,0.5,raw_13.nc
+10m_u_component_of_wind,30,0,-10,-40,2013,2016,hour,0.25,raw_14.nc
+10m_v_component_of_wind,0,-30,-10,-40,2013,2016,year,1,raw_15.nc
+10m_v_component_of_wind,0,-30,30,-10,2013,2016,month,0.5,raw_16.nc
+10m_v_component_of_wind,30,0,30,-10,2013,2016,day,0.5,raw_17.nc
+10m_v_component_of_wind,30,0,-10,-40,2013,2016,hour,0.25,raw_18.nc
