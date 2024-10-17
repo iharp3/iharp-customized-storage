@@ -131,7 +131,7 @@ def download_data_from_csv(input_csv):
             client = cdsapi.Client()
             
             # Download the data
-            print(f"Downloading {variable} data for {start_year}-{end_year} to {file_path}")
+            print(f"\tDownloading {variable} data for {start_year}-{end_year} to {file_path}")
 
             # client.retrieve(dataset, request).download(file_path)   # have to click download button on website
             client.retrieve(dataset, request, file_path)
@@ -187,14 +187,14 @@ def delete_files(files_to_delete):
     for file in files_to_delete:
         matching_files = glob.glob(file)
         if not matching_files:
-            print(f"No files matched the pattern: {file}")
+            print(f"\tNo files matched the pattern: {file}")
         else:
             for match in matching_files:
                 try:
                     os.remove(match)
-                    print(f"Deleted: {match}")
+                    print(f"\tDeleted: {match}")
                 except OSError as e:
-                    print(f"Error deleting {match}: {e}")
+                    print(f"\tError deleting {match}: {e}")
 
 def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
     '''
@@ -218,15 +218,15 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
 
             file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')    # new file name
             get_res_d(finest_file_path, file_d)
-            print(f'Aggregated data from {original_file_name} into daily resolution.\nSaving to {file_d}.')
+            print(f'\tAggregated data from {original_file_name} into daily resolution.\nSaving to {file_d}.')
 
             file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
             get_res_m(file_d, file_m)
-            print(f'Aggregated data from {original_file_name} into monthly resolution.\nSaving to {file_m}.')
+            print(f'\tAggregated data from {original_file_name} into monthly resolution.\nSaving to {file_m}.')
 
             file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
             get_res_y(file_m, file_y)
-            print(f'Aggregated data from {original_file_name} into yearly resolution.\nSaving to {file_y}.')
+            print(f'\tAggregated data from {original_file_name} into yearly resolution.\nSaving to {file_y}.')
 
 def spatial_aggregation(input_folder_path, output_folder_path):
     '''
@@ -260,12 +260,12 @@ def spatial_aggregation(input_folder_path, output_folder_path):
         f_min, f_max = get_res_050(file_path, file_050)
         metadata.append([id_number, temporal_aggregation, '0.5', f_min, f_max, file_050 ])
 
-        print(f'Aggregated data form {file_path} into 0.5 degree spatial resolution.\nSaving to {file_050}.')
+        print(f'\tAggregated data form {file_path} into 0.5 degree spatial resolution.\nSaving to {file_050}.')
 
         file_100 = os.path.join(output_folder_path, f'agg_{id_number}_{temporal_aggregation}_100.nc')
         f_min, f_max = get_res_100(file_path, file_100)
         metadata.append([id_number, temporal_aggregation, '1.0', f_min, f_max, file_100 ])
 
-        print(f'Aggregated data form {file_path} into 1.0 degree spatial resolution.\nSaving to {file_100}.')
+        print(f'\tAggregated data form {file_path} into 1.0 degree spatial resolution.\nSaving to {file_100}.')
 
     return metadata

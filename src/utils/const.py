@@ -17,6 +17,7 @@ U_IN_F = os.path.join(home_dir, repo, 'data/user_input.csv')
 
 T_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
 S_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')
+M_F = os.path.join(home_dir, repo, 'data/agg/metadata.csv')
 
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
