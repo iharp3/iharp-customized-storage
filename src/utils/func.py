@@ -196,7 +196,7 @@ def delete_files(files_to_delete):
                 except OSError as e:
                     print(f"\tError deleting {match}: {e}")
 
-def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
+def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
 
@@ -221,7 +221,7 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path):
             file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
             file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
 
-            get_temporal_agg(finest_file_path, file_d, file_m, file_y)
+            get_temporal_agg(finest_file_path, file_d, file_m, file_y, c)
 
             print(f'\tAggregated data from {original_file_name} into daily, monthly, and yearly resolutions.')
             print(f'\t\tDaily aggregations in: {file_d}.')

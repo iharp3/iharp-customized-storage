@@ -14,6 +14,7 @@ Author: Ana Uribe
 '''Imports'''
 
 import csv
+from dask.distributed import LocalCluster
 
 from utils.const import (
                         RAW_P,
@@ -47,7 +48,14 @@ if __name__ == "__main__":
     ''' Process data'''
     # Aggregate all raw files temporally
     print("\n\nData downloaded successfully, starting temporal aggregation.")
-    temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
+
+    ''' Initiate Cluster '''
+    cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
+    client = cluster.get_client()
+
+    temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
+    
+    cluster.close()
     print("\n\nTemporal aggregation complete, starting pruning.")
 
     # Delete files in temporal_files_to_delete

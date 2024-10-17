@@ -10,14 +10,16 @@ Author: Ana Uribe
 '''
 
 ''' Imports'''
-from dask.distributed import LocalCluster
+# from dask.distributed import LocalCluster
 import numpy as np
 import xarray as xr
 
+# variables in .nc file ['number', 'valid_time', 'latitude', 'longitude', 'expver', 't2m']
 
-''' Initiate Cluster '''
-cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
-client = cluster.get_client()
+
+# ''' Initiate Cluster '''
+# cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
+# client = cluster.get_client()
 
 ''' Helper Functions'''
 def compute_scale_and_offset_mm(min, max, n=16):
@@ -50,14 +52,14 @@ def get_scale_offset_from_persist(pers_array):
 
 ''' Aggregation Function '''
 
-def get_temporal_agg(file_h, file_d, file_m, file_y):
+def get_temporal_agg(file_h, file_d, file_m, file_y, client):
     '''
     IN: file_h (str) - path of raw (hour) .nc file to aggregate
 
         file_d, file_m, file_y - path to store monthly and yearly aggregations
     '''
     # DAILY AGGREGATION
-    ds = xr.open_dataset(file_h, chunks={"time": 24},)
+    ds = xr.open_dataset(file_h, chunks={"valid_time": 24},)
     day = ds.resample(time="D").max()
 
     # days.append(day)

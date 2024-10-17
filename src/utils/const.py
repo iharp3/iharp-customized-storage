@@ -7,7 +7,12 @@ Author: Ana Uribe
 '''
 import os
 
-home_dir = os.path.expanduser('~')
+cluster_501 = 1
+
+if not cluster_501:
+    home_dir = os.path.expanduser('~')
+else:
+    home_dir = '//export/scratch'
 repo = 'iharp-customized-storage'
 
 RAW_P = os.path.join(home_dir, repo, 'data/raw')
