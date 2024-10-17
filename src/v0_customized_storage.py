@@ -49,13 +49,13 @@ if __name__ == "__main__":
     # Aggregate all raw files temporally
     print("\n\nData downloaded successfully, starting temporal aggregation.")
 
-    ''' Initiate Cluster '''
-    cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
-    client = cluster.get_client()
+#     ''' Initiate Cluster '''
+#     cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
+#     client = cluster.get_client()
 
-    temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
-    
-    cluster.close()
+#     temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
+#     cluster.close()
+
     print("\n\nTemporal aggregation complete, starting pruning.")
 
     # Delete files in temporal_files_to_delete
@@ -63,25 +63,25 @@ if __name__ == "__main__":
 
     # Aggregate remaining files spatially
     print("\n\nTemporal pruning complete, starting spatial aggregation.")
-    # all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P)   # output_folder_path should match output_folder in files_to_delete function
-    # print("\n\nSpatial aggregation complete, starting pruning.")
+    all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P)   # output_folder_path should match output_folder in files_to_delete function
+    print("\n\nSpatial aggregation complete, starting pruning.")
     
-    # # Delete files in spatial_files_to_delete
-    # delete_files(S_DEL_F)
+    # Delete files in spatial_files_to_delete
+    delete_files(S_DEL_F)
 
-    # ''' Store data and get metadata '''
-    # to_keep = get_list_of_files_in_folder(AGG_P)
+    ''' Store data and get metadata '''
+    to_keep = get_list_of_files_in_folder(AGG_P)
 
-    # filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
-    # # TODO:  add variable, location and time range from user input to the metadata table...based on id_number??
-    # final_metadata = [[]]
+    filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
+    # TODO:  add variable, location and time range from user input to the metadata table...based on id_number??
+    final_metadata = [[]]
 
-    # # Create a CSV file and write the data
-    # with open(M_F, mode='w', newline='') as file:
-    #     writer = csv.writer(file)
+    # Create a CSV file and write the data
+    with open(M_F, mode='w', newline='') as file:
+        writer = csv.writer(file)
         
-    #     # Write rows of data
-    #     writer.writerows(final_metadata)
+        # Write rows of data
+        writer.writerows(final_metadata)
 
     print(f"\n\nCustomized storage hase been built.")
     print(f"\n\tStorage based on user input in: {U_IN_F}.")

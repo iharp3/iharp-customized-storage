@@ -242,7 +242,7 @@ def spatial_aggregation(input_folder_path, output_folder_path):
     a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path).
     Additionally, create a CSV file with information about the created file.
     '''
-    return []
+    # return []
     metadata = []
     temporal_files = get_list_of_files_in_folder(input_folder_path)   
     hour_files_pattern = r'raw_(\d+)\.nc$'
