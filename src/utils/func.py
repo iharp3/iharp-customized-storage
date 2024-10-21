@@ -85,6 +85,27 @@ def get_list_of_files_in_folder(folder_path):
     
     return list_of_files
 
+def get_file_info(row):
+    '''
+    IN: row (list?) - one row from csv reader
+
+    OUT: var, max_lat, min_lat,  max_long, min_long, start_year, end_year, file_path (str)
+    '''
+    var = row[col_name['var']]
+    max_lat, min_lat = row[col_name['max_lat']], row[col_name['min_lat']]
+    max_long, min_long = row[col_name['max_long']], row[col_name['min_long']]
+    
+    # v0: years in v0_user_input.csv are in cols start_time and end_time
+    start_year, end_year = row[col_name['s_t']], row[col_name['e_t']]
+
+    # start_year, end_year = row[col_name['s_y']], row[col_name['e_y']]
+    # start_month, end_month = row[col_name['s_m']], row[col_name['e_m']]
+    # start_day, end_day = row[col_name['s_d']], row[col_name['e_d']]
+    # start_time, end_time = row[col_name['s_t']], row[col_name['e_t']]
+    file_path = row[col_name['path']]
+
+    return var, max_lat, min_lat,  max_long, min_long, start_year, end_year, file_path
+
 def download_data_from_csv(input_csv):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
@@ -94,18 +115,7 @@ def download_data_from_csv(input_csv):
     with open(input_csv, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            variable = row[col_name['var']]
-            max_lat, min_lat = row[col_name['max_lat']], row[col_name['min_lat']]
-            max_long, min_long = row[col_name['max_long']], row[col_name['min_long']]
-            
-            # v0: years in v0_user_input.csv are in cols start_time and end_time
-            start_year, end_year = row[col_name['s_t']], row[col_name['e_t']]
-
-            # start_year, end_year = row[col_name['s_y']], row[col_name['e_y']]
-            # start_month, end_month = row[col_name['s_m']], row[col_name['e_m']]
-            # start_day, end_day = row[col_name['s_d']], row[col_name['e_d']]
-            # start_time, end_time = row[col_name['s_t']], row[col_name['e_t']]
-            file_path = row[col_name['path']]
+            variable, max_lat, min_lat, max_long, min_long, start_year, end_year, file_path = get_file_info(row)
 
             # Create year, month, day, and time ranges
             year_range = get_year_range(start_year, end_year)
@@ -195,6 +205,16 @@ def delete_files(files_to_delete):
                 except OSError as e:
                     print(f"\tError deleting {match}: {e}")
 
+def find_row_by_file_path(id_number, user_input_csv):
+    cur_file = f'raw_{id_number}.nc'
+    with open(user_input_csv, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row['file_path'] == cur_file:
+                return row
+    print(f'\tNo file found with id_number {id_number} in user input file {user_input_csv}.')
+    return None
+
 def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
@@ -230,9 +250,11 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
             print(f'\t\tYearly aggregations in: {file_y}.')
 
 
-def spatial_aggregation(input_folder_path, output_folder_path, c):
+def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c):
     '''
-    IN: input_folder_path (str) - folder where temporally aggregated files are stored
+    IN: user_input_csv (str) - path to csv with user input
+
+        input_folder_path (str) - folder where temporally aggregated files are stored
 
         output_folder_path (str) - folder where spatially aggregated files will be stored
 
@@ -263,7 +285,11 @@ def spatial_aggregation(input_folder_path, output_folder_path, c):
         file_050 = os.path.join(output_folder_path, f'agg_{id_number}_{temporal_aggregation}_050.nc')
         file_100 = os.path.join(output_folder_path, f'agg_{id_number}_{temporal_aggregation}_100.nc')
 
-        metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c)
+        # find row in user input csv with same id_number
+        row = find_row_by_file_path(id_number, user_input_csv)  
+        variable, max_lat, min_lat, max_long, min_long, start_year, end_year, og_file_path = get_file_info(row)
+
+        metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c, variable, max_lat, min_lat, max_long, min_long, start_year, end_year)
 
         print(f'\tAggregated data from {file_path} into 0.5 and 1.0 degree spatial resolution.')
         print(f'\t\t0.5 resolution in {file_050}.')
