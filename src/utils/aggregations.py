@@ -13,7 +13,7 @@ Author: Ana Uribe
 # from dask.distributed import LocalCluster
 import numpy as np
 import xarray as xr
-import xarray_regrid
+import xarray_regrid as xr_regrid
 
 ''' Helper Functions'''
 def compute_scale_and_offset_mm(min, max, n=16):
@@ -33,10 +33,21 @@ def compute_scale_and_offset(na):
     return compute_scale_and_offset_mm(vmin, vmax)
 
 
+# def get_min_max_from_persist(pers_array):
+#     v_min = pers_array.min().compute().values.item()
+#     v_max = pers_array.max().compute().values.item()
+#     print(f"\tMin:{v_min}, Max:{v_max}")
+#     return v_min, v_max
+
 def get_min_max_from_persist(pers_array):
-    v_min = pers_array.min().compute().values.item()
-    v_max = pers_array.max().compute().values.item()
+    v_min = pers_array.min().compute()
+    v_max = pers_array.max().compute()
+    if hasattr(v_min, 'item'):
+        v_min = v_min.item()
+    if hasattr(v_max, 'item'):
+        v_max = v_max.item()
     print(f"\tMin:{v_min}, Max:{v_max}")
+    
     return v_min, v_max
 
 
@@ -46,18 +57,18 @@ def get_scale_offset_from_persist(pers_array):
 
 def get_grid(n, s, w, e, res):
     '''
-    IN: n, s, w, e (float) - boundaries of the grid
+    IN: n, s, w, e (str) - boundaries of the grid
 
         res (float) - lat/long resolution (Supported: 0.5, 1.0)
 
     OUT: grid (Grid obj) - as defined with inputs
     '''
     if res == 0.5 or res == 1.0:
-        grid = xarray_regrid.Grid(
-            north=n,
-            south=s,
-            west=w,
-            east=e,
+        grid = xr_regrid.Grid(
+            north=float(n),
+            south=float(s),
+            west=float(w),
+            east=float(e),
             resolution_lat=res,
             resolution_lon=res,
         ).create_regridding_dataset()
@@ -152,18 +163,22 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     '''
     metadata = []
 
-    ds = xr.open_dataset(file_025)
+    ds = xr.open_dataset(file_025, chunks='auto')
     renamed_ds = ds.rename({'valid_time':'time'})
     
     # 0.25 SPATIAL AGGREGATION
     persisted_s = client.persist(renamed_ds)
     s_min, s_max = get_min_max_from_persist(persisted_s)
     metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_min, s_max, file_025])
-
+    # print(metadata)
+    # print(max_lat, min_lat, max_long, min_long)
 
     # 0.50 SPATIAL AGGREGATION
     grid_m = get_grid(n=max_lat, s=min_lat, w=min_long, e=max_long, res=0.5)
-    m_ds = persisted_s.regrid.stat(grid_m, method='mean', time_dim='time', skipna=False)
+    regridder = xr_regrid.Regridder.linear(persisted_s, grid_m) # changed renamed_ds to persisted_s
+    m_ds = regridder.regrid(persisted_s)    # changed renamed_ds to persisted_s
+
+    # m_ds = persisted_s.regrid.stat(grid_m, method='mean', time_dim='time', skipna=False)
 
     persisted_m = client.persist(m_ds)
     m_min, m_max = get_min_max_from_persist(persisted_m)
