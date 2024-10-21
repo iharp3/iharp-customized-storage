@@ -13,13 +13,7 @@ Author: Ana Uribe
 # from dask.distributed import LocalCluster
 import numpy as np
 import xarray as xr
-
-# variables in .nc file ['number', 'valid_time', 'latitude', 'longitude', 'expver', 't2m']
-
-
-# ''' Initiate Cluster '''
-# cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
-# client = cluster.get_client()
+import xarray_regrid
 
 ''' Helper Functions'''
 def compute_scale_and_offset_mm(min, max, n=16):
@@ -49,6 +43,25 @@ def get_min_max_from_persist(pers_array):
 def get_scale_offset_from_persist(pers_array):
     v_min, v_max = get_min_max_from_persist(pers_array)
     return compute_scale_and_offset_mm(v_min, v_max)
+
+def get_grid(n, s, w, e, res):
+    '''
+    IN: n, s, w, e (float) - boundaries of the grid
+
+        res (float) - lat/long resolution (Supported: 0.5, 1.0)
+
+    OUT: grid (Grid obj) - as defined with inputs
+    '''
+    grid = xarray_regrid.Grid(
+        north=n,
+        south=s,
+        west=w,
+        east=e,
+        resolution_lat=res,
+        resolution_lon=res,
+    ).create_regridding_dataset()
+
+    return grid
 
 ''' Aggregation Functions '''
 
@@ -117,7 +130,6 @@ def get_temporal_agg(file_h, file_d, file_m, file_y, client):
         },
     )
 
-
 def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregation, client):
     '''
     IN: file_025 (str) - path of raw (0.25 degree) .nc file to aggregate
@@ -135,7 +147,7 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
 
     ds = xr.open_dataset(file_025)
     renamed_ds = ds.rename({'valid_time':'time'})
-
+    
 
     metadata.append([id_number, temporal_aggregation, '0.5', f_min, f_max, file_050 ])
     metadata.append([id_number, temporal_aggregation, '1.0', f_min, f_max, file_100 ])
