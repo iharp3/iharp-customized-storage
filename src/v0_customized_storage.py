@@ -52,7 +52,7 @@ if __name__ == "__main__":
 #     cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
 #     client = cluster.get_client()
 
-#     temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
+    # temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
 #     cluster.close()
 
     print("\n\nTemporal aggregation complete, starting pruning.")
