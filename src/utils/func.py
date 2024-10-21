@@ -242,6 +242,10 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
             file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
             file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
 
+            if os.path.exists(file_d):
+                print(f'\tTemporally aggregated files for ID {id_number} already exist.\n\tSkipping temporal aggregation.')
+                continue
+            
             get_temporal_agg(finest_file_path, file_d, file_m, file_y, c)
 
             print(f'\tAggregated data from {original_file_name} into daily, monthly, and yearly resolutions.')

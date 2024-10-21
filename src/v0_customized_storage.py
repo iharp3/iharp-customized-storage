@@ -48,7 +48,7 @@ if __name__ == "__main__":
     # Aggregate all raw files temporally
     print("\n\nData downloaded successfully, starting temporal aggregation.")
 
-#     ''' Initiate Cluster '''
+    ''' Initiate Cluster '''
 #     cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
 #     client = cluster.get_client()
 
