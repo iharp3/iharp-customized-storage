@@ -196,8 +196,14 @@ def delete_files(files_to_delete_csv):
     with open(files_to_delete_csv, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            names_list = row['file_names']
+            # print(f'\nROW:{row}')
+            file_names = row['file_names']
+            names_list = [r.strip() for r in file_names.split(',')]  # Split by comma and strip any whitespace
+
+            # print(f'\nNAMES LIST:{names_list}')
             for name in names_list:
+                # print(f'\nNAME:{name}')
+                # print(f'\nNAME TYPE: {type(name)}')
                 matching_files = glob.glob(name)
                 if not matching_files:
                     print(f"\tNo files matched the pattern: {name}")
