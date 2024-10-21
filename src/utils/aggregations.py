@@ -50,21 +50,20 @@ def get_scale_offset_from_persist(pers_array):
     v_min, v_max = get_min_max_from_persist(pers_array)
     return compute_scale_and_offset_mm(v_min, v_max)
 
-''' Aggregation Function '''
+''' Aggregation Functions '''
 
 def get_temporal_agg(file_h, file_d, file_m, file_y, client):
     '''
     IN: file_h (str) - path of raw (hour) .nc file to aggregate
 
-        file_d, file_m, file_y - path to store monthly and yearly aggregations
+        file_d, file_m, file_y (str) - path to store monthly and yearly aggregations
+
+        client (Dask client object) - local cluster object to speed up aggregation
     '''
     # DAILY AGGREGATION
     ds = xr.open_dataset(file_h, chunks={"valid_time": 24},)
     renamed_ds = ds.rename({'valid_time':'time'})
     day = renamed_ds.resample(time="D").max()
-
-    # days.append(day)
-    # day_concet = xr.concat(days, dim="time")
 
     persisted = client.persist(day)
     day_scale, day_offset = get_scale_offset_from_persist(persisted["t2m"])
@@ -117,3 +116,27 @@ def get_temporal_agg(file_h, file_d, file_m, file_y, client):
             }
         },
     )
+
+
+def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregation, client):
+    '''
+    IN: file_025 (str) - path of raw (0.25 degree) .nc file to aggregate
+
+        file_050, file_100 (str) - paths to put agg files
+
+        id_number, temporal_aggregation (str) - current file_025's id number and temporal agg to make file name and metadata entry
+
+        client (Dask client object) - local cluster object to speed up aggregation
+
+    OUT: metadata (list) - list with <id_number, temporal_aggregation, spatial_aggregation, file_min_value, file_max_value>
+                          for each file created 
+    '''
+    metadata = []
+
+    ds = xr.open_dataset(file_025)
+    renamed_ds = ds.rename({'valid_time':'time'})
+    day = renamed_ds.resample(time="D").max()
+
+
+    metadata.append([id_number, temporal_aggregation, '0.5', f_min, f_max, file_050 ])
+    metadata.append([id_number, temporal_aggregation, '1.0', f_min, f_max, file_100 ])

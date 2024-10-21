@@ -29,7 +29,6 @@ from utils.func import (
                         download_data_from_csv,
                         files_to_delete,
                         delete_files,
-                        temporal_aggregation,
                         spatial_aggregation,
                         get_list_of_files_in_folder
                        )
@@ -63,7 +62,12 @@ if __name__ == "__main__":
 
     # Aggregate remaining files spatially
     print("\n\nTemporal pruning complete, starting spatial aggregation.")
-    all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P)   # output_folder_path should match output_folder in files_to_delete function
+
+    ''' Initiate Cluster '''
+    cluster = LocalCluster(n_workers=10) 
+    client = cluster.get_client()
+
+    all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P, c=client)   # output_folder_path should match output_folder in files_to_delete function
     print("\n\nSpatial aggregation complete, starting pruning.")
     
     # Delete files in spatial_files_to_delete

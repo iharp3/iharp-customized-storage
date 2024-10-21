@@ -15,8 +15,7 @@ import glob
 import re
 
 from utils.const import col_name, api_request_settings
-from utils.temporal_aggregation import get_temporal_agg
-from utils.spatial_aggregation import get_res_050, get_res_100
+from utils.aggregations import get_temporal_agg, get_spatial_agg
 
 def get_time_range_ids(df):
     '''
@@ -204,6 +203,8 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
 
         output_folder_path (str) - folder where new files will be put
 
+        c (Dask client object) - local cluster object to speed up aggregation
+
     For every row in input_csv file, get file name 'original_file_name' and aggregate data in this file.
     For each aggregation (temporal aggregation={day, month, year}), aggregate the corresp. file and save to
     a new file with name pattern: 'agg_<id_number>_<temporal aggregation>.nc' (where id_number comes from original_file_name)
@@ -229,11 +230,13 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
             print(f'\t\tYearly aggregations in: {file_y}.')
 
 
-def spatial_aggregation(input_folder_path, output_folder_path):
+def spatial_aggregation(input_folder_path, output_folder_path, c):
     '''
     IN: input_folder_path (str) - folder where temporally aggregated files are stored
 
         output_folder_path (str) - folder where spatially aggregated files will be stored
+
+        c (Dask client object) - local cluster object to speed up aggregation
 
     OUT: metadata (list) - list with <id_number, temporal_aggregation, spatial_aggregation, file_min_value, file_max_value>
                           for each file created 
@@ -242,8 +245,6 @@ def spatial_aggregation(input_folder_path, output_folder_path):
     a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path).
     Additionally, create a CSV file with information about the created file.
     '''
-    # return []
-    metadata = []
     temporal_files = get_list_of_files_in_folder(input_folder_path)   
     hour_files_pattern = r'raw_(\d+)\.nc$'
 
@@ -258,16 +259,14 @@ def spatial_aggregation(input_folder_path, output_folder_path):
             id_number = file_path.split('_')[-2]
             temporal_aggregation = file_path.split('_')[-1].split('.')[0]
 
+        # get all agg file names
         file_050 = os.path.join(output_folder_path, f'agg_{id_number}_{temporal_aggregation}_050.nc')
-        f_min, f_max = get_res_050(file_path, file_050)
-        metadata.append([id_number, temporal_aggregation, '0.5', f_min, f_max, file_050 ])
-
-        print(f'\tAggregated data form {file_path} into 0.5 degree spatial resolution.\nSaving to {file_050}.')
-
         file_100 = os.path.join(output_folder_path, f'agg_{id_number}_{temporal_aggregation}_100.nc')
-        f_min, f_max = get_res_100(file_path, file_100)
-        metadata.append([id_number, temporal_aggregation, '1.0', f_min, f_max, file_100 ])
 
-        print(f'\tAggregated data form {file_path} into 1.0 degree spatial resolution.\nSaving to {file_100}.')
+        metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c)
+
+        print(f'\tAggregated data from {file_path} into 0.5 and 1.0 degree spatial resolution.')
+        print(f'\t\t0.5 resolution in {file_050}.')
+        print(f'\t\t1.0 resolution in {file_100}.')
 
     return metadata
