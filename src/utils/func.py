@@ -196,16 +196,18 @@ def delete_files(files_to_delete_csv):
     with open(files_to_delete_csv, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            matching_files = glob.glob(row)
-            if not matching_files:
-                print(f"\tNo files matched the pattern: {row}")
-            else:
-                for match in matching_files:
-                    try:
-                        os.remove(match)
-                        print(f"\tDeleted: {match}")
-                    except OSError as e:
-                        print(f"\tError deleting {match}: {e}")
+            names_list = row['file_names']
+            for name in names_list:
+                matching_files = glob.glob(name)
+                if not matching_files:
+                    print(f"\tNo files matched the pattern: {name}")
+                else:
+                    for match in matching_files:
+                        try:
+                            os.remove(match)
+                            print(f"\tDeleted: {match}")
+                        except OSError as e:
+                            print(f"\tError deleting {match}: {e}")
 
 def find_row_by_file_path(id_number, user_input_csv):
     cur_file = f'raw_{id_number}.nc'
