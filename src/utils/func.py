@@ -217,7 +217,7 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
             id_number = original_file_name.split('_')[-1].split('.')[0]
 
             # get all agg file names
-            file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')    # new file name
+            file_d = os.path.join(output_folder_path, f'agg_{id_number}_day.nc')
             file_m = os.path.join(output_folder_path, f'agg_{id_number}_month.nc')
             file_y = os.path.join(output_folder_path, f'agg_{id_number}_year.nc')
 
