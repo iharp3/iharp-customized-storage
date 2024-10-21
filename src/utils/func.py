@@ -187,23 +187,25 @@ def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal')
                 # Write the 'id' and the file names as a comma-separated string
                 writer.writerow([id_number, ', '.join(file_names)])
 
-def delete_files(files_to_delete):
+def delete_files(files_to_delete_csv):
     '''
-    IN: files_to_delete (list) - list of strings (names of files with their full path) to try to delete
+    IN: files_to_delete_csv (str) - path to csv with list of strings (names of files with their full path) to try to delete
 
     Deletes files in the list
     '''
-    for file in files_to_delete:
-        matching_files = glob.glob(file)
-        if not matching_files:
-            print(f"\tNo files matched the pattern: {file}")
-        else:
-            for match in matching_files:
-                try:
-                    os.remove(match)
-                    print(f"\tDeleted: {match}")
-                except OSError as e:
-                    print(f"\tError deleting {match}: {e}")
+    with open(files_to_delete_csv, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            matching_files = glob.glob(row)
+            if not matching_files:
+                print(f"\tNo files matched the pattern: {row}")
+            else:
+                for match in matching_files:
+                    try:
+                        os.remove(match)
+                        print(f"\tDeleted: {match}")
+                    except OSError as e:
+                        print(f"\tError deleting {match}: {e}")
 
 def find_row_by_file_path(id_number, user_input_csv):
     cur_file = f'raw_{id_number}.nc'
@@ -245,7 +247,7 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
             if os.path.exists(file_d):
                 print(f'\tTemporally aggregated files for ID {id_number} already exist.\n\tSkipping temporal aggregation.')
                 continue
-            
+
             get_temporal_agg(finest_file_path, file_d, file_m, file_y, c)
 
             print(f'\tAggregated data from {original_file_name} into daily, monthly, and yearly resolutions.')

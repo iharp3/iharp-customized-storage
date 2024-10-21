@@ -67,7 +67,7 @@ if __name__ == "__main__":
     cluster = LocalCluster(n_workers=10) 
     client = cluster.get_client()
 
-    all_metadata = spatial_aggregation(input_folder_path=RAW_P, output_folder_path=AGG_P, c=client)   # output_folder_path should match output_folder in files_to_delete function
+    all_metadata = spatial_aggregation(user_input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=AGG_P, c=client)   # output_folder_path should match output_folder in files_to_delete function
     print("\n\nSpatial aggregation complete, starting pruning.")
     
     # Delete files in spatial_files_to_delete
