@@ -135,7 +135,6 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
 
     ds = xr.open_dataset(file_025)
     renamed_ds = ds.rename({'valid_time':'time'})
-    day = renamed_ds.resample(time="D").max()
 
 
     metadata.append([id_number, temporal_aggregation, '0.5', f_min, f_max, file_050 ])
