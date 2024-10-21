@@ -203,5 +203,6 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-
     metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', l_min, l_max, file_100])
+
+    return metadata

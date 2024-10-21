@@ -77,15 +77,13 @@ if __name__ == "__main__":
     to_keep = get_list_of_files_in_folder(AGG_P)
 
     filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
-    # TODO:  add variable, location and time range from user input to the metadata table...based on id_number??
-    final_metadata = [[]]
 
     # Create a CSV file and write the data
     with open(M_F, mode='w', newline='') as file:
         writer = csv.writer(file)
         
         # Write rows of data
-        writer.writerows(final_metadata)
+        writer.writerows(filtered_metadata)
 
     print(f"\n\nCustomized storage hase been built.")
     print(f"\n\tStorage based on user input in: {U_IN_F}.")
