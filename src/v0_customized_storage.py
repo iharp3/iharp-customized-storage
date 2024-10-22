@@ -29,6 +29,7 @@ from utils.func import (
                         download_data_from_csv,
                         files_to_delete,
                         delete_files,
+                        temporal_aggregation,
                         spatial_aggregation,
                         get_list_of_files_in_folder
                        )
@@ -44,21 +45,19 @@ if __name__ == "__main__":
     print("\n\nStarting download of data.")
     # download_data_from_csv(U_IN_F)
 
-    ''' Process data'''
-    # Aggregate all raw files temporally
     print("\n\nData downloaded successfully, starting temporal aggregation.")
 
     ''' Initiate Cluster '''
-#     cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
-#     client = cluster.get_client()
+    cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
+    client = cluster.get_client()
 
-    # temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
-#     cluster.close()
+    temporal_aggregation(input_csv=U_IN_F, input_folder_path=RAW_P, output_folder_path=RAW_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
+    cluster.close()
 
     print("\n\nTemporal aggregation complete, starting pruning.")
 
-    # Delete files in temporal_files_to_delete
-    # delete_files(T_DEL_F)
+    '''Delete files in temporal_files_to_delete'''
+    delete_files(T_DEL_F)
 
     # Aggregate remaining files spatially
     print("\n\nTemporal pruning complete, starting spatial aggregation.")
@@ -72,21 +71,18 @@ if __name__ == "__main__":
 
     print("\n\nSpatial aggregation complete, starting pruning.")
     
-    # Delete files in spatial_files_to_delete
+    '''Delete files in spatial_files_to_delete'''
     delete_files(S_DEL_F)
 
     ''' Store data and get metadata '''
     to_keep = get_list_of_files_in_folder(AGG_P)
-    print(f'\n***************** TO KEEP FILES: {to_keep}')
 
-    # filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
+    filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
 
     # Create a CSV file and write the data
     with open(M_F, mode='w', newline='') as file:
         writer = csv.writer(file)
-        
-        # Write rows of data
-        writer.writerows(all_metadata)
+        writer.writerows(filtered_metadata)
 
     print(f"\n\nCustomized storage hase been built.")
     print(f"\n\tStorage based on user input in: {U_IN_F}.")
