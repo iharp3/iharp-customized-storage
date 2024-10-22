@@ -305,8 +305,11 @@ def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c
         variable, max_lat, min_lat, max_long, min_long, start_year, end_year, og_file_path = get_file_info(row)
 
         cur_metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c, variable, max_lat, min_lat, max_long, min_long, start_year, end_year)
-        metadata.append(cur_metadata)
         
+        metadata.append(cur_metadata['25'])
+        metadata.append(cur_metadata['50'])
+        metadata.append(cur_metadata['100'])
+
         print(f'\tAggregated data from {file_path} into 0.5 and 1.0 degree spatial resolution.')
         print(f'\t\t0.5 resolution in {file_050}.')
         print(f'\t\t1.0 resolution in {file_100}.')
