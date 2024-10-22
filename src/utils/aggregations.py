@@ -35,26 +35,36 @@ def compute_scale_and_offset(na):
     return compute_scale_and_offset_mm(vmin, vmax)
 
 
-# def get_min_max_from_persist(pers_array):
-#     v_min = pers_array.min().compute().values.item()
-#     v_max = pers_array.max().compute().values.item()
-#     print(f"\tMin:{v_min}, Max:{v_max}")
-#     return v_min, v_max
-
 def get_min_max_from_persist(pers_array, s=False):
-    v_min = pers_array.min().compute()
-    v_max = pers_array.max().compute()
-    if hasattr(v_min, 'item'):
-        v_min = v_min.item()
-    if hasattr(v_max, 'item'):
-        v_max = v_max.item()
-    # print(f"\tMin:{v_min}, Max:{v_max}")
-    
+    v_min = pers_array.min().compute().values.item()
+    v_max = pers_array.max().compute().values.item()
+    print(f"\tMin:{v_min}, Max:{v_max}")
+
     if s:
-        mm_str = f"{v_min},{v_max}"
-        return str(mm_str)
+        mm_str = [v_min,v_max]
+        return mm_str
     else:
         return v_min, v_max
+    
+    # return v_min, v_max
+
+# def get_min_max_from_persist(pers_array, s=False):
+#     v_min = pers_array.min().compute()
+#     print(f'\n******************\n1 V_min: {type(v_min)}\n******************\n')
+#     v_max = pers_array.max().compute()
+#     if hasattr(v_min, 'item'):
+#         v_min = v_min.item()
+#         print(f'\n******************\n2 V_min.item(): {type(v_min)}\n******************\n')
+#     if hasattr(v_max, 'item'):
+#         v_max = v_max.item()
+
+#     print(f"\tMin:{v_min}, Max:{v_max}")
+    
+    # if s:
+    #     mm_str = [v_min,v_max]
+    #     return mm_str
+    # else:
+    #     return v_min, v_max
 
 
 def get_scale_offset_from_persist(pers_array):
@@ -176,15 +186,15 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
 
     # Get 0.25 max and min
     persisted_s = client.persist(s_ds)
-    s_mm = get_min_max_from_persist(persisted_s, s=True)
+    s_mm = get_min_max_from_persist(persisted_s.to_dataarray(), s=True)
     print(f'\n******************\nS_MM TYPE: {type(s_mm)}\n******************\n')
-    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, str(temporal_aggregation), '0.25', s_mm, str(file_025)])#s_min_str, s_max_str, file_025])
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_mm, file_025])#s_min_str, s_max_str, file_025])
     
     # Get 0.5, 1.0 spatial aggregation 
     m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
 
     persisted_m = client.persist(m_ds)
-    m_mm = get_min_max_from_persist(persisted_m, s=True)
+    m_mm = get_min_max_from_persist(persisted_m.to_dataarray(), s=True)
     m_scale, m_offset = get_scale_offset_from_persist(persisted_m["t2m"])  # TODO: change this to accept any variable not just 2m temp 
     persisted_m.to_netcdf(
         file_050,
@@ -204,7 +214,7 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     l_ds = s_resample(persisted_s, spatial_resolution=1.0, spatial_agg_method='mean')
 
     persisted_l = client.persist(l_ds)
-    l_mm = get_min_max_from_persist(persisted_l, s=True)
+    l_mm = get_min_max_from_persist(persisted_l.to_dataarray(), s=True)
     l_scale, l_offset = get_scale_offset_from_persist(persisted_l["t2m"])  # TODO: change this to accept any variable not just 2m temp 
     persisted_l.to_netcdf(
         file_100,
