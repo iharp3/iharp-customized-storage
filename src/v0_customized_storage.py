@@ -77,15 +77,16 @@ if __name__ == "__main__":
 
     ''' Store data and get metadata '''
     to_keep = get_list_of_files_in_folder(AGG_P)
+    print(f'\n***************** TO KEEP FILES: {to_keep}')
 
-    filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
+    # filtered_metadata = [lst for lst in all_metadata if lst[-1] in to_keep]
 
     # Create a CSV file and write the data
     with open(M_F, mode='w', newline='') as file:
         writer = csv.writer(file)
         
         # Write rows of data
-        writer.writerows(filtered_metadata)
+        writer.writerows(all_metadata)
 
     print(f"\n\nCustomized storage hase been built.")
     print(f"\n\tStorage based on user input in: {U_IN_F}.")

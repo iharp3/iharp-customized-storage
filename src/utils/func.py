@@ -281,6 +281,7 @@ def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c
     a new file with name pattern: 'agg_<id_number>_<temporal aggregation>_<spatial aggregation>.nc' (where id_number comes from file_path).
     Additionally, create a CSV file with information about the created file.
     '''
+    metadata = []
     temporal_files = get_list_of_files_in_folder(input_folder_path)   
     hour_files_pattern = r'raw_(\d+)\.nc$'
 
@@ -303,8 +304,9 @@ def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c
         row = find_row_by_file_path(id_number, user_input_csv)  
         variable, max_lat, min_lat, max_long, min_long, start_year, end_year, og_file_path = get_file_info(row)
 
-        metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c, variable, max_lat, min_lat, max_long, min_long, start_year, end_year)
-
+        cur_metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c, variable, max_lat, min_lat, max_long, min_long, start_year, end_year)
+        metadata.append(cur_metadata)
+        
         print(f'\tAggregated data from {file_path} into 0.5 and 1.0 degree spatial resolution.')
         print(f'\t\t0.5 resolution in {file_050}.')
         print(f'\t\t1.0 resolution in {file_100}.')

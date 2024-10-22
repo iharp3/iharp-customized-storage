@@ -52,8 +52,7 @@ def get_min_max_from_persist(pers_array, s=False):
     
     if s:
         mm_str = f"{v_min},{v_max}"
-        print(f'\n******************\nMM_STR TYPE: {type(mm_str)}\n******************\n')
-        return mm_str
+        return str(mm_str)
     else:
         return v_min, v_max
 
@@ -178,7 +177,8 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     # Get 0.25 max and min
     persisted_s = client.persist(s_ds)
     s_mm = get_min_max_from_persist(persisted_s, s=True)
-    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_mm, file_025])#s_min_str, s_max_str, file_025])
+    print(f'\n******************\nS_MM TYPE: {type(s_mm)}\n******************\n')
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, str(temporal_aggregation), '0.25', s_mm, str(file_025)])#s_min_str, s_max_str, file_025])
     
     # Get 0.5, 1.0 spatial aggregation 
     m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
