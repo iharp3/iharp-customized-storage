@@ -19,4 +19,4 @@ grpcio
 grpcio-tools
 pandas
 numpy
-xarray-regrid[accel]
+# xarray-regrid[accel]
