@@ -24,6 +24,8 @@ T_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
 S_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')
 M_F = os.path.join(home_dir, repo, 'data/agg/metadata.csv')
 
+RAW_RESOLUTION = 0.25 # 0.25 x 0.25 degree
+
 api_request_settings = {
     "dataset": "reanalysis-era5-single-levels",
     "product_type": ["reanalysis"],

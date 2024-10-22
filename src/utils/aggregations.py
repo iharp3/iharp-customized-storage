@@ -15,6 +15,8 @@ import numpy as np
 import xarray as xr
 # import xarray_regrid as xr_regrid
 
+from utils.const import RAW_RESOLUTION
+
 ''' Helper Functions'''
 def compute_scale_and_offset_mm(min, max, n=16):
     vmin = min
@@ -39,16 +41,21 @@ def compute_scale_and_offset(na):
 #     print(f"\tMin:{v_min}, Max:{v_max}")
 #     return v_min, v_max
 
-def get_min_max_from_persist(pers_array):
+def get_min_max_from_persist(pers_array, s=False):
     v_min = pers_array.min().compute()
     v_max = pers_array.max().compute()
     if hasattr(v_min, 'item'):
         v_min = v_min.item()
     if hasattr(v_max, 'item'):
         v_max = v_max.item()
-    print(f"\tMin:{v_min}, Max:{v_max}")
+    # print(f"\tMin:{v_min}, Max:{v_max}")
     
-    return v_min, v_max
+    if s:
+        mm_str = f"{v_min},{v_max}"
+        print(f'\n******************\nMM_STR TYPE: {type(mm_str)}\n******************\n')
+        return mm_str
+    else:
+        return v_min, v_max
 
 
 def get_scale_offset_from_persist(pers_array):
@@ -79,6 +86,33 @@ def get_grid(n, s, w, e, res):
     else:
         print(f'\tSpatial resolution {res} not supported. Supported vals = 0.5, 1.0')
 """
+
+def get_coarsen_factor(spatial_resolution: float) -> int:
+    """
+    Author: Yuchuan Huang
+    GitHub Repo: iharp2/iharp-pure-query/src/get_data_query.py
+    """
+    return int(spatial_resolution / RAW_RESOLUTION)
+
+def s_resample(xa, spatial_resolution: float, spatial_agg_method: str) -> xr.Dataset:
+    """
+    Author: Yuchuan Huang
+    GitHub Repo: iharp2/iharp-pure-query/src/get_data_query.py
+
+    Resample the time dimension of the given xarray.Dataset
+    """
+    coarsen_factor = get_coarsen_factor(spatial_resolution)
+    xa = xa.coarsen(latitude=coarsen_factor, longitude=coarsen_factor, boundary="trim")
+    if spatial_agg_method == "mean":
+        xa = xa.mean()
+    elif spatial_agg_method == "max":
+        xa = xa.max()
+    elif spatial_agg_method == "min":
+        xa = xa.min()
+    else:
+        raise ValueError(f"Unknown spatial_agg_method: {spatial_agg_method}")
+
+    return xa
 
 ''' Aggregation Functions '''
 
@@ -164,13 +198,63 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
                           for each file created 
     '''
     metadata = []
-
     s_ds = xr.open_dataset(file_025, chunks='auto')
+
+    # Get 0.25 max and min
+    persisted_s = client.persist(s_ds)
+    s_mm = get_min_max_from_persist(persisted_s, s=True)
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_mm, file_025])#s_min_str, s_max_str, file_025])
     
+    # Get 0.5, 1.0 spatial aggregation 
+    m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
+
+    persisted_m = client.persist(m_ds)
+    m_mm = get_min_max_from_persist(persisted_m, s=True)
+    m_scale, m_offset = get_scale_offset_from_persist(persisted_m["t2m"])  # TODO: change this to accept any variable not just 2m temp 
+    persisted_m.to_netcdf(
+        file_050,
+        encoding={
+            "t2m": {
+                    "dtype": "int16",
+                    "missing_value": -32767,
+                    "_FillValue": -32767,
+                    "scale_factor": m_scale,
+                    "add_offset": m_offset,
+            }
+        }
+    )
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', m_mm, file_050])#s_min_str, s_max_str, file_025])
+    
+    # 1.0 SPATIAL AGGREGATION
+    l_ds = s_resample(persisted_s, spatial_resolution=1.0, spatial_agg_method='mean')
+
+    persisted_l = client.persist(l_ds)
+    l_mm = get_min_max_from_persist(persisted_l, s=True)
+    l_scale, l_offset = get_scale_offset_from_persist(persisted_l["t2m"])  # TODO: change this to accept any variable not just 2m temp 
+    persisted_l.to_netcdf(
+        file_100,
+        encoding={
+            "t2m": {
+                    "dtype": "int16",
+                    "missing_value": -32767,
+                    "_FillValue": -32767,
+                    "scale_factor": l_scale,
+                    "add_offset": l_offset,
+            }
+        }
+    )
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', l_mm, file_100])#s_min_str, s_max_str, file_025])
+    
+    return metadata
+
+"""
     # 0.25 SPATIAL AGGREGATION
     persisted_s = client.persist(s_ds)
-    s_min, s_max = get_min_max_from_persist(persisted_s)
-    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_min, s_max, file_025])
+    # s_min, s_max = get_min_max_from_persist(persisted_s)
+    # s_min_str = f'{s_min}'
+    # s_max_str = f'{s_max}'
+    s_mm = get_min_max_from_persist(persisted_s, s=True)
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_mm, file_025])#s_min_str, s_max_str, file_025])
     
     # print(metadata)
     # print(max_lat, min_lat, max_long, min_long)
@@ -178,7 +262,10 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     # 0.50 SPATIAL AGGREGATION
     m_ds = persisted_s.coarsen(latitude=2,longitude=2 ,boundary='trim').mean()
     persisted_m = client.persist(m_ds)
-    m_min, m_max = get_min_max_from_persist(persisted_m)
+    # m_min, m_max = get_min_max_from_persist(persisted_m)
+    # m_min_str = f'{m_min}'
+    # m_max_str = f'{m_max}'
+    m_mm = get_min_max_from_persist(persisted_m, s=True)
     m_scale, m_offset = get_scale_offset_from_persist(persisted_m["t2m"])  # TODO: change this to accept any variable not just 2m temp 
     
     persisted_m.to_netcdf(
@@ -193,12 +280,14 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', m_min, m_max, file_050])
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', m_min_str, m_max_str, file_050])
     
     # 1.0 SPATIAL AGGREGATION
     l_ds = persisted_m.coarsen(latitude=2,longitude=2 ,boundary='trim').mean()
     persisted_l = client.persist(l_ds)
     l_min, l_max = get_min_max_from_persist(persisted_l)
+    l_min_str = f'{l_min}'
+    l_max_str = f'{l_max}'
     l_scale, l_offset = get_scale_offset_from_persist(persisted_l["t2m"])  # TODO: change this to accept any variable not just 2m temp 
     
     persisted_m.to_netcdf(
@@ -213,7 +302,7 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', l_min, l_max, file_100])
+    metadata.append([id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', l_min_str, l_max_str, file_100])
     
     return metadata
     
@@ -270,3 +359,4 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     return metadata
 
     '''
+"""
