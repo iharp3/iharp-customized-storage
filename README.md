@@ -229,6 +229,7 @@ For row 2, which asked for daily and 0.5 degree resolution, we have
 | 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month           | 1.0                | 297.124  | 313.989  | /../data/agg/agg_2_month_100.nc |
 | 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year            | 0.5                | 301.302  | 314.846  | /../data/agg/agg_2_year_050.nc  |
 | 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year            | 1.0                | 301.384  | 314.112  | /../data/agg/agg_2_year_100.nc  |
+
 Thus, we can say that the number of files we get from one user-input row is the number of temporal resolutions we want to keep times the number of spatial resolutions we want to keep.
 
 **Future:**
