@@ -226,6 +226,13 @@ def find_row_by_file_path(id_number, user_input_csv):
     print(f'\tNo file found with id_number {id_number} in user input file {user_input_csv}.')
     return None
 
+def filter_metadata(to_delete_list, all_files):
+    to_filter = set(to_delete_list)
+
+    filtered_file_list = [f for f in all_files if f not in to_filter]
+
+    return filtered_file_list
+
 def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
