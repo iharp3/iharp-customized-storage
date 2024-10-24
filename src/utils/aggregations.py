@@ -165,7 +165,7 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     # Get 0.25 max and min
     persisted_s = client.persist(s_ds)
     s_min, s_max = get_min_max_from_persist(persisted_s.to_dataarray())
-    metadata['25'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', s_min, s_max, file_025]
+    metadata['25'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', round(s_min, 2), round(s_max, 2), file_025]
     
     # Get 0.5 spatial aggregation 
     m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
@@ -185,7 +185,7 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-    metadata['50'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', m_min, m_max, file_050]
+    metadata['50'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', round(m_min, 2), round(m_max, 2), file_050]
     
     # 1.0 spatial aggregation 
     l_ds = s_resample(persisted_s, spatial_resolution=1.0, spatial_agg_method='mean')
@@ -205,6 +205,6 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-    metadata['100'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', l_min, l_max, file_100]
+    metadata['100'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', round(l_min, 2), round(l_max, 2), file_100]
     
     return metadata

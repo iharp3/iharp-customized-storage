@@ -73,7 +73,7 @@ def get_year_range(start_year, end_year):
 
 def get_list_of_files_in_folder(folder_path):
     '''
-    IN: folder_path (str) - path to folder where you want all your 
+    IN: folder_path (str) - path to folder
 
     OUT: list_of_files (list) - list of all the file paths (full paths) in the folder
     '''
@@ -142,7 +142,6 @@ def download_data_from_csv(input_csv):
             # Download the data
             print(f"\tDownloading {variable} data for {start_year}-{end_year} to {file_path}")
 
-            # client.retrieve(dataset, request).download(file_path)   # have to click download button on website
             client.retrieve(dataset, request, file_path)
 
 def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal'):
@@ -154,6 +153,8 @@ def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal')
         output_folder (str) - path to folder where files to delete will be
 
         resolution (str) - type of resolution that is being pruned [default: 'temporal']
+
+    OUT: file_names (list) - list of all the files to delete
     '''
     with open(input_csv, mode='r') as file:
         reader = csv.DictReader(file)
@@ -168,24 +169,28 @@ def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal')
                 if resolution == 'spatial':
                     # Add file names based on the 'spatial_resolution' value
                     if row[col_name['s_res']] == '0.5':
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_025.nc'))
+                        file_names.append(os.path.join(output_folder, file_path))   # original file with hour and 0.25 res
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc')) # all other files with 0.25 res
                     elif row[col_name['s_res']] == '1':
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_025.nc'))
+                        file_names.append(os.path.join(output_folder, file_path))
+                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc'))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_050.nc'))
                 else:
                     # Add file names based on the 'temporal_resolution' value
                     if row[col_name['t_res']] == 'day':
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
+                        file_names.append(os.path.join(output_folder, file_path))
                     elif row[col_name['t_res']] == 'month':
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
+                        file_names.append(os.path.join(output_folder, file_path))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
                     elif row[col_name['t_res']] == 'year':
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_hour.nc'))
+                        file_names.append(os.path.join(output_folder, file_path))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
                         file_names.append(os.path.join(output_folder, f'agg_{id_number}_month.nc'))
 
                 # Write the 'id' and the file names as a comma-separated string
                 writer.writerow([id_number, ', '.join(file_names)])
+
+    return file_names
 
 def delete_files(files_to_delete_csv):
     '''
@@ -196,14 +201,10 @@ def delete_files(files_to_delete_csv):
     with open(files_to_delete_csv, 'r') as file:
         reader = csv.DictReader(file)
         for row in reader:
-            # print(f'\nROW:{row}')
             file_names = row['file_names']
             names_list = [r.strip() for r in file_names.split(',')]  # Split by comma and strip any whitespace
 
-            # print(f'\nNAMES LIST:{names_list}')
             for name in names_list:
-                # print(f'\nNAME:{name}')
-                # print(f'\nNAME TYPE: {type(name)}')
                 matching_files = glob.glob(name)
                 if not matching_files:
                     print(f"\tNo files matched the pattern: {name}")
@@ -311,6 +312,7 @@ def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c
         metadata.append(cur_metadata['100'])
 
         print(f'\tAggregated data from {file_path} into 0.5 and 1.0 degree spatial resolution.')
+        print(f'\t\t0.25 resolution in {file_path}')
         print(f'\t\t0.5 resolution in {file_050}.')
         print(f'\t\t1.0 resolution in {file_100}.')
 

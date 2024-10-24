@@ -15,8 +15,9 @@ else:
     home_dir = '//export/scratch'
 repo = 'iharp-customized-storage'
 
-RAW_P = os.path.join(home_dir, repo, 'data/raw')
-AGG_P = os.path.join(home_dir, repo, 'data/agg')
+# RAW_P = os.path.join(home_dir, repo, 'data/raw')
+# AGG_P = os.path.join(home_dir, repo, 'data/agg')
+DATA_P = os.path.join(home_dir, repo, 'data')
 
 u_in_file_name = 'user_input.csv'
 U_IN_F = os.path.join(home_dir, repo, 'data', u_in_file_name)
