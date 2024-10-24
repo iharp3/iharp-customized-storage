@@ -28,7 +28,8 @@ This repository focuses on:
 #### Instructions:
 To get from the user input to the downloaded data, these are the steps to follow:
 
-1. In `const.py`: update `V_ZERO_USER_INPUT_FILE_PATH` variable to the file path of the user input.
+1. In `const.py`: update the `u_in_file_name` variable to the file name of the user input you want.
+2. In `const.py`: if you are on cluster 501, update `cluster_501` to `True`. If you are on another machine, make sure the file paths are the ones you want.
 2. Run `v0_customized_storage.py`
 
 #### Getting user input
@@ -36,7 +37,7 @@ To get from the user input to the downloaded data, these are the steps to follow
 **Currently:** 
 We take a user input to be a CSV with information regarding the time and spatial resoultion, location (in latitude and longitude degrees), and time range needed for a variable. While day, time, and month can be specified for the time range, we only show the year below in the `start_time` and `end_time` columns because despite user input, we will download the whole year of any year that is at least partly selected in order to be able to aggregate that time range.
 
-Example user input:
+Example user input currently in `user_input.csv`:
 
 |         variable        | max_lat | min_lat | max_long | min_long | start_time | end_time | temporal_resolution | spatial_resolution | file_path |
 |:-----------------------:|:-------:|:-------:|:--------:|:--------:|:----------:|:--------:|:-------------------:|:------------------:|:---------:|
@@ -50,14 +51,6 @@ Example user input:
 |      2m_temperature     |    20   |    0    |    10    |    -10   |    2020    |   2022   |         hour        |        0.25        |  raw_8.nc |
 |      2m_temperature     |    40   |    10   |    -10   |    -40   |    2017    |   2020   |         hour        |        0.25        |  raw_9.nc |
 |      2m_temperature     |    40   |    20   |    30    |     0    |    2008    |   2010   |         hour        |        0.25        | raw_10.nc |
-| 10m_u_component_of_wind |    0    |   -30   |    -10   |    -40   |    2013    |   2016   |         year        |          1         | raw_11.nc |
-| 10m_u_component_of_wind |    0    |   -30   |    30    |    -10   |    2013    |   2016   |        month        |         0.5        | raw_12.nc |
-| 10m_u_component_of_wind |    30   |    0    |    30    |    -10   |    2013    |   2016   |         day         |         0.5        | raw_13.nc |
-| 10m_u_component_of_wind |    30   |    0    |    -10   |    -40   |    2013    |   2016   |         hour        |        0.25        | raw_14.nc |
-| 10m_v_component_of_wind |    0    |   -30   |    -10   |    -40   |    2013    |   2016   |         year        |          1         | raw_15.nc |
-| 10m_v_component_of_wind |    0    |   -30   |    30    |    -10   |    2013    |   2016   |        month        |         0.5        | raw_16.nc |
-| 10m_v_component_of_wind |    30   |    0    |    30    |    -10   |    2013    |   2016   |         day         |         0.5        | raw_17.nc |
-| 10m_v_component_of_wind |    30   |    0    |    -10   |    -40   |    2013    |   2016   |         hour        |        0.25        | raw_18.nc |
 
 #### Condensing user input
 **Currently:** 
@@ -111,7 +104,7 @@ where `row` is the example row, so the `row['variable']` corresponds to the valu
                                 "time":[f"{str(i).zfill(2)}:00" for i in range(0, 24)]
                              }
 
-This downloads all the data asked for in the user input to our local storage, where it is ready to be processed. Each API call downloads one file unless the data requested is too large. For now, assume that each call produces one file, so each row in the user input has the corresponding data in the given file name.
+This downloads all the data asked for in the user input to our local storage in an hourly temporal resolution and a 0.25 degree spatial resolution. Now it needs to be processed. Each API call downloads one file unless the data requested is too large. For now, we assume that each call produces one file, so each row in the user input has the corresponding data in the given file name.
 
 #### Creating customized storage
 When all the data is downloaded, we need to aggregate and prune it to create our customized storage. Below is a table of the data we compute for each downloaded file.
@@ -121,17 +114,26 @@ When all the data is downloaded, we need to aggregate and prune it to create our
 |      Temporal     | Hourly (raw), Daily, Monthly, Yearly | minimum, maximum, mean at each resolution, and the minimum and maximum of the whole file |
 | Spatial (degrees) |         0.25 (raw), 0.5, 1.0         | minimum, maximum, mean at each resolution, and the minimum and maximum of the whole file |
 
-For every desired subset of the data, we keep all coarser resolutions and prune the finer resolutions. For example, if a subset is needed at a monthly resolution, we delete the hourly and daily aggregations and keep the monthly and yearly ones. If a subset of the data is needed at the 0.5 degree resolution, we delete the 0.25 degree resolution and keep the 1.0 degree aggregation. 
+For every desired subset of the data, we keep all coarser resolutions and prune the finer resolutions. For example, if a region is needed at a monthly temporal resolution, we delete the hourly and daily temporal aggregations and keep the monthly and yearly ones. If a subset of the data is needed at the 0.5 degree resolution, we delete the 0.25 degree resolution and keep the 1.0 degree aggregation.
+
+Thus, the highest number of files we can have for a certain region is when we need the data at an hourly and 0.25 resolution, so we must keep:
+* Hourly data at a 0.25, 0.5, and 1.0 degree resolution,
+* Daily data at a 0.25, 0.5, and 1.0 degree resolution,
+* Monthly data at a 0.25, 0.5, and 1.0 degree resolution, and
+* Yearly data at a 0.25, 0.5, and 1.0 degree resolution.
+which is a total of 12 files.
+
+The minimum number of files we can have for a certain region is when we need the data at a yearly and 1.0 resolution, so we only need to keep this one file.
 
 #### Aggregating temporal data
-We first aggregate all the data temporally, calculating the daily minimum, maximum, and mean from the raw (hourly) data, then the monthly minimum, maximum, and mean aggregation from the daily resolution, and finally the same statistics for the yearly resolution. Additionally (to increase scan speed), we save the maximum and minimum values of each file.
+We first aggregate all the data temporally, calculating the daily minimum, maximum, and mean from the raw (hourly) data, then the monthly minimum, maximum, and mean aggregation from the daily resolution, and finally the same statistics for the yearly resolution.
 
 **Currently:**
 Each aggregation is saved in a separate file with the following naming convention:
 
 `agg_<file path>_<temporal resolution>.nc`
 
-where `file path` is determined by the file assigned to the raw data, and `temporal resolution` is either `day, month`, or `year`.
+where `file path` is determined by the file path name assigned to the raw data in the user input, and `temporal resolution` is either `day, month`, or `year`. Note the original file contains the hourly and 0.25 resolution data.
 
 #### Pruning local data
 
@@ -142,25 +144,17 @@ We determine what we do not need using the user input file, where the desired sp
 
 | id | file_names                                           |
 |----|------------------------------------------------------|
-| 1  |   agg_1_hour.nc,   agg_1_day.nc,   agg_1_month.nc    |
-<!-- | 2  |   agg_2_hour.nc                                      |
+| 1  |   raw_1.nc,   agg_1_day.nc,   agg_1_month.nc    |
+<!-- | 2  |   raw_2.nc                                      |
 | 3  |                                                      |
-| 4  |   agg_4_hour.nc,   agg_4_day.nc                      |
-| 5  |   agg_5_hour.nc,   agg_5_day.nc,   agg_5_month.nc    |
-| 6  |   agg_6_hour.nc,   agg_6_day.nc                      |
-| 7  |   agg_7_hour.nc                                      |
+| 4  |   raw_4.nc,   agg_4_day.nc                      |
+| 5  |   raw_5.nc,   agg_5_day.nc,   agg_5_month.nc    |
+| 6  |   raw_6.nc,   agg_6_day.nc                      |
+| 7  |   raw_7.nc                                      |
 | 8  |                                                      |
 | 9  |                                                      |
 | 10 |                                                      |
-| 11 |   agg_11_hour.nc,   agg_11_day.nc,   agg_11_month.nc |
-| 12 |   agg_12_hour.nc,   agg_12_day.nc                    |
-| 13 |   agg_13_hour.nc                                     |
-| 14 |                                                      |
-| 15 |   agg_15_hour.nc,   agg_15_day.nc,   agg_15_month.nc |
-| 16 |   agg_16_hour.nc,   agg_16_day.nc                    |
-| 17 |   agg_17_hour.nc                                     |
-| 18 |                                                      |
-|    |                                                      | -->
+ -->
 
 Since row 1 asks for a yearly resolution, so we delete all the coarser resolutions.
 
@@ -192,15 +186,7 @@ We determine what we do not need using the user input file, where the desired sp
 | 7  |  agg_7_*_025.nc                    |
 | 8  |                                    |
 | 9  |                                    |
-| 10 |                                    |
-| 11 |  agg_11_\*\_025.nc,  agg_11_*_050.nc |
-| 12 |  agg_12_*_025.nc                   |
-| 13 |  agg_13_*_025.nc                   |
-| 14 |                                    |
-| 15 |  agg_15_\*\_025.nc,  agg_15_*_050.nc |
-| 16 |  agg_16_*_025.nc                   |
-| 17 |  agg_17_*_025.nc                   |
-| 18 |                                    | -->
+| 10 |                                    |-->
 
 Since the first row asks for 1.0 degree resolutions, the 0.25 and 0.5 degree files can be delted. The `*` signify that all temporal resolutions that have this spatial resolution should be deleted.
 
@@ -209,7 +195,7 @@ Now we have a storage customized for the user interest.
 
 We also have the following metadata for each file:
 * All the information from the user input row: variable, location range, time range.
-* File path (simplified to file name here)
+* File path
 * File minimum and maximum values
 
 For example, the output metadata for the first and second rows of the user input is shown below. 
@@ -222,14 +208,13 @@ For row 2, which asked for daily and 0.5 degree resolution, we have
 
 | id_number | variable       | max_lat | min_lat | max_long | min_long | start_time | end_time | time_resolution | spatial_resolution | file_min | file_max | file_path                       |
 |-----------|----------------|---------|---------|----------|----------|------------|----------|-----------------|--------------------|----------|----------|---------------------------------|
-| 1         | 2m_temperature | -30     | -40     | 40       | 30       | 2003       | 2003     | year            | 1.0                | 295.075  | 307.309  | /../data/agg/agg_1_year_100.nc  |
-| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | day             | 0.5                | 293.100  | 314.846  | /../data/agg/agg_2_day_050.nc   |
-| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | day             | 1.0                | 294.031  | 313.989  | /../data/agg/agg_2_day_100.nc   |
-| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month           | 0.5                | 296.950  | 314.846  | /../data/agg/agg_2_month_050.nc |
-| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month           | 1.0                | 297.124  | 313.989  | /../data/agg/agg_2_month_100.nc |
-| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year            | 0.5                | 301.302  | 314.846  | /../data/agg/agg_2_year_050.nc  |
-| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year            | 1.0                | 301.384  | 314.112  | /../data/agg/agg_2_year_100.nc  |
-
+| 1         | 2m_temperature | -30     | -40     | 40       | 30       | 2003       | 2003     | year            | 1.0                | 295.075  | 307.309  | /../data/agg_1_year_100.nc  |
+| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | day             | 0.5                | 293.100  | 314.846  | /../data/agg_2_day_050.nc   |
+| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | day             | 1.0                | 294.031  | 313.989  | /../data/agg_2_day_100.nc   |
+| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month           | 0.5                | 296.950  | 314.846  | /../data/agg_2_month_050.nc |
+| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | month           | 1.0                | 297.124  | 313.989  | /../data/agg_2_month_100.nc |
+| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year            | 0.5                | 301.302  | 314.846  | /../data/agg_2_year_050.nc  |
+| 2         | 2m_temperature | 10      | 0       | 0        | -20      | 2021       | 2023     | year            | 1.0                | 301.384  | 314.112  | /../data/agg_2_year_100.nc  |
 Thus, we can say that the number of files we get from one user-input row is the number of temporal resolutions we want to keep times the number of spatial resolutions we want to keep.
 
 **Future:**

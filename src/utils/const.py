@@ -7,7 +7,7 @@ Author: Ana Uribe
 '''
 import os
 
-cluster_501 = 1
+cluster_501 = False
 
 if not cluster_501:
     home_dir = os.path.expanduser('~')
@@ -18,7 +18,8 @@ repo = 'iharp-customized-storage'
 RAW_P = os.path.join(home_dir, repo, 'data/raw')
 AGG_P = os.path.join(home_dir, repo, 'data/agg')
 
-U_IN_F = os.path.join(home_dir, repo, 'data/user_input.csv')
+u_in_file_name = 'user_input.csv'
+U_IN_F = os.path.join(home_dir, repo, 'data', u_in_file_name)
 
 T_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
 S_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')

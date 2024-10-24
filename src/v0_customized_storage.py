@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
     ''' Download data with API calls'''
     print("\n\nStarting download of data.")
-    # download_data_from_csv(U_IN_F)
+    download_data_from_csv(U_IN_F)
 
     print("\n\nData downloaded successfully, starting temporal aggregation.")
 
