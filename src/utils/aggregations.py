@@ -140,6 +140,75 @@ def get_temporal_agg(file_h, file_d, file_m, file_y, client):
         },
     )
 
+# def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregation, client, variable, max_lat, min_lat, max_long, min_long, start_year, end_year):
+#     '''
+#     IN: file_025 (str) - path of raw (0.25 degree) .nc file to aggregate
+
+#         file_050, file_100 (str) - paths to put agg files
+
+#         id_number, temporal_aggregation (str) - current file_025's id number and temporal agg to make file name and metadata entry
+
+#         client (Dask client object) - local cluster object to speed up aggregation
+
+#         variable, max_... (str) - info about file
+
+#     OUT: metadata (list) - list with <id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year,
+#                                              temporal_aggregation, spatial_aggregation, file_min_value, file_max_value>
+#                           for each file created 
+#     '''
+#     metadata = {'25': '',
+#                 '50': '',
+#                 '100':''}
+    
+#     s_ds = xr.open_dataset(file_025, chunks='auto')
+
+#     # Get 0.25 max and min
+#     persisted_s = client.persist(s_ds)
+#     s_min, s_max = get_min_max_from_persist(persisted_s.to_dataarray())
+#     metadata['25'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', round(s_min, 2), round(s_max, 2), file_025]
+    
+#     # Get 0.5 spatial aggregation 
+#     m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
+
+#     persisted_m = client.persist(m_ds)
+#     m_min, m_max = get_min_max_from_persist(persisted_m.to_dataarray())
+#     m_scale, m_offset = get_scale_offset_from_persist(persisted_m["t2m"])  # TODO: change this to accept any variable not just 2m temp 
+#     persisted_m.to_netcdf(
+#         file_050,
+#         encoding={
+#             "t2m": {
+#                     "dtype": "int16",
+#                     "missing_value": -32767,
+#                     "_FillValue": -32767,
+#                     "scale_factor": m_scale,
+#                     "add_offset": m_offset,
+#             }
+#         }
+#     )
+#     metadata['50'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', round(m_min, 2), round(m_max, 2), file_050]
+    
+#     # 1.0 spatial aggregation 
+#     l_ds = s_resample(persisted_s, spatial_resolution=1.0, spatial_agg_method='mean')
+
+#     persisted_l = client.persist(l_ds)
+#     l_min, l_max = get_min_max_from_persist(persisted_l.to_dataarray())
+#     l_scale, l_offset = get_scale_offset_from_persist(persisted_l["t2m"])  # TODO: change this to accept any variable not just 2m temp 
+#     persisted_l.to_netcdf(
+#         file_100,
+#         encoding={
+#             "t2m": {
+#                     "dtype": "int16",
+#                     "missing_value": -32767,
+#                     "_FillValue": -32767,
+#                     "scale_factor": l_scale,
+#                     "add_offset": l_offset,
+#             }
+#         }
+#     )
+#     metadata['100'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', round(l_min, 2), round(l_max, 2), file_100]
+    
+#     return metadata
+
 def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregation, client, variable, max_lat, min_lat, max_long, min_long, start_year, end_year):
     '''
     IN: file_025 (str) - path of raw (0.25 degree) .nc file to aggregate
@@ -160,51 +229,14 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
                 '50': '',
                 '100':''}
     
-    s_ds = xr.open_dataset(file_025, chunks='auto')
-
-    # Get 0.25 max and min
-    persisted_s = client.persist(s_ds)
-    s_min, s_max = get_min_max_from_persist(persisted_s.to_dataarray())
+    s_min, s_max = 0.12345, 87.12345
     metadata['25'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', round(s_min, 2), round(s_max, 2), file_025]
     
-    # Get 0.5 spatial aggregation 
-    m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
-
-    persisted_m = client.persist(m_ds)
-    m_min, m_max = get_min_max_from_persist(persisted_m.to_dataarray())
-    m_scale, m_offset = get_scale_offset_from_persist(persisted_m["t2m"])  # TODO: change this to accept any variable not just 2m temp 
-    persisted_m.to_netcdf(
-        file_050,
-        encoding={
-            "t2m": {
-                    "dtype": "int16",
-                    "missing_value": -32767,
-                    "_FillValue": -32767,
-                    "scale_factor": m_scale,
-                    "add_offset": m_offset,
-            }
-        }
-    )
+    m_min, m_max = 0.12345, 87.12345
     metadata['50'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', round(m_min, 2), round(m_max, 2), file_050]
     
-    # 1.0 spatial aggregation 
-    l_ds = s_resample(persisted_s, spatial_resolution=1.0, spatial_agg_method='mean')
-
-    persisted_l = client.persist(l_ds)
-    l_min, l_max = get_min_max_from_persist(persisted_l.to_dataarray())
-    l_scale, l_offset = get_scale_offset_from_persist(persisted_l["t2m"])  # TODO: change this to accept any variable not just 2m temp 
-    persisted_l.to_netcdf(
-        file_100,
-        encoding={
-            "t2m": {
-                    "dtype": "int16",
-                    "missing_value": -32767,
-                    "_FillValue": -32767,
-                    "scale_factor": l_scale,
-                    "add_offset": l_offset,
-            }
-        }
-    )
+    l_min, l_max = 0.12345, 87.12345
+    
     metadata['100'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', round(l_min, 2), round(l_max, 2), file_100]
     
     return metadata

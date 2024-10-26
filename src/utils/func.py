@@ -144,77 +144,73 @@ def download_data_from_csv(input_csv):
 
             client.retrieve(dataset, request, file_path)
 
-def files_to_delete(input_csv, output_csv, output_folder, resolution='temporal'):
+def write_to_csv(out, l):
+    with open(out, mode='w', newline='') as o:
+        writer = csv.writer(o)
+        writer.writerow(['id', 'file_names'])
+
+        for path in l:
+            writer.writerow(['', ', '.join(path)])
+            
+
+def files_to_delete(input_csv, output_folder):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
 
-        output_csv (str) - file name of csv that will be created that will have file names of files to delete
-
         output_folder (str) - path to folder where files to delete will be
-
-        resolution (str) - type of resolution that is being pruned [default: 'temporal']
 
     OUT: file_names (list) - list of all the files to delete
     '''
+    t_file_names = []
+    s_file_names = []
     with open(input_csv, mode='r') as file:
         reader = csv.DictReader(file)
-        with open(output_csv, mode='w', newline='') as outfile:
-            writer = csv.writer(outfile)
-            writer.writerow(['id', 'file_names'])
-            for row in reader:
-                file_path = row[col_name['path']]
-                id_number = file_path.split('_')[-1].split('.')[0]
-                file_names = []
+        for row in reader:
+            file_path = row[col_name['path']]
+            id_number = file_path.split('_')[-1].split('.')[0]
 
-                if resolution == 'spatial':
-                    # Add file names based on the 'spatial_resolution' value
-                    if row[col_name['s_res']] == '0.5':
-                        file_names.append(os.path.join(output_folder, file_path))   # original file with hour and 0.25 res
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc')) # all other files with 0.25 res
-                    elif row[col_name['s_res']] == '1':
-                        file_names.append(os.path.join(output_folder, file_path))
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc'))
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_050.nc'))
-                else:
-                    # Add file names based on the 'temporal_resolution' value
-                    if row[col_name['t_res']] == 'day':
-                        file_names.append(os.path.join(output_folder, file_path))
-                    elif row[col_name['t_res']] == 'month':
-                        file_names.append(os.path.join(output_folder, file_path))
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
-                    elif row[col_name['t_res']] == 'year':
-                        file_names.append(os.path.join(output_folder, file_path))
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
-                        file_names.append(os.path.join(output_folder, f'agg_{id_number}_month.nc'))
+            # Add file names based on the 'spatial_resolution' value
+            print(row[col_name['s_res']])
+            print(type(row[col_name['s_res']]))
+            if row[col_name['s_res']] == '0.5':
+                print(f'path: {os.path.join(output_folder, file_path)}')
+                s_file_names.append(os.path.join(output_folder, file_path))   # original file with hour and 0.25 res
+                s_file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc')) # all other files with 0.25 res
+            elif row[col_name['s_res']] == '1':
+                s_file_names.append(os.path.join(output_folder, file_path))
+                s_file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc'))
+                s_file_names.append(os.path.join(output_folder, f'agg_{id_number}_*_050.nc'))
+            
+            # Add file names based on the 'temporal_resolution' value
+            if row[col_name['t_res']] == 'day':
+                t_file_names.append(os.path.join(output_folder, file_path))
+            elif row[col_name['t_res']] == 'month':
+                t_file_names.append(os.path.join(output_folder, file_path))
+                t_file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
+            elif row[col_name['t_res']] == 'year':
+                t_file_names.append(os.path.join(output_folder, file_path))
+                t_file_names.append(os.path.join(output_folder, f'agg_{id_number}_day.nc'))
+                t_file_names.append(os.path.join(output_folder, f'agg_{id_number}_month.nc'))
 
-                # Write the 'id' and the file names as a comma-separated string
-                writer.writerow([id_number, ', '.join(file_names)])
+    return t_file_names, s_file_names
 
-    return file_names
-
-def delete_files(files_to_delete_csv):
+def delete_files(names_list):
     '''
-    IN: files_to_delete_csv (str) - path to csv with list of strings (names of files with their full path) to try to delete
+    IN: names_list (list) - names of files (with their full path) to try to delete
 
     Deletes files in the list
     '''
-    with open(files_to_delete_csv, 'r') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            file_names = row['file_names']
-            names_list = [r.strip() for r in file_names.split(',')]  # Split by comma and strip any whitespace
-
-            for name in names_list:
-                matching_files = glob.glob(name)
-                if not matching_files:
-                    print(f"\tNo files matched the pattern: {name}")
-                else:
-                    for match in matching_files:
-                        try:
-                            os.remove(match)
-                            print(f"\tDeleted: {match}")
-                        except OSError as e:
-                            print(f"\tError deleting {match}: {e}")
+    for name in names_list:
+        matching_files = glob.glob(name)
+        if not matching_files:
+            print(f"\tNo files matched the pattern: {name}")
+        else:
+            for match in matching_files:
+                try:
+                    os.remove(match)
+                    print(f"\tDeleted: {match}")
+                except OSError as e:
+                    print(f"\tError deleting {match}: {e}")
 
 def find_row_by_file_path(id_number, user_input_csv):
     cur_file = f'raw_{id_number}.nc'
@@ -226,12 +222,12 @@ def find_row_by_file_path(id_number, user_input_csv):
     print(f'\tNo file found with id_number {id_number} in user input file {user_input_csv}.')
     return None
 
-def filter_metadata(to_delete_list, all_files):
-    to_filter = set(to_delete_list)
+def filter_metadata(to_delete_list_1, to_delete_list_2, all_files):
 
-    filtered_file_list = [f for f in all_files if f not in to_filter]
+    t = [row for row in all_files if row[-1] not in to_delete_list_1]
+    s = [row for row in t if row[-1] not in to_delete_list_2]
 
-    return filtered_file_list
+    return s
 
 def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
     '''
@@ -310,6 +306,7 @@ def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c
 
         # find row in user input csv with same id_number
         row = find_row_by_file_path(id_number, user_input_csv)  
+
         variable, max_lat, min_lat, max_long, min_long, start_year, end_year, og_file_path = get_file_info(row)
 
         cur_metadata = get_spatial_agg(file_path, file_050, file_100, id_number, temporal_aggregation, c, variable, max_lat, min_lat, max_long, min_long, start_year, end_year)

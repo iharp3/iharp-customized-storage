@@ -7,23 +7,23 @@ Author: Ana Uribe
 '''
 import os
 
-cluster_501 = False
+cluster_501 = True
 
 if not cluster_501:
     home_dir = os.path.expanduser('~')
 else:
-    home_dir = '//export/scratch'
+    home_dir = '/export/scratch'
 repo = 'iharp-customized-storage'
 
 # RAW_P = os.path.join(home_dir, repo, 'data/raw')
 # AGG_P = os.path.join(home_dir, repo, 'data/agg')
 DATA_P = os.path.join(home_dir, repo, 'data')
-
+# /export/scratch/iharp-customized-storage/data/user_input.csv
 u_in_file_name = 'user_input.csv'
-U_IN_F = os.path.join(home_dir, repo, 'data', u_in_file_name)
+U_IN_F = os.path.join(home_dir, repo, f'data/files/{u_in_file_name}')
 
-T_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_temporal.csv')
-S_DEL_F = os.path.join(home_dir, repo, 'data/prune_list_spatial.csv')
+T_DEL_F = os.path.join(home_dir, repo, 'data/files/prune_list_temporal.csv')
+S_DEL_F = os.path.join(home_dir, repo, 'data/files/prune_list_spatial.csv')
 M_F = os.path.join(home_dir, repo, 'data/agg/metadata.csv')
 
 RAW_RESOLUTION = 0.25 # 0.25 x 0.25 degree
