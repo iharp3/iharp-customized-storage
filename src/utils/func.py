@@ -144,15 +144,6 @@ def download_data_from_csv(input_csv):
 
             client.retrieve(dataset, request, file_path)
 
-def write_to_csv(out, l):
-    with open(out, mode='w', newline='') as o:
-        writer = csv.writer(o)
-        writer.writerow(['id', 'file_names'])
-
-        for path in l:
-            writer.writerow(['', ', '.join(path)])
-            
-
 def files_to_delete(input_csv, output_folder):
     '''
     IN: input_csv (str) - file name of csv that has the initial user input
@@ -170,10 +161,7 @@ def files_to_delete(input_csv, output_folder):
             id_number = file_path.split('_')[-1].split('.')[0]
 
             # Add file names based on the 'spatial_resolution' value
-            print(row[col_name['s_res']])
-            print(type(row[col_name['s_res']]))
             if row[col_name['s_res']] == '0.5':
-                print(f'path: {os.path.join(output_folder, file_path)}')
                 s_file_names.append(os.path.join(output_folder, file_path))   # original file with hour and 0.25 res
                 s_file_names.append(os.path.join(output_folder, f'agg_{id_number}_*.nc')) # all other files with 0.25 res
             elif row[col_name['s_res']] == '1':
@@ -223,7 +211,11 @@ def find_row_by_file_path(id_number, user_input_csv):
     return None
 
 def filter_metadata(to_delete_list_1, to_delete_list_2, all_files):
-
+    '''
+    IN: to_delete_list_1, 2 (list) - lists of files to delete
+        
+        all_files (list) - list of lists with each raw and agg file info
+    '''
     t = [row for row in all_files if row[-1] not in to_delete_list_1]
     s = [row for row in t if row[-1] not in to_delete_list_2]
 
@@ -262,7 +254,6 @@ def temporal_aggregation(input_csv, input_folder_path, output_folder_path, c):
 
             get_temporal_agg(finest_file_path, file_d, file_m, file_y, c)
 
-            print(f'\tAggregated data from {original_file_name} into daily, monthly, and yearly resolutions.')
             print(f'\t\tDaily aggregations in: {file_d}.')
             print(f'\t\tMonthly aggregations in: {file_m}.')
             print(f'\t\tYearly aggregations in: {file_y}.')
@@ -315,7 +306,6 @@ def spatial_aggregation(user_input_csv, input_folder_path, output_folder_path, c
         metadata.append(cur_metadata['50'])
         metadata.append(cur_metadata['100'])
 
-        print(f'\tAggregated data from {file_path} into 0.5 and 1.0 degree spatial resolution.')
         print(f'\t\t0.25 resolution in {file_path}')
         print(f'\t\t0.5 resolution in {file_050}.')
         print(f'\t\t1.0 resolution in {file_100}.')

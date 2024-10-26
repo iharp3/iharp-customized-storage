@@ -19,8 +19,6 @@ from dask.distributed import LocalCluster
 from utils.const import (
                         DATA_P,
                         U_IN_F,
-                        T_DEL_F,
-                        S_DEL_F,
                         M_F
                         )
 
@@ -40,45 +38,38 @@ if __name__ == "__main__":
     t_files_to_delete, s_files_to_delete = files_to_delete(U_IN_F, output_folder=DATA_P)
 
 
-    # ''' Download data with API calls'''
-    # print("\n\nStarting download of data.")
-    # # download_data_from_csv(U_IN_F)
+    ''' Download data with API calls'''
+    print("\n\nStarting download of data.")
+    download_data_from_csv(U_IN_F)
 
-    # print("\n\nData downloaded successfully, starting temporal aggregation.")
+    print("\n\nData downloaded successfully, starting temporal aggregation.")
 
-    # ''' Initiate Cluster '''
-    # cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
-    # client = cluster.get_client()
+    ''' Initiate Cluster '''
+    cluster = LocalCluster(n_workers=10)  # Fully-featured local Dask cluster
+    client = cluster.get_client()
 
-    # temporal_aggregation(input_csv=U_IN_F, input_folder_path=DATA_P, output_folder_path=DATA_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
-    # cluster.close()
+    temporal_aggregation(input_csv=U_IN_F, input_folder_path=DATA_P, output_folder_path=DATA_P, c=client)    # input and output folder paths both RAW_P so we spatially aggregate hourly files too
+    cluster.close()
 
-    # print("\n\nTemporal aggregation complete, starting pruning.")
+    print("\n\nTemporal aggregation complete, starting pruning.")
 
     '''Delete files in temporal_files_to_delete'''
     delete_files(t_files_to_delete)
 
-    # # Aggregate remaining files spatially
-    # print("\n\nTemporal pruning complete, starting spatial aggregation.")
+    # Aggregate remaining files spatially
+    print("\n\nTemporal pruning complete, starting spatial aggregation.")
 
-    # ''' Initiate Cluster '''
-    # cluster = LocalCluster(n_workers=10) 
-    # client = cluster.get_client()
-
-    ''' get rid of below'''
-    client = None
-    ''' get rid of above'''
+    ''' Initiate Cluster '''
+    cluster = LocalCluster(n_workers=10) 
+    client = cluster.get_client()
 
     all_metadata = spatial_aggregation(user_input_csv=U_IN_F, input_folder_path=DATA_P, output_folder_path=DATA_P, c=client)   # output_folder_path should match output_folder in files_to_delete function
-    # cluster.close()
+    cluster.close()
 
-    # print("\n\nSpatial aggregation complete, starting pruning.")
+    print("\n\nSpatial aggregation complete, starting pruning.")
     
-    # '''Delete files in spatial_files_to_delete'''
-    # delete_files(S_DEL_F)
-
-    print(f"t_files: {t_files_to_delete}")
-    print(f"s_files: {s_files_to_delete}")
+    '''Delete files in spatial_files_to_delete'''
+    delete_files(s_files_to_delete)
 
     ''' Store data and get metadata '''
     filtered_metadata = filter_metadata(t_files_to_delete, s_files_to_delete, all_metadata)
