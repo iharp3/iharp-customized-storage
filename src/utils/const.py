@@ -7,7 +7,7 @@ Author: Ana Uribe
 '''
 import os
 
-cluster_501 = True
+cluster_501 = False
 
 if not cluster_501:
     home_dir = os.path.expanduser('~')

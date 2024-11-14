@@ -1,0 +1,8 @@
+variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resolution,spatial_resolution,file_path
+2m_temperature, -40, -180, 180, -180, 2000, 2001, year, 1.0, raw_1.nc
+2m_temperature, 40, -40, 180, -180, 2000, 2001, day, 1.0, raw_2.nc
+2m_temperature, 90, 0, 180, -180, 2000, 2001, day, 0.5, raw_3.nc
+2m_temperature, 90, 50, 50, -120, 2000, 2001, month, 0.5, raw_4.nc
+2m_temperature, 90, 70, 0, -180, 2000, 2001, day, 0.25, raw_5.nc
+2m_temperature, -60, -90, 180, 120, 2000, 2001, hour, 0.25, raw_6.nc
+2m_temperature, -60, -90, -120, -180, 2000, 2001, hour, 0.25, raw_7.nc
