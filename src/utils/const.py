@@ -7,18 +7,30 @@ Author: Ana Uribe
 '''
 import os
 
-cluster_501 = False
+# cluster_501 = False
 
-if not cluster_501:
-    home_dir = os.path.expanduser('~')
-else:
-    home_dir = '/export/scratch'
+# if not cluster_501:
+#     home_dir = os.path.expanduser('~')
+# else:
+#     home_dir = '/export/scratch'
+
+home_dir = os.path.expanduser('~')
 repo = 'iharp-customized-storage'
 
 DATA_P = os.path.join(home_dir, repo, 'data')
-u_in_file_name = 'user_input.csv'
+u_in_file_name = 'user_interest_tuples.csv'
 U_IN_F = os.path.join(home_dir, repo, f'data/files/{u_in_file_name}')
 M_F = os.path.join(home_dir, repo, 'data/files/metadata.csv')
+
+
+if __name__ == "__main__":
+    print('\n##############################################\n')
+    print('\n################### Paths ###################\n')
+    print(f'\nData will be saved in: {DATA_P}')
+    print(f'\nUser interest input will be taken from: {U_IN_F}')
+    print(f'\nMetadata will be saved in: {M_F}')
+    print('\n##############################################\n')
+    print('\n##############################################\n')
 
 RAW_RESOLUTION = 0.25 # 0.25 x 0.25 degree
 

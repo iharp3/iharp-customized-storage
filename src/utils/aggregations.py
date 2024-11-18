@@ -13,6 +13,7 @@ Author: Ana Uribe
 # from dask.distributed import LocalCluster
 import numpy as np
 import xarray as xr
+import os
 # import xarray_regrid as xr_regrid
 
 from utils.const import RAW_RESOLUTION
@@ -72,6 +73,15 @@ def s_resample(xa, spatial_resolution: float, spatial_agg_method: str) -> xr.Dat
         raise ValueError(f"Unknown spatial_agg_method: {spatial_agg_method}")
 
     return xa
+
+def get_file_size(f):
+    '''
+    Get file size of any file in file path f using os
+    '''
+    file_size = os.path.getsize(f)
+    file_size_mb = round(file_size / (1024 * 1024), 4)    # Convert to MB
+
+    return file_size_mb
 
 ''' Aggregation Functions '''
 
@@ -165,7 +175,10 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
     # Get 0.25 max and min
     persisted_s = client.persist(s_ds)
     s_min, s_max = get_min_max_from_persist(persisted_s.to_dataarray())
-    metadata['25'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', round(s_min, 2), round(s_max, 2), file_025]
+
+    s_f_size = get_file_size(file_025)
+    
+    metadata['25'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.25', round(s_min, 2), round(s_max, 2), file_025, s_f_size]
     
     # Get 0.5 spatial aggregation 
     m_ds = s_resample(persisted_s, spatial_resolution=0.5, spatial_agg_method='mean')
@@ -185,7 +198,8 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-    metadata['50'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', round(m_min, 2), round(m_max, 2), file_050]
+    m_f_size = get_file_size(file_050)
+    metadata['50'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '0.5', round(m_min, 2), round(m_max, 2), file_050, m_f_size]
     
     # 1.0 spatial aggregation 
     l_ds = s_resample(persisted_s, spatial_resolution=1.0, spatial_agg_method='mean')
@@ -205,7 +219,8 @@ def get_spatial_agg(file_025, file_050, file_100, id_number, temporal_aggregatio
             }
         }
     )
-    metadata['100'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', round(l_min, 2), round(l_max, 2), file_100]
+    l_f_size = get_file_size(file_100)
+    metadata['100'] = [id_number, variable, max_lat, min_lat, max_long, min_long, start_year, end_year, temporal_aggregation, '1.0', round(l_min, 2), round(l_max, 2), file_100, l_f_size]
     
     return metadata
 
