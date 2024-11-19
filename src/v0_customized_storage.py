@@ -15,10 +15,12 @@ Author: Ana Uribe
 
 import csv
 from dask.distributed import LocalCluster
+import pandas as pd
 
 from utils.const import (
                         DATA_P,
                         U_IN_F,
+                        M_F_UNORDERED,
                         M_F
                         )
 
@@ -75,9 +77,16 @@ if __name__ == "__main__":
     filtered_metadata = filter_metadata(t_files_to_delete, s_files_to_delete, all_metadata)
 
     # Create a CSV file and write the data
-    with open(M_F, mode='w', newline='') as file:
+    with open(M_F_UNORDERED, mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(filtered_metadata)
+
+    # sort by id
+    df = pd.read_csv(M_F_UNORDERED)
+    sorted_df = df.sort_values(by=col_name['path'])
+
+    # Save the sorted DataFrame to a new CSV file
+    sorted_df.to_csv(M_F, index=False)
 
     print(f"\n\nCustomized storage hase been built.")
     print(f"\n\tStorage based on user input in: {U_IN_F}.")

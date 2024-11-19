@@ -20,6 +20,7 @@ repo = 'iharp-customized-storage'
 DATA_P = os.path.join(home_dir, repo, 'data')
 u_in_file_name = 'user_interest_tuples.csv'
 U_IN_F = os.path.join(home_dir, repo, f'data/files/{u_in_file_name}')
+M_F_UNORDERED = os.path.join(home_dir, repo, 'data/files/unordered_metadata.csv')
 M_F = os.path.join(home_dir, repo, 'data/files/metadata.csv')
 
 
