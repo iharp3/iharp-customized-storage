@@ -14,7 +14,7 @@ import os
 import glob
 import re
 
-from utils.const import col_name, api_request_settings
+from utils.const import col_name, api_request_settings, DATA_P
 from utils.aggregations import get_temporal_agg, get_spatial_agg
 
 def get_time_range_ids(df):
@@ -103,7 +103,7 @@ def get_file_info(row):
     # start_day, end_day = row[col_name['s_d']], row[col_name['e_d']]
     # start_time, end_time = row[col_name['s_t']], row[col_name['e_t']]
     file_name = row[col_name['path']]
-    file_path = os.path.join(data, file_name)
+    file_path = os.path.join(DATA_P, file_name)
 
     return var, max_lat, min_lat,  max_long, min_long, start_year, end_year, file_path
 
