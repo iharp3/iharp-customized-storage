@@ -136,6 +136,8 @@ def download_data_from_csv(input_csv):
                 'download_format': api_request_settings['download_format'],
                 'area': [max_lat, min_long, min_lat, max_long]  # Order: [N, W, S, E]
             }
+            #     'area': [max_lat, min_long, min_lat, max_long]  # Order: [N, W, S, E]
+            # }
             
             client = cdsapi.Client()
             
