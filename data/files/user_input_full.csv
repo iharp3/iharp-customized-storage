@@ -4,3 +4,8 @@ variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resoluti
 2m_temperature,30,10,-30,-40,2016,2018,hour,0.25,raw_3.nc
 2m_temperature,10,-10,-30,-40,2007,2009,month,0.5,raw_4.nc
 2m_temperature,40,20,10,-10,2009,2011,year,0.25,raw_5.nc
+2m_temperature,10,0,20,0,2020,2021,month,1,raw_6.nc
+2m_temperature,40,10,40,20,2023,2023,day,0.5,raw_7.nc
+2m_temperature,20,0,10,-10,2020,2022,hour,0.25,raw_8.nc
+2m_temperature,40,10,-10,-40,2017,2020,hour,0.25,raw_9.nc
+2m_temperature,40,20,30,0,2008,2010,hour,0.25,raw_10.nc
