@@ -102,7 +102,8 @@ def get_file_info(row):
     # start_month, end_month = row[col_name['s_m']], row[col_name['e_m']]
     # start_day, end_day = row[col_name['s_d']], row[col_name['e_d']]
     # start_time, end_time = row[col_name['s_t']], row[col_name['e_t']]
-    file_path = row[col_name['path']]
+    file_name = row[col_name['path']]
+    file_path = os.path.join(data, file_name)
 
     return var, max_lat, min_lat,  max_long, min_long, start_year, end_year, file_path
 
