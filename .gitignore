@@ -1,6 +1,7 @@
 # large data
 data/raw
 data/agg
+other_data/
 
 # raw data files
 *.nc
