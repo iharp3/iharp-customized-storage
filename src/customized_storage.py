@@ -10,6 +10,7 @@ from ApiGenerator import API_Call
 
 # Upload user input
 user_interest_rows = load_csv(USER_INTEREST)
+failed_rows = []
 
 for row in user_interest_rows:
     # Create file name
@@ -23,8 +24,15 @@ for row in user_interest_rows:
     if wait_for_file(raw_file_name):
         print(f"\tData downloaded to: {raw_file_name}.")
     else:
-        user_interest_rows.append(row)
+        failed_rows.append(row)
 
+if failed_rows == []
+    print(f"Finished downloading all data.")
+else:
+    print(f"Failed to download following files:")
+    for row in failed_rows:
+        print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
+        
     # Temporally aggregate file (return metadata with list of file names to aggregate spatially, and list of files to delete)
         # Spatially aggregate file (return metadata and list of files to delete)
 
