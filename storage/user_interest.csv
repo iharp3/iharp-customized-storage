@@ -1,0 +1,5 @@
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
+2m_temperature,90,85,0,-10,2010,2012,y,1
+2m_temperature,90,85,0,-10,2010,2015,m,0.5
+2m_temperature,90,80,10,-10,2020,2020,h,0.25
+2m_temperature,80,75,10,-10,2020,2022,d,0.5

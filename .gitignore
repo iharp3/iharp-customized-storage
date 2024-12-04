@@ -2,6 +2,7 @@
 data/raw
 data/agg
 other_data/
+storage/*.nc
 
 # raw data files
 *.nc

@@ -55,7 +55,6 @@ def load_csv(file_path):
     with open(file_path, 'r') as csvfile:
         reader = csv.DictReader(csvfile)
         rows = [row for row in reader]  # Each row is a dictionary
-    
     return rows
 
 def get_file_size(file_path):
@@ -63,3 +62,18 @@ def get_file_size(file_path):
     file_size_mb = file_size_bytes / (1024 * 1024)
 
     return file_size_mb
+
+def wait_for_file(file_path, timeout=1800, poll_interval=60):
+    """
+    Wait up to timeout seconds (1800sec=30mins) for file to exist.
+    Check every poll_interval seconds.
+    """
+    start_time = time.time()
+    while not os.path.exists(file_path):
+        elapsed_time = time.time() - start_time
+        if elapsed_time > timeout:
+            print(f"Timeout reached. File '{file_path}' not created.")
+            return False
+        time.sleep(poll_interval)
+    print(f"File '{file_path}' created.")
+    return True
