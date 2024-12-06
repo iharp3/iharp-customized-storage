@@ -35,11 +35,11 @@ def delete_file(file_path):
     if os.path.isfile(file_path):
         try:
             os.remove(file_path)
-            print(f"File '{file_path}' has been deleted successfully.")
+            print(f"\tFile '{file_path}' has been deleted successfully.")
         except Exception as e:
-            print(f"An error occurred while deleting the file: {e}")
+            print(f"\tAn error occurred while deleting the file: {e}")
     else:
-        print(f"The path '{file_path}' does not exist or is not a file.")
+        print(f"\tThe path '{file_path}' does not exist or is not a file.")
 
 def save_csv(rows, file_path):
     """
@@ -50,6 +50,16 @@ def save_csv(rows, file_path):
         writer = csv.DictWriter(csvfile, fieldnames=headers)
         writer.writeheader()
         writer.writerows(rows)
+
+def save_list_to_csv(list, file_path):
+    """
+    Saves csv file from list of strings.
+    """
+    with open(file_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for l in list:
+            writer.writerow([l])
+
 
 def load_csv(file_path):
     with open(file_path, 'r') as csvfile:
