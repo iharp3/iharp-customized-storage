@@ -31,6 +31,15 @@ def get_agg_file_name(cur_file_name, t):
     
     return file_name
 
+def modify_filename(cur_file_name, agg_type):
+    """
+    Replaces '.nc' with parameter agg_type.
+    """
+    return cur_file_name.replace('.nc', agg_type)
+
+def get_data_path(file_name):
+    return
+
 def delete_file(file_path):
     if os.path.isfile(file_path):
         try:
@@ -87,3 +96,26 @@ def wait_for_file(file_path, timeout=1800, poll_interval=60):
         time.sleep(poll_interval)
     print(f"File '{file_path}' created.")
     return True
+
+def get_min_max_of_array(arr):
+    v_min = arr.min().compute().values.item()
+    v_max = arr.max().compute().values.item()
+    # print(f"\tMin:{v_min}, Max:{v_max}")
+
+    return v_min, v_max
+
+def compute_scale_and_offset_mm(mi, ma, n=16):
+    vmin = mi
+    vmax = ma
+    # Stretch/compress data to the available packed range
+    scale_factor = (vmax - vmin) / (2**n - 1)
+    # Translate the range to be symmetric about zero
+    add_offset = vmin + 2 ** (n - 1) * scale_factor
+    print(f"\tScale factor: {scale_factor}, add offset: {add_offset}")
+    
+    return scale_factor, add_offset
+
+def get_scale_offset(arr):
+    v_min, v_max = get_min_max_of_array(arr)
+    
+    return compute_scale_and_offset_mm(v_min, v_max), v_min, v_max
