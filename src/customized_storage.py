@@ -51,13 +51,13 @@ def main():
         to_delete_list = []
 
         # Temporal aggregation
-        temporal_agg_object = DataAgg(name=row['file_name'], var=row['variable'], t=True, target=row['temporal_resolution'])
+        temporal_agg_object = DataAgg(name=row['file_name'], var=row['variable'], t=True, target=row['temporal_resolution'], constant=config.RAW_SP_RES)
         temporal_metadata_list, temporal_to_delete_list = temporal_agg_object.make_temporal_agg_files()
         # [{'name':123, 'size':4, 'temp_res': d, 'sp_res':0.25}, {'name':456, 'size':4, 'temp_res': d, 'sp_res':0.25}]
 
         for d in temporal_metadata_list:
             # Spatial aggregation
-            spatial_agg_object, to_delete_list = DataAgg(name=d['file_name'], t=False, target=row['spatial_resolution'])
+            spatial_agg_object, to_delete_list = DataAgg(name=d['file_name'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
             spatial_metadata_list, spatial_to_delete_list = spatial_agg_object.make_spatial_agg_files()
 
             metadata_list = metadata_list + spatial_metadata_list
