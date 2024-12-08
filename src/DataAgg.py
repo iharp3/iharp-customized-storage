@@ -92,6 +92,9 @@ class DataAgg:
 
 	def spatial_agg(self, dataset, resolution):
 		"""
+		TODO: Check that the file names update correctly (should have gotten s2 for 1.0)
+		TODO: Check that you get the files you want (I think you're overwritting files because the file names did not update)
+		TODO: Check the metadata you want (I think you're adding too many things to the metadata)
 		"""
 		# Get agg file names
 		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()

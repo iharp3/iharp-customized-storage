@@ -71,6 +71,8 @@ def main():
 
     print(f"All files temporally and spatially aggregated.")
 
+    #TODO: raw files have to be deleted. Probably easiest to do in DataAgg before you add things to the metadata list...
+
     # Save metadata
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
