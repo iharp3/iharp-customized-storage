@@ -64,23 +64,23 @@ def main():
         full_metadata_list = full_metadata_list + metadata_list
 
         # TODO: add an interim save that saves metadata list here so you don't lose all metadata data if loop fails
-        
+
     print(f"All files temporally and spatially aggregated.")
 
     # Save metadata
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
 
-    # Check before deleting files to delete
-    delete_now = input("Would you like to delete unnecessary files now? [Yes or No]").strip()
-    if delete_now == "No":
-        print(f"Saving files to delete list to {config.TO_DELETE}")
-        save_list_to_csv(full_to_delete_list, config.TO_DELETE)
-    elif delete_now == "Yes":
-        for file in full_to_delete_list:
-            delete_file(file)
-    else:
-        print("Input must be either 'No' or 'Yes'.")
+    # # Check before deleting files to delete
+    # delete_now = input("Would you like to delete unnecessary files now? [Yes or No]").strip()
+    # if delete_now == "No":
+    #     print(f"Saving files to delete list to {config.TO_DELETE}")
+    #     save_list_to_csv(full_to_delete_list, config.TO_DELETE)
+    # elif delete_now == "Yes":
+    #     for file in full_to_delete_list:
+    #         delete_file(file)
+    # else:
+    #     print("Input must be either 'No' or 'Yes'.")
         
 if __name__ == "__main__":
     main()

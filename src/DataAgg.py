@@ -14,8 +14,8 @@ import config
 
 class DataAgg:
 
-	self.all_t = ["1D", "1M", "1Y"]
-	self.all_s = [0.5, 1.0]
+	self.all_t = ["1H", "1D", "1M", "1Y"]
+	self.all_s = [0.25, 0.5, 1.0]
 
     def __init__(self, name, var, t, target, constant):
         self.name = name    # file name
@@ -26,7 +26,7 @@ class DataAgg:
 
         self.metadata_list = []
 
-	def compress_save_and_get_dict(agg, name, t_res, s_res):
+	def compress_save_and_get_dict(agg, name, t_res, s_res, agg_type):
 		"""
 		Get scale and offset to compress dataset. Save compressed dataset.
 		Return a dictionary with dataset metadata.
@@ -48,7 +48,8 @@ class DataAgg:
 		)
 
 		d = {"temporal_resolution":t_res,
-			 "spatial_resolution":s_res, 
+			 "spatial_resolution":s_res,
+			 "agg_type": agg_type
 			 "min":round(v_min, 2),
 			 "max":round(v_max, 2),
 			 "file_size":get_file_size(file_path),
@@ -73,19 +74,19 @@ class DataAgg:
 		
 		"""
 		# Get agg file names
-		mean_agg_name, min_agg_name, max_agg_name = get_all_agg_names()
+		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
 
 		# Mean aggregation
 		mean_agg = dataset.resample(time=resolution).mean()	# TODO: Might need to persist dataset after this
-		d_mean = compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=resolution[1], s_res=self.constant)
+		d_mean = self.compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="mean")
 
 		# Min aggregation
 		min_agg = dataset.resample(time=resolution).min()	# TODO: Might need to persist dataset here
-		d_min = compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=resolution[1], s_res=self.constant)
+		d_min = self.compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="min")
 
 		# Max aggregation
 		max_agg = dataset.resample(time=resolution).max()	# TODO: Might need to persist dataset here
-		d_max = compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=resolution[1], s_res=self.constant)
+		d_max = self.compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="max")
 	
 		return [d_mean, d_min, d_max]
 
@@ -93,22 +94,22 @@ class DataAgg:
 		"""
 		"""
 		# Get agg file names
-		mean_agg_name, min_agg_name, max_agg_name = get_all_agg_names()
+		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
 
 		# Get coarsen factor
 		c_f = int(resolution/self.constant)
 
 		# Mean aggregation
 		mean_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").mean()
-		d_mean = compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=self.constant, s_res=resolution)
+		d_mean = self.compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=self.constant, s_res=resolution, agg_type="mean")
 
 		# Min aggregation
 		min_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").min()
-		d_min = compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=self.constant, s_res=resolution)
+		d_min = self.compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=self.constant, s_res=resolution, agg_type="min")
 
 		# Max aggregation
 		max_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").max()
-		d_max = compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=self.constant, s_res=resolution)
+		d_max = self.compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=self.constant, s_res=resolution, agg_type="max")
 
 		return [d_mean, d_min, d_max]
 
@@ -123,12 +124,12 @@ class DataAgg:
 		file_path = get_data_path(self.name)
 		ds = xr.open_dataset(file_path, chunks={config.TIME: config.NUM_CHUNKS})	#TODO: check time dimension has name "valid_time"
 
-		# Get raw file dict
-		r = compress_save_and_get_dict(agg=ds, name=self.name, t_res="H", s_res=self.constant)
-
-		# For the temporal aggregations we need
-		for i in range(self.all_t.index(self.target), len(self.all_t)):
-			mean_min_max_metadata_list = self.temporal_agg(ds, resolution)	# Get all agg types (mean, min, max)
+		for i in range(self.all_t.index(self.target), len(self.all_t)):	# This for-loop gets us every temporal resolution
+			resolution = all_t[i]
+			if resolution == "1H":
+				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=config.RAW_T_RES, s_res=self.constant, agg_type="none")
+			else:
+				mean_min_max_metadata_list = self.temporal_agg(ds, resolution)	# This function gets us all agg types (mean, min, max)
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list	# Save dicts to metadata_list
 
 		return self.metadata_list
@@ -139,3 +140,17 @@ class DataAgg:
 
 		Returns:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
+		"""
+		# Get dataset to aggregate
+		file_path - get_data_path(self.name)
+		ds = xr.open_dataset(file_path, chunks={"auto"})	#TODO: determine good chunks
+
+		for i in range(self.all_s.index(self.target), len(self.all_s)):	# This for-loop gets us every spatial resolution
+		resolution = float(all_s[i])
+			if resolution == 0.25:
+				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=self.constant, s_res=config.RAW_SP_RES, agg_type="none")
+			else:
+				mean_min_max_metadata_list = self.spatial_agg(ds, resolution)
+			self.metadata_list = self.metadata_list + mean_min_max_metadata_list
+
+		return self.metadata_list
