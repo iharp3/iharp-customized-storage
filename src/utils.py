@@ -6,6 +6,8 @@ import time
 import re
 import csv
 
+import config
+
 def get_unique_num():
     return int(time.time() * 1000)
 
@@ -38,7 +40,8 @@ def modify_filename(cur_file_name, agg_type):
     return cur_file_name.replace('.nc', agg_type)
 
 def get_data_path(file_name):
-    return
+
+    return os.path.join(config.DATA_D, file_name)
 
 def delete_file(file_path):
     if os.path.isfile(file_path):
@@ -117,5 +120,5 @@ def compute_scale_and_offset_mm(mi, ma, n=16):
 
 def get_scale_offset(arr):
     v_min, v_max = get_min_max_of_array(arr)
-    
-    return compute_scale_and_offset_mm(v_min, v_max), v_min, v_max
+    scale, offset = compute_scale_and_offset_mm(v_min, v_max)
+    return scale, offset, v_min, v_max

@@ -6,13 +6,17 @@ import time
 import sys
 
 from utils import load_csv, save_csv, save_list_to_csv
+from DataAgg import DataAgg
+"""
 from ApiGenerator import API_Call
+"""
 
 import config
 
 def main():
     # Upload user input
     user_interest_rows = load_csv(config.USER_INTEREST)
+    """
     failed_rows = []
 
     for row in user_interest_rows:
@@ -40,7 +44,7 @@ def main():
             print(f"Failed to download following files:")
             for row in failed_rows:
                 print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
-
+    """
     # Aggregate data and get metadata
     full_metadata_list = []
 
