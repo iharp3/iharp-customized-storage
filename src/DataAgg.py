@@ -120,6 +120,7 @@ class DataAgg:
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
 		ds = xr.open_dataset(file_path, chunks={config.TIME: config.NUM_CHUNKS})	#TODO: check time dimension has name "valid_time"
+		ds = ds.chunk({"valid_time": 8760})	# Re-chunking by the number of hours in a year
 
 		for i in range(self.all_t.index(self.target), len(self.all_t)):	# This for-loop gets us every temporal resolution
 			resolution = str(self.all_t[i])

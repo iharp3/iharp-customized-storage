@@ -60,7 +60,7 @@ def main():
 
         for d in temporal_metadata_list:
             # Spatial aggregation
-            spatial_agg_object = DataAgg(name=d['file_name'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
+            spatial_agg_object = DataAgg(name=d['file_name'], var=row['variable'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
             spatial_metadata_list  = spatial_agg_object.make_spatial_agg_files()
 
             metadata_list = metadata_list + spatial_metadata_list
