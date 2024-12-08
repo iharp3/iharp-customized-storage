@@ -44,6 +44,7 @@ def main():
     # Aggregate data and get metadata
     full_metadata_list = []
 
+    print(f"Starting aggregation.")
     for row in user_interest_rows:
         row_info = {'variable':row['variable'],'max_lat_N':row['max_lat_N'],'min_lat_S':row['min_lat_S'],'max_long_E':row['max_long_E'],'min_long_W':row['min_long_W'],'start_time':row['start_time'],'end_time':row['end_time']}
         metadata_list = []
@@ -62,6 +63,7 @@ def main():
         
         metadata_list = [{**row_info, **m} for m in metadata_list]
         full_metadata_list = full_metadata_list + metadata_list
+        print(f"\tCurrent metadata: \n\t{metadata_list}")
 
         # TODO: add an interim save that saves metadata list here so you don't lose all metadata data if loop fails
 
