@@ -1,3 +1,2 @@
-variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution,file_name
-t2m,90,85,0,-10,2010,2012,1YE,1,t2m_t0_s0_11111.nc
-t2m,90,85,0,-10,2010,2015,1M,0.5,t2m_t0_s0_22222.nc
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
+t2m,10,0,15,5,2020-01-01T00:00,2020-12-31T24:00,1YE,0.5

@@ -7,16 +7,14 @@ import sys
 
 from utils import load_csv, save_csv, save_list_to_csv
 from DataAgg import DataAgg
-"""
 from ApiGenerator import API_Call
-"""
 
 import config
 
 def main():
     # Upload user input
     user_interest_rows = load_csv(config.USER_INTEREST)
-    """
+    
     failed_rows = []
 
     for row in user_interest_rows:
@@ -44,7 +42,7 @@ def main():
             print(f"Failed to download following files:")
             for row in failed_rows:
                 print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
-    """
+    
     # Aggregate data and get metadata
     full_metadata_list = []
 
@@ -76,17 +74,6 @@ def main():
     # Save metadata
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
-
-    # # Check before deleting files to delete
-    # delete_now = input("Would you like to delete unnecessary files now? [Yes or No]").strip()
-    # if delete_now == "No":
-    #     print(f"Saving files to delete list to {config.TO_DELETE}")
-    #     save_list_to_csv(full_to_delete_list, config.TO_DELETE)
-    # elif delete_now == "Yes":
-    #     for file in full_to_delete_list:
-    #         delete_file(file)
-    # else:
-    #     print("Input must be either 'No' or 'Yes'.")
         
 if __name__ == "__main__":
     main()
