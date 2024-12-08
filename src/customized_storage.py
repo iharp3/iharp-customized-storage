@@ -43,31 +43,28 @@ def main():
 
     # Aggregate data and get metadata
     full_metadata_list = []
-    full_to_delete_list = []
 
     for row in user_interest_rows:
         row_info = {'variable':row['variable'],'max_lat_N':row['max_lat_N'],'min_lat_S':row['min_lat_S'],'max_long_E':row['max_long_E'],'min_long_W':row['min_long_W'],'start_time':row['start_time'],'end_time':row['end_time']}
         metadata_list = []
-        to_delete_list = []
 
         # Temporal aggregation
         temporal_agg_object = DataAgg(name=row['file_name'], var=row['variable'], t=True, target=row['temporal_resolution'], constant=config.RAW_SP_RES)
-        temporal_metadata_list, temporal_to_delete_list = temporal_agg_object.make_temporal_agg_files()
+        temporal_metadata_list = temporal_agg_object.make_temporal_agg_files()
         # [{'name':123, 'size':4, 'temp_res': d, 'sp_res':0.25}, {'name':456, 'size':4, 'temp_res': d, 'sp_res':0.25}]
 
         for d in temporal_metadata_list:
             # Spatial aggregation
-            spatial_agg_object, to_delete_list = DataAgg(name=d['file_name'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
-            spatial_metadata_list, spatial_to_delete_list = spatial_agg_object.make_spatial_agg_files()
+            spatial_agg_object = DataAgg(name=d['file_name'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
+            spatial_metadata_list  = spatial_agg_object.make_spatial_agg_files()
 
             metadata_list = metadata_list + spatial_metadata_list
-            to_delete_list = to_delete_list + spatial_to_delete_list
         
         metadata_list = [{**row_info, **m} for m in metadata_list]
         full_metadata_list = full_metadata_list + metadata_list
-        full_to_delete_list = full_to_delete_list + to_delete_list
 
         # TODO: add an interim save that saves metadata list here so you don't lose all metadata data if loop fails
+        
     print(f"All files temporally and spatially aggregated.")
 
     # Save metadata

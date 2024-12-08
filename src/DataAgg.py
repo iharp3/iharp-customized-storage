@@ -105,7 +105,7 @@ class DataAgg:
 		# Min aggregation
 		min_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").min()
 		d_min = compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=self.constant, s_res=resolution)
-		
+
 		# Max aggregation
 		max_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").max()
 		d_max = compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=self.constant, s_res=resolution)
@@ -118,7 +118,6 @@ class DataAgg:
 
 		Returns:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
-			too_fine_list: List of file names that have finer temporal aggregation than is needed.
 		"""
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
@@ -133,3 +132,10 @@ class DataAgg:
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list	# Save dicts to metadata_list
 
 		return self.metadata_list
+
+	def make_spatial_agg_files():
+		"""
+		Aggregates data spatially from the finest (0.25) to the coarsest (1.0) spatial aggregation.
+
+		Returns:
+			metadata_list: List of dictionaries containing metadata for aggregated files.
