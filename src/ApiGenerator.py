@@ -2,8 +2,12 @@
 ApiGenerator.py: Creates and manages API calls to remote data repositories.
 """
 import numpy as np
+import pandas as pd
+import cdsapi
 
 from utils import get_data_path
+
+import config
 
 class API_Call:
     def __init__(self, row, name):
@@ -11,8 +15,11 @@ class API_Call:
         self.name = name    # file name
 
     def get_year_range(self):
-        start_year = (self.row['start_time']).astype('M8[ns]').item().year
-        end_year = (self.row['end_time']).astype('M8[ns]').item().year
+        start_time = self.row['start_time']
+        start_year = pd.to_datetime(start_time).year
+        
+        end_time = self.row['end_time']
+        end_year = pd.to_datetime(end_time).year
 
         return [str(i) for i in range(int(start_year), int(end_year) + 1)]
 
@@ -34,7 +41,7 @@ class API_Call:
                    "time": config.TIME_RANGE,
                    "data_format": config.DATA_FORMAT,
                    "download_format": config.DOWNLOAD_FORMAT,
-                   "area": get_area_list()
+                   "area": self.get_area_list()
         }
 
         return request
@@ -43,9 +50,9 @@ class API_Call:
         file_path = get_data_path(self.name)
 
         dataset = config.DATASET
-        request = era5_api_request()
+        request = self.era5_api_request()
 
         client = cdsapi.Client()
 
-        print(f"\tDownloading {self.row['variable']} data to {file_path}.")
+        print(f"\n\tDownloading {self.row['variable']} data to {file_path}.\n")
         client.retrieve(dataset,request,file_path)

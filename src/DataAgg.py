@@ -15,9 +15,12 @@ import config
 class DataAgg:
 	def __init__(self, name, var, t, target, constant):
 		self.name = name    # file name
-		self.var = var	# variable in file
+		self.var = config.VAR_SHORT_N[var]	# variable in file
 		self.t = t  # True if temporal agg, False if spatial agg
-		self.target = target    # either temporal or spatial resolution (depends on self.t)
+		if t:
+			self.target = str(target)
+		else:
+			self.target = float(target)
 		self.constant = constant	# either temporal or spatial resolution (depends on self.t)
 		self.metadata_list = []
 		self.all_t = ["1H", "1D", "1M", "1YE"]
@@ -140,8 +143,8 @@ class DataAgg:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
 		"""
 		# Get dataset to aggregate
-		file_path - get_data_path(self.name)
-		ds = xr.open_dataset(file_path, chunks={"auto"})	#TODO: determine good chunks
+		file_path = get_data_path(self.name)
+		ds = xr.open_dataset(file_path, chunks='auto')	#TODO: determine good chunks
 
 		for i in range(self.all_s.index(self.target), len(self.all_s)):	# This for-loop gets us every spatial resolution
 			resolution = float(self.all_s[i])

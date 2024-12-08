@@ -5,7 +5,7 @@ import os
 import time
 import sys
 
-from utils import load_csv, save_csv, save_list_to_csv
+from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, wait_for_file
 from DataAgg import DataAgg
 from ApiGenerator import API_Call
 
@@ -32,13 +32,13 @@ def main():
             failed_rows.append(row)
 
     # Note failed rows
-    if failed_rows == []
+    if failed_rows == []:
         print(f"Finished downloading all data.")
     else:
         if len(failed_rows) == len(user_interest_rows):
             print(f"Failed to download all files. Exiting.")
             sys.exit()
-        else
+        else:
             print(f"Failed to download following files:")
             for row in failed_rows:
                 print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
