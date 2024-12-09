@@ -53,7 +53,7 @@ class DataAgg:
 			d = {"temporal_resolution":t_res,
 				"spatial_resolution":s_res,
 				"temporal_agg_type": agg_type,
-				"spatial_agg_type": 0.25
+				"spatial_agg_type": 0.25,
 				"min":round(v_min, 2),
 				"max":round(v_max, 2),
 				"file_size":get_file_size(file_path),
@@ -62,7 +62,7 @@ class DataAgg:
 			d = {"temporal_resolution":t_res,
 			 "spatial_resolution":s_res,
 			 "temporal_agg_type": self.temp_agg_type,
-			 "spatial_agg_type": agg_type
+			 "spatial_agg_type": agg_type,
 			 "min":round(v_min, 2),
 			 "max":round(v_max, 2),
 			 "file_size":get_file_size(file_path),
