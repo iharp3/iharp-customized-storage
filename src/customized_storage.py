@@ -15,33 +15,33 @@ def main():
     # Upload user input
     user_interest_rows = load_csv(config.USER_INTEREST)
     
-    # failed_rows = []
+    failed_rows = []
 
-    # for row in user_interest_rows:
+    for row in user_interest_rows:
 
-    #     raw_file_name = get_raw_file_name(row['variable'])
-    #     row['file_name'] = raw_file_name
+        raw_file_name = get_raw_file_name(row['variable'])
+        row['file_name'] = raw_file_name
 
-    #     call = API_Call(row, raw_file_name)
-    #     call.era5_api_request()
-    #     call.make_file()
+        call = API_Call(row, raw_file_name)
+        call.era5_api_request()
+        call.make_file()
 
-    #     if wait_for_file(raw_file_name):
-    #         print(f"\tData downloaded to: {raw_file_name}.")
-    #     else:
-    #         failed_rows.append(row)
+        if wait_for_file(raw_file_name):
+            print(f"\tData downloaded to: {raw_file_name}.")
+        else:
+            failed_rows.append(row)
 
-    # # Note failed rows
-    # if failed_rows == []:
-    #     print(f"Finished downloading all data.")
-    # else:
-    #     if len(failed_rows) == len(user_interest_rows):
-    #         print(f"Failed to download all files. Exiting.")
-    #         sys.exit()
-    #     else:
-    #         print(f"Failed to download following files:")
-    #         for row in failed_rows:
-    #             print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
+    # Note failed rows
+    if failed_rows == []:
+        print(f"Finished downloading all data.")
+    else:
+        if len(failed_rows) == len(user_interest_rows):
+            print(f"Failed to download all files. Exiting.")
+            sys.exit()
+        else:
+            print(f"Failed to download following files:")
+            for row in failed_rows:
+                print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
     
     # Aggregate data and get metadata
     full_metadata_list = []
