@@ -15,12 +15,14 @@ import config
 class DataAgg:
 	def __init__(self, name, var, t, target, constant):
 		self.name = name    # file name
+		self.cur_name = name	# updated file name
 		self.var = config.VAR_SHORT_N[var]	# variable in file
 		self.t = t  # True if temporal agg, False if spatial agg
 		if t:
 			self.target = str(target)
 		else:
 			self.target = float(target)
+		self.temp_agg_type = ""
 		self.constant = constant	# either temporal or spatial resolution (depends on self.t)
 		self.metadata_list = []
 		self.all_t = ["1H", "1D", "1M", "1YE"]
@@ -47,9 +49,20 @@ class DataAgg:
 			}
 		)
 
-		d = {"temporal_resolution":t_res,
+		if self.t:	# temporal agg
+			d = {"temporal_resolution":t_res,
+				"spatial_resolution":s_res,
+				"temporal_agg_type": agg_type,
+				"spatial_agg_type": 0.25
+				"min":round(v_min, 2),
+				"max":round(v_max, 2),
+				"file_size":get_file_size(file_path),
+				"file_name":name}
+		else:	# spatial agg
+			d = {"temporal_resolution":t_res,
 			 "spatial_resolution":s_res,
-			 "agg_type": agg_type,
+			 "temporal_agg_type": self.temp_agg_type,
+			 "spatial_agg_type": agg_type
 			 "min":round(v_min, 2),
 			 "max":round(v_max, 2),
 			 "file_size":get_file_size(file_path),
@@ -61,11 +74,12 @@ class DataAgg:
 		"""
 		Make names for aggregations
 		"""
-		agg_name = get_agg_file_name(self.name, t=self.t)
+		agg_name = get_agg_file_name(self.cur_name, t=self.t)
+		self.cur_name = agg_name
 
-		mean_agg_name = modify_filename(cur_file_name=agg_name, agg_type="_mean.nc")
-		min_agg_name = modify_filename(cur_file_name=agg_name, agg_type="_min.nc")
-		max_agg_name = modify_filename(cur_file_name=agg_name, agg_type="_max.nc")
+		mean_agg_name = modify_filename(cur_file_name=self.cur_name, agg_type="_mean.nc")
+		min_agg_name = modify_filename(cur_file_name=self.cur_name, agg_type="_min.nc")
+		max_agg_name = modify_filename(cur_file_name=self.cur_name, agg_type="_max.nc")
 
 		return mean_agg_name, min_agg_name, max_agg_name
 
@@ -94,7 +108,6 @@ class DataAgg:
 		"""
 		TODO: Check that the file names update correctly (should have gotten s2 for 1.0)
 		TODO: Check that you get the files you want (I think you're overwritting files because the file names did not update)
-		TODO: Check the metadata you want (I think you're adding too many things to the metadata)
 		"""
 		# Get agg file names
 		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
@@ -125,7 +138,7 @@ class DataAgg:
 		"""
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
-		ds = xr.open_dataset(file_path, chunks={config.TIME: config.NUM_CHUNKS})	#TODO: check time dimension has name "valid_time"
+		ds = xr.open_dataset(file_path, chunks={config.TIME: config.NUM_CHUNKS})
 		ds = ds.chunk({"valid_time": 8760})	# Re-chunking by the number of hours in a year
 
 		for i in range(self.all_t.index(self.target), len(self.all_t)):	# This for-loop gets us every temporal resolution
@@ -138,13 +151,14 @@ class DataAgg:
 
 		return self.metadata_list
 
-	def make_spatial_agg_files(self):
+	def make_spatial_agg_files(self, cur_t_agg_file):
 		"""
 		Aggregates data spatially from the finest (0.25) to the coarsest (1.0) spatial aggregation.
 
 		Returns:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
 		"""
+		self.temp_agg_type = cur_t_agg_file
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
 		ds = xr.open_dataset(file_path, chunks='auto')	#TODO: determine good chunks

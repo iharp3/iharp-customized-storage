@@ -83,7 +83,7 @@ def get_file_size(file_path):
     file_size_bytes = os.path.getsize(file_path)
     file_size_mb = file_size_bytes / (1024 * 1024)
 
-    return file_size_mb
+    return round(file_size_mb, 2)
 
 def wait_for_file(file_path, timeout=1800, poll_interval=60):
     """

@@ -25,6 +25,7 @@ def test_util_funcs():
     print("\n~~~Testing spatially aggregated file name creation:")
     true_agg = f"var_t0_s1_{unique_num}.nc"
     agg = get_agg_file_name(raw, t=0)
+    agg = get_agg_file_name(agg, t=0)
     if agg == true_agg:
         print(f"Aggregated file name is as expected:{agg}")
     else:

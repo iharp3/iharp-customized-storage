@@ -18,7 +18,7 @@ RAW_T_RES = "H"
 NUM_CHUNKS = 1000
 
 # era5 API request settings
-TIME = "valid_time"
+TIME = "valid_time"     # TODO: check this is new value
 VAR_SHORT_N = {"2m_temperature":"t2m"}
 DATASET =  "reanalysis-era5-single-levels"
 PRODUCT_TYPE = ["reanalysis"]
