@@ -1,3 +1,9 @@
 variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
-2m_temperature,10,0,15,0,2015-01-01T00:00,2020-12-31T23:00,1H,0.25
-2m_temperature,85,80,
+2m_temperature,10,0,15,0,2015-01-01T00:00,2020-12-31T23:00,1H,1.0
+2m_temperature,85,80,0,-20,2000-01-01T00:00,2020-12-31T23:00,1YE,0.5
+2m_temperature,85,80,20,0,2000-01-01T00:00,2020-12-31T23:00,1YE,0.5
+2m_temperature,90,70,-50,-80,2008-01-01T00:00,2023-12-31T23:00,1M,1.0
+2m_temperature,90,-20,15,0,2012-01-01T00:00,2022-12-31T23:00,1D,0.5
+2m_temperature,85,80,40,60,2000-01-01T00:00,2005-12-31T23:00,1M,0.25
+2m_temperature,85,80,60,40,2000-01-01T00:00,2005-12-31T23:00,1H,0.25
+2m_temperature,01,0,30,0,2015-01-01T00:00,2020-12-31T23:00,1D,1.0
