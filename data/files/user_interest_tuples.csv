@@ -1,5 +1,0 @@
-variable,max_lat,min_lat,max_long,min_long,start_time,end_time,temporal_resolution,spatial_resolution,file_path
-2m_temperature,90,0,180,-180,2000,2001,day,0.5,raw_1.nc
-2m_temperature,90,50,50,-120,2000,2001,month,0.25,raw_2.nc
-2m_temperature,80,70,0,-180,2000,2001,day,0.25,raw_3.nc
-2m_temperature,0,-40,180,-180,2000,2001,day,1,raw_4.nc
