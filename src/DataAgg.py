@@ -151,14 +151,14 @@ class DataAgg:
 
 		return self.metadata_list
 
-	def make_spatial_agg_files(self, cur_t_agg_file):
+	def make_spatial_agg_files(self, cur_t_agg_type):
 		"""
 		Aggregates data spatially from the finest (0.25) to the coarsest (1.0) spatial aggregation.
 
 		Returns:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
 		"""
-		self.temp_agg_type = cur_t_agg_file
+		self.temp_agg_type = cur_t_agg_type
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
 		ds = xr.open_dataset(file_path, chunks='auto')	#TODO: determine good chunks
