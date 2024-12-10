@@ -114,7 +114,7 @@ def compute_scale_and_offset_mm(mi, ma, n=16):
     scale_factor = (vmax - vmin) / (2**n - 1)
     # Translate the range to be symmetric about zero
     add_offset = vmin + 2 ** (n - 1) * scale_factor
-    print(f"\tScale factor: {scale_factor}, add offset: {add_offset}")
+    # print(f"\tScale factor: {scale_factor}, add offset: {add_offset}")
     
     return scale_factor, add_offset
 
