@@ -25,6 +25,7 @@ import xarray as xr
 import pandas as pd
 
 if __name__ == "__main__":
+    # Example: python PostProcess.py -D /data/iharp-customized-storage/storage/ -M /data/iharp-customized-storage/storage/metadata.csv
     parser = argparse.ArgumentParser()
     parser.add_argument("-D", "--data_folder", type=str, help="Path to the data files folder.")
     parser.add_argument("-M", "--metadata", type=str, help="Path to the metadata file.")
