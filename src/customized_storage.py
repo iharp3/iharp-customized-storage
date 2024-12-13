@@ -27,31 +27,28 @@ def main():
         # Upload user input
         user_interest_rows = load_csv(config.USER_INTEREST)
 
-        if user_interest_rows[0]['file_name']:
-            pass
+        failed_rows = []
+        completed_rows = []
+
+        for row in user_interest_rows:
+            try:
+                completed_rows += process_row(row)
+                
+                if wait_for_file(raw_file_name):
+                    print(f"\tData downloaded to: {raw_file_name}.")
+                    save_csv(completed_rows, config.USER_INTEREST_NAMED)
+                else:
+                    failed_rows.append(row)
+
+            except Exception as e:
+                print(f"\tError processing row {row}: {e}")
+        
+        # Note failed rows
+        if failed_rows == []:
+            print(f"Finished downloading all data.")
         else:
-            failed_rows = []
-            completed_rows = []
-
-            for row in user_interest_rows:
-                try:
-                    completed_rows += process_row(row)
-                    
-                    if wait_for_file(raw_file_name):
-                        print(f"\tData downloaded to: {raw_file_name}.")
-                        save_csv(completed_rows, config.USER_INTEREST_NAMED)
-                    else:
-                        failed_rows.append(row)
-
-                except Exception as e:
-                    print(f"\tError processing row {row}: {e}")
-            
-            # Note failed rows
-            if failed_rows == []:
-                print(f"Finished downloading all data.")
-            else:
-                # save failed rows to file
-                save_list_to_csv(failed_rows, config.FAILED_ROWS)
+            # save failed rows to file
+            save_list_to_csv(failed_rows, config.FAILED_ROWS)
 
     except FileNotFoundError:
         print(f"Input file not found.")
