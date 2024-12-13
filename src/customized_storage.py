@@ -29,19 +29,21 @@ def main():
         
         failed_rows = []
 
-        # with open(config.user_interest_named, mode='w', newline='', encoding='utf-8') as outfile:
-
+        completed_rows = []
 
         for row in user_interest_rows:
             try:
-                updated_row = process_row(row)
+                completed_rows += process_row(row)
                 
                 if wait_for_file(raw_file_name):
                     print(f"\tData downloaded to: {raw_file_name}.")
+                    save_csv(completed_rows, config.user_interest_named_csv)
                 else:
                     failed_rows.append(row)
+
             except Exception as e:
                 print(f"\tError processing row {row}: {e}")
+        
         # Note failed rows
         if failed_rows == []:
             print(f"Finished downloading all data.")
@@ -54,13 +56,13 @@ def main():
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-    
 
     # Aggregate data and get metadata
     full_metadata_list = []
+    user_interest_named = load_csv(config.user_interest_named_csv)
 
     print(f"Starting aggregation.")
-    for row in user_interest_rows:
+    for row in user_interest_named:
         row_info = {'variable':row['variable'],'max_lat_N':row['max_lat_N'],'min_lat_S':row['min_lat_S'],'max_long_E':row['max_long_E'],'min_long_W':row['min_long_W'],'start_time':row['start_time'],'end_time':row['end_time']}
         metadata_list = []
 
@@ -78,10 +80,8 @@ def main():
         
         metadata_list = [{**row_info, **m} for m in metadata_list]
         full_metadata_list = full_metadata_list + metadata_list
-        print(f"\tCurrent metadata: \n\t{metadata_list}")
 
-        # TODO: add an interim save that saves metadata list here so you don't lose all metadata data if loop fails
-
+        save_csv(full_metadata_list, config.METADATA)
     print(f"All files temporally and spatially aggregated.")
 
     #TODO: raw files have to be deleted. Probably easiest to do in DataAgg before you add things to the metadata list...
