@@ -27,7 +27,7 @@ def main():
         # Upload user input
         user_interest_rows = load_csv(config.USER_INTEREST)
 
-        if user_interest_rows['file_name']:
+        if user_interest_rows[0]['file_name']:
             pass
         else:
             failed_rows = []

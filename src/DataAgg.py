@@ -25,16 +25,23 @@ class DataAgg:
 		self.temp_agg_type = ""
 		self.constant = constant	# either temporal or spatial resolution (depends on self.t)
 		self.metadata_list = []
-		self.all_t = ["1H", "1D", "1M", "1YE"]
+		self.all_t = ["1H", "1D", "1ME", "1YE"]
 		self.all_s = [0.25, 0.5, 1.0]
 
 	def compress_save_and_get_dict(self, agg, name, t_res, s_res, agg_type):
 		"""
-		Get scale and offset to compress dataset. Save compressed dataset.
+		Get scale and offset to compress dataset. Drop unwanted dimensions from dataset. Save compressed dataset.
 		Return a dictionary with dataset metadata.
 		"""
-		file_path = get_data_path(name)
+		# drop unwanted dimensions, rename dim
+		agg = agg.rename({"valid_time": "time"})
+		if "number" in agg.coords:
+			agg = agg.drop_vars("number")
+		if "expver" in agg.coords:
+			agg = agg.drop_vars("expver")
+
 		scale, offset, v_min, v_max = get_scale_offset(arr=agg[self.var])
+		file_path = get_data_path(name)
 
 		agg.to_netcdf(
 			file_path,
