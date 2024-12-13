@@ -11,10 +11,12 @@ DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 USER_INTEREST = os.path.join(DATA_D, 'user_interest.csv') # file with user interest
 METADATA = os.path.join(DATA_D, 'metadata.csv') # file with metadata
 TO_DELETE = os.path.join(DATA_D, 'files_to_delete.csv') # file with files to delete after aggregation
+USER_INTEREST_NAMED = os.path.join(DATA_D, 'user_interest_named.csv')   # user interest file with names for each raw file
+FAILED_ROWS = os.path.join(DATA_D, 'failed_rows.csv')   # list of rows that didn't run
 
-# 
+#  
 RAW_SP_RES = 0.25
-RAW_T_RES = "H"
+RAW_T_RES = "1H"
 NUM_CHUNKS = 1000
 
 # era5 API request settings

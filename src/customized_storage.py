@@ -37,7 +37,7 @@ def main():
                 
                 if wait_for_file(raw_file_name):
                     print(f"\tData downloaded to: {raw_file_name}.")
-                    save_csv(completed_rows, config.user_interest_named_csv)
+                    save_csv(completed_rows, config.USER_INTEREST_NAMED)
                 else:
                     failed_rows.append(row)
 
@@ -49,7 +49,7 @@ def main():
             print(f"Finished downloading all data.")
         else:
             # save failed rows to file
-            save_list_to_csv(failed_rows, config.failed_rows_csv)
+            save_list_to_csv(failed_rows, config.FAILED_ROWS)
 
     except FileNotFoundError:
         print(f"Input file not found.")
@@ -59,7 +59,7 @@ def main():
 
     # Aggregate data and get metadata
     full_metadata_list = []
-    user_interest_named = load_csv(config.user_interest_named_csv)
+    user_interest_named = load_csv(config.USER_INTEREST_NAMED)
 
     print(f"Starting aggregation.")
     for row in user_interest_named:

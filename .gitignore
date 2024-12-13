@@ -3,6 +3,7 @@ data/raw
 data/agg
 other_data/
 storage/*.nc
+test_data/
 
 # raw data files
 *.nc
