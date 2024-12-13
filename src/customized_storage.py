@@ -26,30 +26,32 @@ def main():
     try:
         # Upload user input
         user_interest_rows = load_csv(config.USER_INTEREST)
-        
-        failed_rows = []
 
-        completed_rows = []
-
-        for row in user_interest_rows:
-            try:
-                completed_rows += process_row(row)
-                
-                if wait_for_file(raw_file_name):
-                    print(f"\tData downloaded to: {raw_file_name}.")
-                    save_csv(completed_rows, config.USER_INTEREST_NAMED)
-                else:
-                    failed_rows.append(row)
-
-            except Exception as e:
-                print(f"\tError processing row {row}: {e}")
-        
-        # Note failed rows
-        if failed_rows == []:
-            print(f"Finished downloading all data.")
+        if user_interest_rows['file_name']:
+            pass
         else:
-            # save failed rows to file
-            save_list_to_csv(failed_rows, config.FAILED_ROWS)
+            failed_rows = []
+            completed_rows = []
+
+            for row in user_interest_rows:
+                try:
+                    completed_rows += process_row(row)
+                    
+                    if wait_for_file(raw_file_name):
+                        print(f"\tData downloaded to: {raw_file_name}.")
+                        save_csv(completed_rows, config.USER_INTEREST_NAMED)
+                    else:
+                        failed_rows.append(row)
+
+                except Exception as e:
+                    print(f"\tError processing row {row}: {e}")
+            
+            # Note failed rows
+            if failed_rows == []:
+                print(f"Finished downloading all data.")
+            else:
+                # save failed rows to file
+                save_list_to_csv(failed_rows, config.FAILED_ROWS)
 
     except FileNotFoundError:
         print(f"Input file not found.")
@@ -80,12 +82,13 @@ def main():
         
         metadata_list = [{**row_info, **m} for m in metadata_list]
         full_metadata_list = full_metadata_list + metadata_list
-
         save_csv(full_metadata_list, config.METADATA)
+
     print(f"All files temporally and spatially aggregated.")
 
     #TODO: raw files have to be deleted. Probably easiest to do in DataAgg before you add things to the metadata list...
-
+    #TODO: add post-processing code from Yuchuan (dropping dataset dimensions stuff) during DataAgg before .to_netcdf
+    
     # Save metadata
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
