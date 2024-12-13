@@ -11,38 +11,51 @@ from ApiGenerator import API_Call
 
 import config
 
+def process_row(row):
+    raw_file_name = get_raw_file_name(row['variable'])
+    updated_row = row
+    updated_row['file_name'] = raw_file_name
+
+    call = API_Call(row, raw_file_name)
+    call.era5_api_request()
+    call.make_file()
+
+    return updated_row
+
 def main():
-    # Upload user input
-    user_interest_rows = load_csv(config.USER_INTEREST)
-    
-    failed_rows = []
+    try:
+        # Upload user input
+        user_interest_rows = load_csv(config.USER_INTEREST)
+        
+        failed_rows = []
 
-    for row in user_interest_rows:
+        # with open(config.user_interest_named, mode='w', newline='', encoding='utf-8') as outfile:
 
-        raw_file_name = get_raw_file_name(row['variable'])
-        row['file_name'] = raw_file_name
 
-        call = API_Call(row, raw_file_name)
-        call.era5_api_request()
-        call.make_file()
-
-        if wait_for_file(raw_file_name):
-            print(f"\tData downloaded to: {raw_file_name}.")
+        for row in user_interest_rows:
+            try:
+                updated_row = process_row(row)
+                
+                if wait_for_file(raw_file_name):
+                    print(f"\tData downloaded to: {raw_file_name}.")
+                else:
+                    failed_rows.append(row)
+            except Exception as e:
+                print(f"\tError processing row {row}: {e}")
+        # Note failed rows
+        if failed_rows == []:
+            print(f"Finished downloading all data.")
         else:
-            failed_rows.append(row)
+            # save failed rows to file
+            save_list_to_csv(failed_rows, config.failed_rows_csv)
 
-    # Note failed rows
-    if failed_rows == []:
-        print(f"Finished downloading all data.")
-    else:
-        if len(failed_rows) == len(user_interest_rows):
-            print(f"Failed to download all files. Exiting.")
-            sys.exit()
-        else:
-            print(f"Failed to download following files:")
-            for row in failed_rows:
-                print(f"\tVariable {row['variable']} for region {row['max_lat_N']}N {row['min_lat_S']}S {row['max_long_E']}E {row['min_long_W']}W at a \n\t\t{row['spatial_resolution']} spatial resolution and \n\ttime range {row['start_time']}-{row['end_time']} at a \n\t\t{row['temporal_resolution']}.")
+    except FileNotFoundError:
+        print(f"Input file not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}.")
+
     
+
     # Aggregate data and get metadata
     full_metadata_list = []
 
