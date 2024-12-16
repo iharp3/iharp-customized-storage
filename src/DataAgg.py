@@ -28,7 +28,7 @@ class DataAgg:
 		self.all_t = ["1H", "1D", "1ME", "1YE"]
 		self.all_s = [0.25, 0.5, 1.0]
 
-	def compress_save_and_get_dict(self, agg, name, t_res, s_res, agg_type):
+	def compress_save_and_get_dict(self, agg, name, t_res, s_res, agg_type, e):
 		"""
 		Get scale and offset to compress dataset. Drop unwanted dimensions from dataset. Save compressed dataset.
 		Return a dictionary with dataset metadata.
@@ -40,21 +40,11 @@ class DataAgg:
 		if "expver" in agg.coords:
 			agg = agg.drop_vars("expver")
 
-		scale, offset, v_min, v_max = get_scale_offset(arr=agg[self.var])
+		# scale, offset, v_min, v_max = get_scale_offset(arr=agg[self.var])
+		agg.t2m.encoding = e	# new encoding 
 		file_path = get_data_path(name)
 
-		agg.to_netcdf(
-			file_path,
-			encoding={
-				self.var: {
-					"dtype": "int16",
-					"missing_value": -32767,
-                	"_FillValue": -32767,
-                	"scale_factor": scale,
-                	"add_offset": offset,
-				}
-			}
-		)
+		agg.to_netcdf(file_path)
 
 		if self.t:	# temporal agg
 			d = {"temporal_resolution":t_res,
@@ -94,20 +84,22 @@ class DataAgg:
 		"""
 		
 		"""
+		cur_encoding = dataset.t2m.encoding
+
 		# Get agg file names
 		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
 
 		# Mean aggregation
 		mean_agg = dataset.resample(valid_time=resolution).mean()	# TODO: Might need to persist dataset after this
-		d_mean = self.compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="mean")
+		d_mean = self.compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="mean", e=cur_encoding)
 
 		# Min aggregation
 		min_agg = dataset.resample(valid_time=resolution).min()	# TODO: Might need to persist dataset here
-		d_min = self.compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="min")
+		d_min = self.compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="min", e=cur_encoding)
 
 		# Max aggregation
 		max_agg = dataset.resample(valid_time=resolution).max()	# TODO: Might need to persist dataset here
-		d_max = self.compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="max")
+		d_max = self.compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=resolution[1], s_res=self.constant, agg_type="max", e=cur_encoding)
 	
 		return [d_mean, d_min, d_max]
 
@@ -116,6 +108,8 @@ class DataAgg:
 		TODO: Check that the file names update correctly (should have gotten s2 for 1.0)
 		TODO: Check that you get the files you want (I think you're overwritting files because the file names did not update)
 		"""
+		cur_encoding = dataset.t2m.encoding
+
 		# Get agg file names
 		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
 
@@ -124,15 +118,15 @@ class DataAgg:
 
 		# Mean aggregation
 		mean_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").mean()
-		d_mean = self.compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=self.constant, s_res=resolution, agg_type="mean")
+		d_mean = self.compress_save_and_get_dict(agg=mean_agg, name=mean_agg_name, t_res=self.constant, s_res=resolution, agg_type="mean", e=cur_encoding)
 
 		# Min aggregation
 		min_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").min()
-		d_min = self.compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=self.constant, s_res=resolution, agg_type="min")
+		d_min = self.compress_save_and_get_dict(agg=min_agg, name=min_agg_name, t_res=self.constant, s_res=resolution, agg_type="min", e=cur_encoding)
 
 		# Max aggregation
 		max_agg = dataset.coarsen(latitude=c_f, longitude=c_f, boundary="trim").max()
-		d_max = self.compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=self.constant, s_res=resolution, agg_type="max")
+		d_max = self.compress_save_and_get_dict(agg=max_agg, name=max_agg_name, t_res=self.constant, s_res=resolution, agg_type="max", e=cur_encoding)
 
 		return [d_mean, d_min, d_max]
 
