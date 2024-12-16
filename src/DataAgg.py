@@ -4,7 +4,7 @@ DataAgg.py: Class for aggregating data.
 import os
 import xarray as xr
 
-from utils import get_agg_file_name, get_scale_offset, get_file_size, get_data_path, modify_filename
+from utils import get_agg_file_name, get_min_max_of_array, get_file_size, get_data_path, modify_filename
 
 import config
 
@@ -40,7 +40,7 @@ class DataAgg:
 		if "expver" in agg.coords:
 			agg = agg.drop_vars("expver")
 
-		# scale, offset, v_min, v_max = get_scale_offset(arr=agg[self.var])
+		v_min, v_max = get_min_max_of_array(arr=agg[self.var])
 		agg.t2m.encoding = e	# new encoding 
 		file_path = get_data_path(name)
 
