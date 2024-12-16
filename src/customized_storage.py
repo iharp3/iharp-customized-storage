@@ -62,6 +62,7 @@ def main():
 
     print(f"Starting aggregation.")
     for row in user_interest_named:
+        print(f"\nNEW ROW\n")
         row_info = {'variable':row['variable'],'max_lat_N':row['max_lat_N'],'min_lat_S':row['min_lat_S'],'max_long_E':row['max_long_E'],'min_long_W':row['min_long_W'],'start_time':row['start_time'],'end_time':row['end_time']}
         metadata_list = []
 
@@ -71,6 +72,7 @@ def main():
         # [{'name':123, 'size':4, 'temp_res': d, 'sp_res':0.25}, {'name':456, 'size':4, 'temp_res': d, 'sp_res':0.25}]
 
         for d in temporal_metadata_list:
+            print(f"\tSpatial agg")
             # Spatial aggregation
             spatial_agg_object = DataAgg(name=d['file_name'], var=row['variable'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
             spatial_metadata_list  = spatial_agg_object.make_spatial_agg_files(cur_t_agg_type=d['temporal_agg_type'])
