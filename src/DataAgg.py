@@ -34,7 +34,7 @@ class DataAgg:
 		Return a dictionary with dataset metadata.
 		"""
 		# drop unwanted dimensions, rename dim
-		agg = agg.rename({"valid_time": "time"})
+		# agg = agg.rename({"valid_time": "time"})
 		if "number" in agg.coords:
 			agg = agg.drop_vars("number")
 		if "expver" in agg.coords:
