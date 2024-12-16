@@ -145,7 +145,8 @@ class DataAgg:
 		for i in range(self.all_t.index(self.target), len(self.all_t)):	# This for-loop gets us every temporal resolution
 			resolution = str(self.all_t[i])
 			if resolution == "1H":
-				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=config.RAW_T_RES, s_res=self.constant, agg_type="none")
+				cur_encoding = ds.t2m.encoding
+				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=config.RAW_T_RES, s_res=self.constant, agg_type="none", e=cur_encoding)
 			else:
 				mean_min_max_metadata_list = self.temporal_agg(ds, resolution)	# This function gets us all agg types (mean, min, max)
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list	# Save dicts to metadata_list
@@ -167,7 +168,8 @@ class DataAgg:
 		for i in range(self.all_s.index(self.target), len(self.all_s)):	# This for-loop gets us every spatial resolution
 			resolution = float(self.all_s[i])
 			if resolution == 0.25:
-				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=self.constant, s_res=config.RAW_SP_RES, agg_type="none")
+				cur_encoding = ds.t2m.encoding
+				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=self.constant, s_res=config.RAW_SP_RES, agg_type="none", e=cur_encoding)
 			else:
 				mean_min_max_metadata_list = self.spatial_agg(ds, resolution)
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list
