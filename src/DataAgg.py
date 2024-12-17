@@ -150,6 +150,15 @@ class DataAgg:
 				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=config.RAW_T_RES, s_res=self.constant, agg_type="none", e=cur_encoding, c=False)
 			else:
 				mean_min_max_metadata_list = self.temporal_agg(ds, resolution)	# This function gets us all agg types (mean, min, max)
+
+			if isinstance(mean_min_max_metadata_list, dict):
+				print(mean_min_max_metadata_list)
+				mean_min_max_metadata_list = [mean_min_max_metadata_list]
+			elif isinstance(mean_min_max_metadata_list, list):
+				mean_min_max_metadata_list = mean_min_max_metadata_list
+			else:
+				raise TypeError(f"Object {mean_min_max_metadata_list} is neither a dictionary nor a list\ntype {type(mean_min_max_metadata_list)}")
+	
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list	# Save dicts to metadata_list
 
 		return self.metadata_list
@@ -174,6 +183,7 @@ class DataAgg:
 				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=self.constant, s_res=config.RAW_SP_RES, agg_type="none", e=cur_encoding, c=False)
 			else:
 				mean_min_max_metadata_list = self.spatial_agg(ds, resolution)
+				
 			if isinstance(mean_min_max_metadata_list, dict):
 				print(mean_min_max_metadata_list)
 				mean_min_max_metadata_list = [mean_min_max_metadata_list]
