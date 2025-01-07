@@ -3,20 +3,8 @@ jupyter
 xarray
 netcdf4
 h5py
-dask[complete]
-dask_yarn
-venv-pack
 pyarrow
-zarr
-zarr[jupyter]
-fsspec
-gcsfs
-s3fs
-matplotlib
-tiledb
-tiledb-cf[complete]
-grpcio
-grpcio-tools
 pandas
 numpy
+dask[complete]
 # xarray-regrid[accel]
