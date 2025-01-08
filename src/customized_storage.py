@@ -22,7 +22,7 @@ def process_row(row):
 
     return updated_row
 
-def main(ui, ui_named, ui_failed):
+def download_data(ui, ui_named, ui_failed):
     try:
         # Upload user input
         user_interest_rows = load_csv(ui)
@@ -55,10 +55,10 @@ def main(ui, ui_named, ui_failed):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-'''
+def aggregate_data(ui_named):
     # Aggregate data and get metadata
     full_metadata_list = []
-    user_interest_named = load_csv(config.USER_INTEREST_NAMED)
+    user_interest_named = load_csv(ui_named)
 
     print(f"Starting aggregation.")
     for row in user_interest_named:
@@ -91,10 +91,11 @@ def main(ui, ui_named, ui_failed):
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
 
-'''
-
 if __name__ == "__main__":
-    for cur_ui in ui_list:
+    for i in config.UI_LIST:
+        cur_ui = os.path.join(config.CUR_DATA_D, i)
         named = cur_ui + 'named'
         failed = cur_ui + 'failed'
         main(cur_ui, named, failed)
+
+        # download_data(named)
