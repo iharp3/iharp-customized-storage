@@ -18,8 +18,8 @@ FAILED_ROWS = os.path.join(DATA_D, 'failed_rows.csv')   # list of rows that didn
 
 # multiple user interest
 CUR_DATA_D = os.path.join(DATA_D, 'temperature')
-UI_LIST = ["ui_1.csv", "ui_2.csv", "ui_3.csv", "ui_4.csv", "ui_5.csv", "ui_6.csv", "ui_7.csv"]
-
+# UI_LIST = ["ui_1.csv", "ui_2.csv", "ui_3.csv", "ui_4.csv", "ui_5.csv", "ui_6.csv", "ui_7.csv"]
+UI_LIST = ["ui_1.csv"]
 #  
 RAW_SP_RES = 0.25
 RAW_T_RES = "1H"

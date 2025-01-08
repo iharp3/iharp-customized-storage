@@ -4,6 +4,8 @@ customized_storage.py: Main function that creates customized storage.
 import os
 import time
 import sys
+import pandas as pd
+import xarray as xr
 
 from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, wait_for_file
 from DataAgg import DataAgg
@@ -32,26 +34,41 @@ def download_data(ui, ui_named, ui_failed):
         for row in user_interest_rows:
             try:
                 raw_file_name = get_raw_file_name(row['variable'])
-                completed_rows += process_row(row, raw_file_name)
+                raw_file_path = os.path.join(config.CUR_DATA_D, raw_file_name)
+                completed_rows += process_row(row, raw_file_path)
                 
                 print(f"\tData downloaded to: {raw_file_name}.")
-                save_csv(completed_rows, ui_named)
+                save_csv(completed_rows, ui_named)  # saves current user interest rows with name to a csv
 
             except Exception as e:
                 print(f"\tError processing row {row}: {e}")
                 failed_rows.append(row)
         
+        final_ui_named = 'final_' + ui_named
+        save_csv(completed_rows, final_ui_named)
         # Note failed rows
         if failed_rows == []:
             print(f"Finished downloading all data.")
         else:
             # save failed rows to file
+            print(f"Did not download all data. See {ui_failed}.")
             save_list_to_csv(failed_rows, ui_failed)
 
     except FileNotFoundError:
         print(f"Input file not found.")
     except Exception as e:
         print(f"An error occurred: {e}.")
+
+def combine_data(all_named):
+
+    df = pd.concat([pd.read_csv(file) for file in all_named], ignore_index=True)
+    group_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
+    grouped = df.groupby(group_cols)
+
+    final_ui_named = []
+    for _, group in grouped:
+        sorted_group = group.sort_values(by='max_long_E')
+
 
 def aggregate_data(ui_named):
     # Aggregate data and get metadata
@@ -90,10 +107,14 @@ def aggregate_data(ui_named):
     print(f"All metadata saved to {config.METADATA}")
 
 if __name__ == "__main__":
+    all_named = []
     for i in config.UI_LIST:
         cur_ui = os.path.join(config.CUR_DATA_D, i)
         named = cur_ui + 'named'
+        all_named.append(named)
         failed = cur_ui + 'failed'
+
         download_data(cur_ui, named, failed)
 
-        # aggregate_data(named)
+    # combine_data(all_named)
+    # aggregate_data(named)

@@ -1,8 +1,4 @@
 variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
-2m_temperature,90,40,180,-180,1940,1944,Y,1
-2m_temperature,-70,-90,180,-180,1940,1944,Y,1
-2m_temperature,90,40,180,-180,1945,1949,Y,1
-2m_temperature,-70,-90,180,-180,1945,1949,Y,1
 2m_temperature,90,40,180,-180,1950,1954,Y,1
 2m_temperature,-70,-90,180,-180,1950,1954,Y,1
 2m_temperature,90,40,180,-180,1955,1959,Y,1
