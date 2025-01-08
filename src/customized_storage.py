@@ -11,8 +11,7 @@ from ApiGenerator import API_Call
 
 import config
 
-def process_row(row):
-    raw_file_name = get_raw_file_name(row['variable'])
+def process_row(row, raw_file_name):
     updated_row = row
     updated_row['file_name'] = raw_file_name
 
@@ -32,16 +31,15 @@ def download_data(ui, ui_named, ui_failed):
 
         for row in user_interest_rows:
             try:
-                completed_rows += process_row(row)
+                raw_file_name = get_raw_file_name(row['variable'])
+                completed_rows += process_row(row, raw_file_name)
                 
-                if wait_for_file(raw_file_name):
-                    print(f"\tData downloaded to: {raw_file_name}.")
-                    save_csv(completed_rows, ui_named)
-                else:
-                    failed_rows.append(row)
+                print(f"\tData downloaded to: {raw_file_name}.")
+                save_csv(completed_rows, ui_named)
 
             except Exception as e:
                 print(f"\tError processing row {row}: {e}")
+                failed_rows.append(row)
         
         # Note failed rows
         if failed_rows == []:
@@ -98,4 +96,4 @@ if __name__ == "__main__":
         failed = cur_ui + 'failed'
         download_data(cur_ui, named, failed)
 
-        # download_data(named)
+        # aggregate_data(named)
