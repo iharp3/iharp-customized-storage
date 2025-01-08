@@ -22,40 +22,40 @@ def process_row(row):
 
     return updated_row
 
-def main():
-    # try:
-    #     # Upload user input
-    #     user_interest_rows = load_csv(config.USER_INTEREST)
+def main(ui, ui_named, ui_failed):
+    try:
+        # Upload user input
+        user_interest_rows = load_csv(ui)
 
-    #     failed_rows = []
-    #     completed_rows = []
+        failed_rows = []
+        completed_rows = []
 
-    #     for row in user_interest_rows:
-    #         try:
-    #             completed_rows += process_row(row)
+        for row in user_interest_rows:
+            try:
+                completed_rows += process_row(row)
                 
-    #             if wait_for_file(raw_file_name):
-    #                 print(f"\tData downloaded to: {raw_file_name}.")
-    #                 save_csv(completed_rows, config.USER_INTEREST_NAMED)
-    #             else:
-    #                 failed_rows.append(row)
+                if wait_for_file(raw_file_name):
+                    print(f"\tData downloaded to: {raw_file_name}.")
+                    save_csv(completed_rows, ui_named)
+                else:
+                    failed_rows.append(row)
 
-    #         except Exception as e:
-    #             print(f"\tError processing row {row}: {e}")
+            except Exception as e:
+                print(f"\tError processing row {row}: {e}")
         
-    #     # Note failed rows
-    #     if failed_rows == []:
-    #         print(f"Finished downloading all data.")
-    #     else:
-    #         # save failed rows to file
-    #         save_list_to_csv(failed_rows, config.FAILED_ROWS)
+        # Note failed rows
+        if failed_rows == []:
+            print(f"Finished downloading all data.")
+        else:
+            # save failed rows to file
+            save_list_to_csv(failed_rows, ui_failed)
 
-    # except FileNotFoundError:
-    #     print(f"Input file not found.")
-    # except Exception as e:
-    #     print(f"An error occurred: {e}.")
+    except FileNotFoundError:
+        print(f"Input file not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}.")
 
-
+'''
     # Aggregate data and get metadata
     full_metadata_list = []
     user_interest_named = load_csv(config.USER_INTEREST_NAMED)
@@ -90,6 +90,11 @@ def main():
     # Save metadata
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
-        
+
+'''
+
 if __name__ == "__main__":
-    main()
+    for cur_ui in ui_list:
+        named = cur_ui + 'named'
+        failed = cur_ui + 'failed'
+        main(cur_ui, named, failed)
