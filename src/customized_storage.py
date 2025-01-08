@@ -96,6 +96,6 @@ if __name__ == "__main__":
         cur_ui = os.path.join(config.CUR_DATA_D, i)
         named = cur_ui + 'named'
         failed = cur_ui + 'failed'
-        main(cur_ui, named, failed)
+        download_data(cur_ui, named, failed)
 
         # download_data(named)
