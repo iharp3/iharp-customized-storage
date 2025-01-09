@@ -41,7 +41,7 @@ def modify_filename(cur_file_name, agg_type):
 
 def get_data_path(file_name):
 
-    return os.path.join(config.DATA_D, file_name)
+    return os.path.join(config.CUR_DATA_D, file_name)
 
 def delete_file(file_path):
     try:

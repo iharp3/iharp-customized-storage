@@ -115,16 +115,18 @@ def combine_data(all_named, folder):
         save_csv(final_ui_named, csv_path)
     
     # save list of files that were combined and can be deleted
-    combined_files_name = sorted_group.iloc[0]['variable'] + f'_combined_files_{u}.csv'
+    combined_files_name = sorted_group.iloc[0]['variable'] + f'delete_combined_files_{u}.csv'
     combined_files_path = os.path.join(folder, combined_files_name)
     save_csv(list_of_combined_files, combined_files_path)
 
     return csv_path, combined_files_path
 
-def aggregate_data(ui_named):
+def aggregate_data(ui_named, folder):
     # Aggregate data and get metadata
     full_metadata_list = []
     user_interest_named = load_csv(ui_named)
+
+    too_fine_list = []
 
     print(f"Starting aggregation.")
     for row in user_interest_named:
@@ -134,15 +136,15 @@ def aggregate_data(ui_named):
 
         # Temporal aggregation
         temporal_agg_object = DataAgg(name=row['file_name'], var=row['variable'], t=True, target=row['temporal_resolution'], constant=config.RAW_SP_RES)
-        temporal_metadata_list = temporal_agg_object.make_temporal_agg_files()
+        temporal_metadata_list, too_fine = temporal_agg_object.make_temporal_agg_files()
         # [{'name':123, 'size':4, 'temp_res': d, 'sp_res':0.25}, {'name':456, 'size':4, 'temp_res': d, 'sp_res':0.25}]
-
+        too_fine_list += too_fine
         for d in temporal_metadata_list:
             print(f"\tSpatial agg")
             # Spatial aggregation
             spatial_agg_object = DataAgg(name=d['file_name'], var=row['variable'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
-            spatial_metadata_list  = spatial_agg_object.make_spatial_agg_files(cur_t_agg_type=d['temporal_agg_type'])
-
+            spatial_metadata_list, too_fine  = spatial_agg_object.make_spatial_agg_files(cur_t_agg_type=d['temporal_agg_type'])
+            too_fine_list = too_fine
             metadata_list = metadata_list + spatial_metadata_list
         
         metadata_list = [{**row_info, **m} for m in metadata_list]
@@ -150,12 +152,16 @@ def aggregate_data(ui_named):
         save_csv(full_metadata_list, config.METADATA)
 
     print(f"All files temporally and spatially aggregated.")
-
-    #TODO: raw files have to be deleted. Probably easiest to do in DataAgg before you add things to the metadata list...
-    
     # Save metadata
     save_csv(full_metadata_list, config.METADATA)
     print(f"All metadata saved to {config.METADATA}")
+
+    # Save files to delete
+    u = get_unique_num()
+    too_fine_path = os.path.join(folder, f'delete_{u}.csv')
+    save_csv(too_fine_list, too_fine_path)
+
+    return too_fine_list
 
 if __name__ == "__main__":
     all_named = []
@@ -167,8 +173,14 @@ if __name__ == "__main__":
 
         download_data(cur_ui, named, failed)
 
-    # final_data_folder = os.path.join(config.CUR_DATA_D, 'merged')
-    # final_named, combined_files = combine_data(all_named, final_data_folder)
-    # delete_files(filenames=combined_files, directory=config.CUR_DATA_D)   # deletes files that were combined
+    # final_info_folder = os.path.join(config.CUR_DATA_D, 'merged')
 
-    # aggregate_data(final_named)
+    # final_named, combined_files = combine_data(all_named, final_info_folder)
+
+    # files_to_delete = aggregate_data(final_named, final_info_folder)
+
+    # if config.DELETE:
+        # delete_files(filenames=combined_files, directory=config.CUR_DATA_D)   # deletes files that were combined
+        # delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
+
+        # print('All files in {combined_files} and {files_to_delete} have been deleted.')

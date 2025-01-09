@@ -86,6 +86,7 @@ class DataAgg:
 		"""
 		
 		"""
+		# TODO: check if this encoding works for all variables not just temperature
 		cur_encoding = dataset.t2m.encoding
 
 		# Get agg file names
@@ -108,6 +109,7 @@ class DataAgg:
 	def spatial_agg(self, dataset, resolution):
 		"""
 		"""
+		# TODO: check if this encoding works for all variables not just temperature
 		cur_encoding = dataset.t2m.encoding
 
 		# Get agg file names
@@ -137,6 +139,9 @@ class DataAgg:
 		Returns:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
 		"""
+		# List to save files to delete
+		too_fine_list = []
+		too_fine = True
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
 		ds = xr.open_dataset(file_path, chunks={config.TIME: config.NUM_CHUNKS})
@@ -146,6 +151,7 @@ class DataAgg:
 			print(f"\tTemporal agg \t{i}")
 			resolution = str(self.all_t[i])
 			if resolution == "1H":	# if you want hourly resolution
+				too_fine = False
 				cur_encoding = ds.t2m.encoding
 				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=config.RAW_T_RES, s_res=self.constant, agg_type="none", e=cur_encoding, c=False)
 			else:
@@ -161,7 +167,10 @@ class DataAgg:
 	
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list	# Save dicts to metadata_list
 
-		return self.metadata_list
+		if too_fine:
+			too_fine_list = [file_path]
+
+		return self.metadata_list, too_fine_list
 
 	def make_spatial_agg_files(self, cur_t_agg_type):
 		"""
@@ -170,6 +179,9 @@ class DataAgg:
 		Returns:
 			metadata_list: List of dictionaries containing metadata for aggregated files.
 		"""
+		# List to save files to delete
+		too_fine_list = []
+		too_fine = True
 		self.temp_agg_type = cur_t_agg_type
 		# Get dataset to aggregate
 		file_path = get_data_path(self.name)
@@ -179,6 +191,7 @@ class DataAgg:
 			print(f"\t\tSpatial agg \t{i}")
 			resolution = float(self.all_s[i])
 			if resolution == 0.25:
+				too_fine = False
 				cur_encoding = ds.t2m.encoding
 				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=self.constant, s_res=config.RAW_SP_RES, agg_type="none", e=cur_encoding, c=False)
 			else:
@@ -193,5 +206,6 @@ class DataAgg:
 				raise TypeError(f"Object {mean_min_max_metadata_list} is neither a dictionary nor a list\ntype {type(mean_min_max_metadata_list)}")
 
 			self.metadata_list = self.metadata_list + mean_min_max_metadata_list
-
-		return self.metadata_list
+		if too_fine:
+			too_fine_list = [file_path]
+		return self.metadata_list, too_fine_list
