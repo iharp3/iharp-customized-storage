@@ -44,14 +44,19 @@ def get_data_path(file_name):
     return os.path.join(config.DATA_D, file_name)
 
 def delete_file(file_path):
-    if os.path.isfile(file_path):
-        try:
+    try:
+        if os.path.isfile(file_path):
             os.remove(file_path)
             print(f"\tFile '{file_path}' has been deleted successfully.")
-        except Exception as e:
-            print(f"\tAn error occurred while deleting the file: {e}")
-    else:
-        print(f"\tThe path '{file_path}' does not exist or is not a file.")
+        else:
+            print(f"\tThe path '{file_path}' does not exist or is not a file.")
+    except Exception as e:
+        print(f"\tAn error occurred while deleting the file: {e}")
+
+def delete_files(filenames, directory):
+    for filename in filenames:
+        file_path = os.path.join(directory, filename)
+        delete_file(file_path)
 
 def save_csv(rows, file_path):
     """

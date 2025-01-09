@@ -66,6 +66,7 @@ def combine_data(all_named, folder):
     grouped = df.groupby(group_cols)
 
     final_ui_named = [] # csv with condensed user interest files
+    list_of_combined_files = []
     u = get_unique_num()
     for _, group in grouped:
         sorted_group = group.sort_values(by='max_long_E')
@@ -98,7 +99,7 @@ def combine_data(all_named, folder):
             for ds in datasets:
                 ds.close()
             # save concatenation to new file
-            merged_dataset_name = os.path.join(folder, get_raw_file_name(sorted_group.iloc[0]['variable']))
+            merged_dataset_name = get_raw_file_name(sorted_group.iloc[0]['variable'])
             merged_dataset.to_netcdf(merged_dataset_name)
             # add row to final_ui_named
             merged_row = sorted_group.iloc[0]
@@ -106,11 +107,19 @@ def combine_data(all_named, folder):
             merged_row['file_name'] = merged_dataset_name
             final_ui_named.append(merged_row)
 
+        list_of_combined_files += consecutive_files
+
+        # update final_ui_named csv with each group
         csv_name = sorted_group.iloc[0]['variable'] + f'_final_user_interest_{u}.csv'
         csv_path = os.path.join(folder, csv_name)
         save_csv(final_ui_named, csv_path)
     
-    return csv_path
+    # save list of files that were combined and can be deleted
+    combined_files_name = sorted_group.iloc[0]['variable'] + f'_combined_files_{u}.csv'
+    combined_files_path = os.path.join(folder, combined_files_name)
+    save_csv(list_of_combined_files, combined_files_path)
+
+    return csv_path, combined_files_path
 
 def aggregate_data(ui_named):
     # Aggregate data and get metadata
@@ -159,5 +168,7 @@ if __name__ == "__main__":
         download_data(cur_ui, named, failed)
 
     # final_data_folder = os.path.join(config.CUR_DATA_D, 'merged')
-    # final_named = combine_data(all_named, final_data_folder)
+    # final_named, combined_files = combine_data(all_named, final_data_folder)
+    # delete_files(filenames=combined_files, directory=config.CUR_DATA_D)   # deletes files that were combined
+
     # aggregate_data(final_named)
