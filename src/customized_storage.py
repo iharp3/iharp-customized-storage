@@ -7,7 +7,7 @@ import sys
 import pandas as pd
 import xarray as xr
 
-from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, wait_for_file
+from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_unique_num
 from DataAgg import DataAgg
 from ApiGenerator import API_Call
 
@@ -60,12 +60,13 @@ def download_data(ui, ui_named, ui_failed):
         print(f"An error occurred: {e}.")
 
 def combine_data(all_named, folder):
-
+    '''TODO: Assumes the variable column is the same for all rows'''
     df = pd.concat([pd.read_csv(file) for file in all_named], ignore_index=True)
     group_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
     grouped = df.groupby(group_cols)
 
     final_ui_named = [] # csv with condensed user interest files
+    u = get_unique_num()
     for _, group in grouped:
         sorted_group = group.sort_values(by='max_long_E')
         consecutive_files = []
@@ -104,8 +105,12 @@ def combine_data(all_named, folder):
             merged_row['min_long_W'] = final_min_long_W
             merged_row['file_name'] = merged_dataset_name
             final_ui_named.append(merged_row)
+
+        csv_name = sorted_group.iloc[0]['variable'] + f'_final_user_interest_{u}.csv'
+        csv_path = os.path.join(folder, csv_name)
+        save_csv(final_ui_named, csv_path)
     
-    return final_ui_named
+    return csv_path
 
 def aggregate_data(ui_named):
     # Aggregate data and get metadata
