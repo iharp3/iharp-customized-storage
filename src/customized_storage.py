@@ -68,10 +68,10 @@ def combine_data(all_named, folder):
     final_ui_named = [] # csv with condensed user interest files
     for _, group in grouped:
         sorted_group = group.sort_values(by='max_long_E')
-        all_files_in_group = set(sorted_group)
-        consecutive_files = {}
+        consecutive_files = []
         final_min_long_W = 0
-
+        
+        i = 0
         for i in range(len(sorted_group)):
             if i == 0:
                 consecutive_files.add(sorted_group.iloc[i]['file_name'])
@@ -82,9 +82,14 @@ def combine_data(all_named, folder):
                     consecutive_files.add(cur_row['file_name'])
                     final_min_long_W = cur_row['min_long_W']
                 else:
+                    # add the remaining files to final_ui_named
+                    for j in range(len(sorted_group) - i):
+                        final_ui_named.append(sorted_group.iloc[j + i])
                     break
-
-        if len(consecutive_files) > 1:
+        
+        if len(consecutive_files) == 1:     # no consecutive files, add first row to final_ui_named
+            final_ui_named.append(sorted_group.iloc[0])
+        else:
             # concatenate consecutive files
             file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
             datasets = [xr.open_dataset(file) for file in file_paths]
@@ -95,17 +100,12 @@ def combine_data(all_named, folder):
             merged_dataset_name = os.path.join(folder, get_raw_file_name(sorted_group.iloc[0]['variable']))
             merged_dataset.to_netcdf(merged_dataset_name)
             # add row to final_ui_named
-
-        # else:
-            # only one file added to the group, the first one
- 
-        # elif len((all_files_in_group - consecutive_files)) > 0:
-            # add other file rows not in consecutive files to final_ui_named
-
-
-
-
-
+            merged_row = sorted_group.iloc[0]
+            merged_row['min_long_W'] = final_min_long_W
+            merged_row['file_name'] = merged_dataset_name
+            final_ui_named.append(merged_row)
+    
+    return final_ui_named
 
 def aggregate_data(ui_named):
     # Aggregate data and get metadata
@@ -154,5 +154,5 @@ if __name__ == "__main__":
         download_data(cur_ui, named, failed)
 
     # final_data_folder = os.path.join(config.CUR_DATA_D, 'merged')
-    # combine_data(all_named, final_data_folder)
-    # aggregate_data(named)
+    # final_named = combine_data(all_named, final_data_folder)
+    # aggregate_data(final_named)
