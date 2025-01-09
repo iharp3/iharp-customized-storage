@@ -59,15 +59,52 @@ def download_data(ui, ui_named, ui_failed):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-def combine_data(all_named):
+def combine_data(all_named, folder):
 
     df = pd.concat([pd.read_csv(file) for file in all_named], ignore_index=True)
     group_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
     grouped = df.groupby(group_cols)
 
-    final_ui_named = []
+    final_ui_named = [] # csv with condensed user interest files
     for _, group in grouped:
         sorted_group = group.sort_values(by='max_long_E')
+        all_files_in_group = set(sorted_group)
+        consecutive_files = {}
+        final_min_long_W = 0
+
+        for i in range(len(sorted_group)):
+            if i == 0:
+                consecutive_files.add(sorted_group.iloc[i]['file_name'])
+            else:
+                prev_row = sorted_group.iloc[i-1]
+                cur_row = sorted_group.iloc[i]
+                if prev_row['min_long_W'] == cur_row['max_long_E']:
+                    consecutive_files.add(cur_row['file_name'])
+                    final_min_long_W = cur_row['min_long_W']
+                else:
+                    break
+
+        if len(consecutive_files) > 1:
+            # concatenate consecutive files
+            file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
+            datasets = [xr.open_dataset(file) for file in file_paths]
+            merged_dataset = xr.concat(datasets, dim='longitude')
+            for ds in datasets:
+                ds.close()
+            # save concatenation to new file
+            merged_dataset_name = os.path.join(folder, get_raw_file_name(sorted_group.iloc[0]['variable']))
+            merged_dataset.to_netcdf(merged_dataset_name)
+            # add row to final_ui_named
+
+        # else:
+            # only one file added to the group, the first one
+ 
+        # elif len((all_files_in_group - consecutive_files)) > 0:
+            # add other file rows not in consecutive files to final_ui_named
+
+
+
+
 
 
 def aggregate_data(ui_named):
@@ -116,5 +153,6 @@ if __name__ == "__main__":
 
         download_data(cur_ui, named, failed)
 
-    # combine_data(all_named)
+    # final_data_folder = os.path.join(config.CUR_DATA_D, 'merged')
+    # combine_data(all_named, final_data_folder)
     # aggregate_data(named)
