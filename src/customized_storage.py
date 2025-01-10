@@ -35,7 +35,7 @@ def download_data(ui, ui_named, ui_failed):
             try:
                 raw_file_name = get_raw_file_name(row['variable'])
                 raw_file_path = os.path.join(config.CUR_DATA_D, raw_file_name)
-                completed_rows += process_row(row, raw_file_path)
+                completed_rows.append(process_row(row, raw_file_path))
                 
                 print(f"\tData downloaded to: {raw_file_name}.")
                 save_csv(completed_rows, ui_named)  # saves current user interest rows with name to a csv
