@@ -1,0 +1,11 @@
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
+10m_u_component_of_wind,90,40,180,0,2016,2018,D,0.5
+10m_u_component_of_wind,90,40,0,-70,2016,2018,D,0.25
+10m_u_component_of_wind,90,40,-70,-180,2016,2018,D,0.5
+10m_u_component_of_wind,-70,-90,-90,-180,2016,2018,D,0.5
+10m_u_component_of_wind,-70,-90,0,-90,2016,2018,D,0.5
+10m_u_component_of_wind,-70,-90,180,0,2016,2018,D,0.5
+10m_u_component_of_wind,90,40,180,0,2019,2020,D,0.5
+10m_u_component_of_wind,90,40,0,-70,2019,2020,D,0.25
+10m_u_component_of_wind,90,40,-70,-180,2019,2020,D,0.5
+10m_u_component_of_wind,-70,-90,-90,-180,2019,2020,D,0.5
