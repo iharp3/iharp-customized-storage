@@ -38,8 +38,9 @@ def download_data(ui, ui_named, ui_failed):
                 completed_rows.append(process_row(row, raw_file_path))
                 
                 print(f"\tData downloaded to: {raw_file_name}.")
+                print(completed_rows)
                 save_csv(completed_rows, ui_named)  # saves current user interest rows with name to a csv
-
+                print('save_csv worked.')
             except Exception as e:
                 print(f"\tError processing row {row}: {e}")
                 failed_rows.append(row)
