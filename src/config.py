@@ -12,8 +12,8 @@ DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 # multiple user interest
 CUR_DATA_D = os.path.join(DATA_D, 'temperature')
 DELETE = False
-# UI_LIST = ["ui_1.csv", "ui_2.csv", "ui_3.csv", "ui_4.csv", "ui_5.csv", "ui_6.csv", "ui_7.csv"]
-UI_LIST = ["ui_1.csv"]
+UI_LIST = ["ui_2.csv", "ui_3.csv", "ui_4.csv", "ui_5.csv", "ui_6.csv", "ui_7.csv"]
+# UI_LIST = ["ui_1.csv"]
 METADATA = os.path.join(CUR_DATA_D, 'metadata.csv') # file with metadata
 
 # single user interest
