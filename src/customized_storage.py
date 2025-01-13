@@ -168,9 +168,9 @@ if __name__ == "__main__":
     all_named = []
     for i in config.UI_LIST:
         cur_ui = os.path.join(config.CUR_DATA_D, i)
-        named = cur_ui + 'named'
+        named = 'named_' + cur_ui
         all_named.append(named)
-        failed = cur_ui + 'failed'
+        failed = 'failed' + cur_ui
 
         download_data(cur_ui, named, failed)
 
