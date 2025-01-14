@@ -3,11 +3,12 @@ customized_storage.py: Main function that creates customized storage.
 '''
 import os
 import time
+from datetime import datetime, timedelta
 import sys
 import pandas as pd
 import xarray as xr
 
-from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_unique_num, get_data_path
+from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_unique_num, get_data_path, delete_files
 from DataAgg import DataAgg
 from ApiGenerator import API_Call
 
@@ -58,7 +59,7 @@ def download_data(ui, ui_named, ui_failed):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col, merge_dim):
+def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col, merge_dim, t_bool):
     # load all file rows into one pandas df
     if os.path.isfile(get_data_path(all_named_together)):
         df = pd.read_csv(get_data_path(all_named_together))
@@ -87,11 +88,31 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
                 prev_row = sorted_group.iloc[i-1].to_dict()
                 cur_row = sorted_group.iloc[i].to_dict()
                 # rows are consecutive
-                if prev_row[compared_col] == cur_row[sort_col]:
+                # consecutive = False
+                if t_bool == True:
+                    compared_date = datetime.strptime(cur_row[compared_col], "%Y-%m-%dT%H:%M")
+                    sorted_date = datetime.strptime(prev_row[sort_col], "%Y-%m-%dT%H:%M")
+                    # print(f'sorted: {sorted_date}- \tcompared: {compared_date}')
+                    # if i ==1:       #TODO#TODO
+                    #     print(f'\nprev_row: {prev_row}')
+                    #     print(f'\n\tsorted_date: {sorted_date}')
+                    #     print(f'\ncur_row: {cur_row}')
+                    #     print(f'\n\tcompared_date: {compared_date}')
+                    if sorted_date - compared_date == timedelta(hours=1):
+                        consecutive = True
+                    else:
+                        consecutive = False
+                else:
+                    consecutive = prev_row[compared_col] == cur_row[sort_col]
+                # print(f'consecutive={consecutive}')
+                if consecutive:
                     if (i-1) == 0:
                         consecutive_files.append(prev_row['file_name'])     # add first row to consecutive files
                     consecutive_files.append(cur_row['file_name'])
-                    final_min_long_W = cur_row[compared_col]
+                    if t_bool:
+                        final_min_long_W = cur_row[sort_col]
+                    else:
+                        final_min_long_W = cur_row[compared_col]
                     count = i
                 # rows stop being consecutive
                 else:
@@ -118,7 +139,10 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
 
                 # add row to final_ui_named
                 merged_row = sorted_group.iloc[0].to_dict()
-                merged_row[compared_col] = final_min_long_W
+                if t_bool:
+                    merged_row[sort_col] = final_min_long_W
+                else:
+                    merged_row[compared_col] = final_min_long_W
                 merged_row['file_name'] = merged_dataset_name
                 final_ui_named.append(merged_row)
 
@@ -142,7 +166,7 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
 
     return csv_name, combined_files_name
 
-def aggregate_data(ui_named, folder):
+def aggregate_data(ui_named):
     # Aggregate data and get metadata
     full_metadata_list = []
     user_interest_named = load_csv(ui_named)
@@ -179,10 +203,11 @@ def aggregate_data(ui_named, folder):
 
     # Save files to delete
     u = get_unique_num()
-    too_fine_path = os.path.join(folder, f'delete_{u}.csv')
+    too_fine_name = f'delete_too_fine_{u}.csv'
+    too_fine_path = get_data_path(too_fine_name)
     save_csv(too_fine_list, too_fine_path)
 
-    return too_fine_list
+    return too_fine_name
 
 if __name__ == "__main__":
     all_named = []
@@ -193,38 +218,38 @@ if __name__ == "__main__":
 
         all_named.append(named)
 
-        # download_data(cur_ui, named, failed)
+        download_data(cur_ui, named, failed)
 
-    # grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
-    # sort_col = 'max_long_E'
-    # compared_col = 'min_long_W'
-    # merge_dim = 'longitude'
-    # combined_long, combined_files_long = combine_data(all_named=all_named, 
-    #                                            all_named_together='final_ui_named.csv', 
-    #                                            grp_cols=grp_cols, 
-    #                                            sort_col=sort_col, 
-    #                                            compared_col=compared_col, 
-    #                                            merge_dim=merge_dim)
+    grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
+    sort_col = 'max_long_E'
+    compared_col = 'min_long_W'
+    merge_dim = 'longitude'
+    combined_long, combined_files_long = combine_data(all_named=all_named, 
+                                               all_named_together='final_ui_named.csv', 
+                                               grp_cols=grp_cols, 
+                                               sort_col=sort_col, 
+                                               compared_col=compared_col, 
+                                               merge_dim=merge_dim,
+                                               t_bool=False)
     
     grp_cols_t = ['temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S', 'max_long_E', 'min_long_W']
     sort_col_t = 'start_time'
     compared_col_t = 'end_time'
     merge_dim_t = config.TIME
 
-    combined_long = 'combined_user_interest.csv'
-
-    ## TODO: need to make it so the min and max time are consecutive not just equal like for long
     combined_time, combined_files_time = combine_data(all_named=[combined_long], 
                                                all_named_together=combined_long, 
                                                grp_cols=grp_cols_t, 
                                                sort_col=sort_col_t, 
                                                compared_col=compared_col_t, 
-                                               merge_dim=merge_dim_t)
+                                               merge_dim=merge_dim_t,
+                                               t_bool=True)
 
-    # files_to_delete = aggregate_data(get_data_path(combined_time), final_info_folder)
+    files_to_delete = aggregate_data(get_data_path(combined_time))
 
-    # if config.DELETE:
-        # delete_files(filenames=combined_files_long, directory=config.CUR_DATA_D)   # deletes files that were combined
-        # delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
+    if config.DELETE:
+        delete_files(filenames=combined_files_long, directory=config.CUR_DATA_D)    # deletes files that were combined in longitude dim
+        delete_files(filenames=combined_files_time, directory=config.CUR_DATA_D)    # deletes files that were combined in temporal dim
+        delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
 
-        # print('All files in {combined_files} and {files_to_delete} have been deleted.')
+        print(f'All files in \n\t{combined_files_long}, \n\t{combined_files_time} and \n\t{files_to_delete} have been deleted.')
