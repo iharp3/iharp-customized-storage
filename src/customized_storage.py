@@ -34,7 +34,7 @@ def download_data(ui, ui_named, ui_failed):
         for row in user_interest_rows:
             try:
                 raw_file_name = get_raw_file_name(row['variable'])
-                completed_rows.append(process_row(row, raw_file_name))
+                # completed_rows.append(process_row(row, raw_file_name))        #TODO#TODO
                 
                 print(f"\tData downloaded to: {raw_file_name}.")
                 print(completed_rows)
@@ -43,8 +43,8 @@ def download_data(ui, ui_named, ui_failed):
                 print(f"\tError processing row {row}: {e}")
                 failed_rows.append(row)
         
-        final_ui_named = 'final_' + ui_named    # all csvs for each ui csv are saved to a final one
-        save_csv(completed_rows, final_ui_named)
+        final_ui_named = 'final_ui_named.csv'    # all csvs for each ui csv are saved to a final one
+        save_csv(completed_rows, get_data_path(final_ui_named))
         # Note failed rows
         if failed_rows == []:
             print(f"Finished downloading all data.")
@@ -58,14 +58,21 @@ def download_data(ui, ui_named, ui_failed):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-def combine_data(all_named, out):
-    df = pd.concat([pd.read_csv(file) for file in all_named], ignore_index=True)
-    group_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
+def combine_data(all_named, all_named_together, out, grp_cols, sort_col, compared_col, merge_dim):
+    # load all file rows into one pandas df
+    if os.path.isfile(get_data_path(all_named_together)):
+        df = pd.read_csv(get_data_path(all_named_together))
+    else:
+        df = pd.concat([pd.read_csv(get_data_path(file)) for file in all_named], ignore_index=True)
+
+    # group file rows by columns
+    group_cols = grp_cols
     grouped = df.groupby(group_cols)
 
     final_ui_named = []
     list_of_combined_files = []
-    u = get_unique_num()
+    # u = get_unique_num()    #TODO#TODO
+    u = 167
 
     for _, group in grouped:
         if len(group) == 1:
@@ -73,7 +80,7 @@ def combine_data(all_named, out):
             final_ui_named.append(d)
         else:
             # order max_long_E
-            sorted_group = group.sort_values(by='max_long_E', ascending=False)
+            sorted_group = group.sort_values(by=sort_col, ascending=False)
             # check if consecutive
             consecutive_files = []
             count = 0
@@ -81,11 +88,11 @@ def combine_data(all_named, out):
                 prev_row = sorted_group.iloc[i-1].to_dict()
                 cur_row = sorted_group.iloc[i].to_dict()
                 # rows are consecutive
-                if prev_row['min_long_W'] == cur_row['max_long_E']:
+                if prev_row[compared_col] == cur_row[sort_col]:
                     if (i-1) == 0:
                         consecutive_files.append(prev_row['file_name'])     # add first row to consecutive files
                     consecutive_files.append(cur_row['file_name'])
-                    final_min_long_W = cur_row['min_long_W']
+                    final_min_long_W = cur_row[compared_col]
                     count = i
                 # rows stop being consecutive
                 else:
@@ -100,18 +107,19 @@ def combine_data(all_named, out):
                 # combine consecutive files
                 file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
                 
-                datasets = [xr.open_dataset(file) for file in file_paths]
-                merged_dataset = xr.concat(datasets, dim='longitude')
-                for ds in datasets:
-                    ds.close()
+                #TODO#TODO
+                # datasets = [xr.open_dataset(file) for file in file_paths]
+                # merged_dataset = xr.concat(datasets, dim=merge_dim)
+                # for ds in datasets:
+                #     ds.close()
 
                 # # save concatenation to new file
                 merged_dataset_name = get_raw_file_name(sorted_group.iloc[0]['variable'])
-                merged_dataset.to_netcdf(os.path.join(out, merged_dataset_name))
+                # merged_dataset.to_netcdf(get_data_path(merged_dataset_name))    #TODO#TODO
 
                 # add row to final_ui_named
                 merged_row = sorted_group.iloc[0].to_dict()
-                merged_row['min_long_W'] = final_min_long_W
+                merged_row[compared_col] = final_min_long_W
                 merged_row['file_name'] = merged_dataset_name
                 final_ui_named.append(merged_row)
 
@@ -124,13 +132,13 @@ def combine_data(all_named, out):
                     final_ui_named.append(sorted_group.iloc[j + count].to_dict())
 
             # update final_ui_named csv with each group
-            csv_name = sorted_group.iloc[0]['variable'] + f'_final_user_interest_{u}.csv'
-            csv_path = os.path.join(out, csv_name)
+            csv_name = sorted_group.iloc[0]['variable'] + f'_final_combined_user_interest_{u}.csv'
+            csv_path = get_data_path(csv_name)
             save_csv(final_ui_named, csv_path)
         
     # save list of files that were combined and can be deleted
     combined_files_name = sorted_group.iloc[0]['variable'] + f'delete_combined_files_{u}.csv'
-    combined_files_path = os.path.join(out, combined_files_name)
+    combined_files_path = get_data_path(combined_files_name)
     save_list_to_csv(list_of_combined_files, combined_files_path)
 
     return csv_path, combined_files_path
@@ -186,11 +194,20 @@ if __name__ == "__main__":
 
         all_named.append(named)
 
-        download_data(cur_ui, named, failed)
+        # download_data(cur_ui, named, failed)
 
-    # final_info_folder = get_data_path('merged')
-
-    # final_named, combined_files = combine_data(all_named, final_info_folder)
+    final_info_folder = get_data_path('meta')
+    grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
+    sort_col = 'max_long_E'
+    compared_col = 'min_long_W'
+    merge_dim = 'longitude'
+    final_named, combined_files = combine_data(all_named=all_named, 
+                                               all_named_together='final_ui_named.csv', 
+                                               out=final_info_folder, 
+                                               grp_cols=grp_cols, 
+                                               sort_col=sort_col, 
+                                               compared_col=compared_col, 
+                                               merge_dim=merge_dim)
 
     # files_to_delete = aggregate_data(final_named, final_info_folder)
 
