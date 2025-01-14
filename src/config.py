@@ -5,8 +5,8 @@ import os
 
 # File paths
 # HOME = os.path.expanduser('~')    # makes home directory my private user directory (/home/uribe055)
-# HOME = "/data/"
-HOME = "/home/uribe055"
+HOME = "/data/"
+# HOME = "/home/uribe055"
 REPO = 'iharp-customized-storage'
 DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 

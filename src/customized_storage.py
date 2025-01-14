@@ -7,7 +7,7 @@ import sys
 import pandas as pd
 import xarray as xr
 
-from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_unique_num
+from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_unique_num, get_data_path
 from DataAgg import DataAgg
 from ApiGenerator import API_Call
 
@@ -34,18 +34,16 @@ def download_data(ui, ui_named, ui_failed):
         for row in user_interest_rows:
             try:
                 raw_file_name = get_raw_file_name(row['variable'])
-                raw_file_path = os.path.join(config.CUR_DATA_D, raw_file_name)
-                completed_rows.append(process_row(row, raw_file_path))
+                completed_rows.append(process_row(row, raw_file_name))
                 
                 print(f"\tData downloaded to: {raw_file_name}.")
                 print(completed_rows)
-                save_csv(completed_rows, ui_named)  # saves current user interest rows with name to a csv
-                print('save_csv worked.')
+                save_csv(completed_rows, get_data_path(ui_named))  # saves current user interest rows with name to a csv
             except Exception as e:
                 print(f"\tError processing row {row}: {e}")
                 failed_rows.append(row)
         
-        final_ui_named = 'final_' + ui_named
+        final_ui_named = 'final_' + ui_named    # all csvs for each ui csv are saved to a final one
         save_csv(completed_rows, final_ui_named)
         # Note failed rows
         if failed_rows == []:
@@ -53,7 +51,7 @@ def download_data(ui, ui_named, ui_failed):
         else:
             # save failed rows to file
             print(f"Did not download all data. See {ui_failed}.")
-            save_list_to_csv(failed_rows, ui_failed)
+            save_list_to_csv(failed_rows, get_data_path(ui_failed))
 
     except FileNotFoundError:
         print(f"Input file not found.")
@@ -182,14 +180,15 @@ def aggregate_data(ui_named, folder):
 if __name__ == "__main__":
     all_named = []
     for i in config.UI_LIST:
-        cur_ui = os.path.join(config.CUR_DATA_D, i)
+        cur_ui = get_data_path(i)
         named = 'named_' + i
+        failed = get_data_path('failed_' + i)
+
         all_named.append(named)
-        failed = 'failed' + i
 
         download_data(cur_ui, named, failed)
 
-    # final_info_folder = os.path.join(config.CUR_DATA_D, 'merged')
+    # final_info_folder = get_data_path('merged')
 
     # final_named, combined_files = combine_data(all_named, final_info_folder)
 
