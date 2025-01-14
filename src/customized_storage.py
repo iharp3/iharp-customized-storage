@@ -216,7 +216,7 @@ if __name__ == "__main__":
 
         all_named.append(named)
 
-        # download_data(cur_ui, named, failed)
+        download_data(cur_ui, named, failed)
 
     print(f"Combining files if longitude values are consecutive.")
     grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
