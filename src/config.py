@@ -5,14 +5,14 @@ import os
 
 # File paths
 # HOME = os.path.expanduser('~')    # makes home directory my private user directory (/home/uribe055)
-TOKEN = "Y" # A = Ana, Y = Yuchuan, G = Gehad
-# HOME = "/data/"     # for 513
-HOME = "/home/uribe055"       # for others
+TOKEN = "A" # A = Ana, Y = Yuchuan, G = Gehad
+HOME = "/data/"     # for 513
+# HOME = "/home/uribe055"       # for others
 REPO = 'iharp-customized-storage'
 DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 
 # multiple user interest
-CUR_DATA_D = os.path.join(DATA_D, 'total_precipitation')
+CUR_DATA_D = os.path.join(DATA_D, 'snow_depth')
 DELETE = False
 UI_LIST = ["ui_1.csv", "ui_2.csv"]
 METADATA = os.path.join(CUR_DATA_D, 'metadata.csv') # file with metadata
