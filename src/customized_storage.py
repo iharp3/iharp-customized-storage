@@ -58,7 +58,7 @@ def download_data(ui, ui_named, ui_failed):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-def combine_data(all_named, all_named_together, out, grp_cols, sort_col, compared_col, merge_dim):
+def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col, merge_dim):
     # load all file rows into one pandas df
     if os.path.isfile(get_data_path(all_named_together)):
         df = pd.read_csv(get_data_path(all_named_together))
@@ -71,8 +71,7 @@ def combine_data(all_named, all_named_together, out, grp_cols, sort_col, compare
 
     final_ui_named = []
     list_of_combined_files = []
-    # u = get_unique_num()    #TODO#TODO
-    u = 167
+    u = get_unique_num()
 
     for _, group in grouped:
         if len(group) == 1:
@@ -132,16 +131,16 @@ def combine_data(all_named, all_named_together, out, grp_cols, sort_col, compare
                     final_ui_named.append(sorted_group.iloc[j + count].to_dict())
 
             # update final_ui_named csv with each group
-            csv_name = sorted_group.iloc[0]['variable'] + f'_final_combined_user_interest_{u}.csv'
+            csv_name = f'combined_user_interest_{u}.csv'
             csv_path = get_data_path(csv_name)
             save_csv(final_ui_named, csv_path)
         
     # save list of files that were combined and can be deleted
-    combined_files_name = sorted_group.iloc[0]['variable'] + f'delete_combined_files_{u}.csv'
+    combined_files_name = f'delete_combined_files_{u}.csv'
     combined_files_path = get_data_path(combined_files_name)
     save_list_to_csv(list_of_combined_files, combined_files_path)
 
-    return csv_path, combined_files_path
+    return csv_name, combined_files_name
 
 def aggregate_data(ui_named, folder):
     # Aggregate data and get metadata
@@ -196,23 +195,36 @@ if __name__ == "__main__":
 
         # download_data(cur_ui, named, failed)
 
-    final_info_folder = get_data_path('meta')
-    grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
-    sort_col = 'max_long_E'
-    compared_col = 'min_long_W'
-    merge_dim = 'longitude'
-    final_named, combined_files = combine_data(all_named=all_named, 
-                                               all_named_together='final_ui_named.csv', 
-                                               out=final_info_folder, 
-                                               grp_cols=grp_cols, 
-                                               sort_col=sort_col, 
-                                               compared_col=compared_col, 
-                                               merge_dim=merge_dim)
+    # grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
+    # sort_col = 'max_long_E'
+    # compared_col = 'min_long_W'
+    # merge_dim = 'longitude'
+    # combined_long, combined_files_long = combine_data(all_named=all_named, 
+    #                                            all_named_together='final_ui_named.csv', 
+    #                                            grp_cols=grp_cols, 
+    #                                            sort_col=sort_col, 
+    #                                            compared_col=compared_col, 
+    #                                            merge_dim=merge_dim)
+    
+    grp_cols_t = ['temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S', 'max_long_E', 'min_long_W']
+    sort_col_t = 'start_time'
+    compared_col_t = 'end_time'
+    merge_dim_t = config.TIME
 
-    # files_to_delete = aggregate_data(final_named, final_info_folder)
+    combined_long = 'combined_user_interest.csv'
+
+    ## TODO: need to make it so the min and max time are consecutive not just equal like for long
+    combined_time, combined_files_time = combine_data(all_named=[combined_long], 
+                                               all_named_together=combined_long, 
+                                               grp_cols=grp_cols_t, 
+                                               sort_col=sort_col_t, 
+                                               compared_col=compared_col_t, 
+                                               merge_dim=merge_dim_t)
+
+    # files_to_delete = aggregate_data(get_data_path(combined_time), final_info_folder)
 
     # if config.DELETE:
-        # delete_files(filenames=combined_files, directory=config.CUR_DATA_D)   # deletes files that were combined
+        # delete_files(filenames=combined_files_long, directory=config.CUR_DATA_D)   # deletes files that were combined
         # delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
 
         # print('All files in {combined_files} and {files_to_delete} have been deleted.')
