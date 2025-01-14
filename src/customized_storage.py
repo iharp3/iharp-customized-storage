@@ -44,7 +44,7 @@ def download_data(ui, ui_named, ui_failed):
                 print(f"\tError processing row {row}: {e}")
                 failed_rows.append(row)
         
-        final_ui_named = 'final_ui_named.csv'    # all csvs for each ui csv are saved to a final one
+        final_ui_named = 'downloaded_named.csv'    # all csvs for each ui csv are saved to a final one
         save_csv(completed_rows, get_data_path(final_ui_named))
         # Note failed rows
         if failed_rows == []:
@@ -73,6 +73,8 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
     final_ui_named = []
     list_of_combined_files = []
     u = get_unique_num()
+    csv_name = f'combined_user_interest_{u}.csv'
+    csv_path = get_data_path(csv_name)
 
     for _, group in grouped:
         if len(group) == 1:
@@ -147,10 +149,9 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
                     final_ui_named.append(sorted_group.iloc[j + count].to_dict())
 
             # update final_ui_named csv with each group
-            csv_name = f'combined_user_interest_{u}.csv'
-            csv_path = get_data_path(csv_name)
             save_csv(final_ui_named, csv_path)
-        
+
+    save_csv(final_ui_named, csv_path)   
     # save list of files that were combined and can be deleted
     combined_files_name = f'delete_combined_files_{u}.csv'
     combined_files_path = get_data_path(combined_files_name)
@@ -210,14 +211,14 @@ if __name__ == "__main__":
 
         all_named.append(named)
 
-        download_data(cur_ui, named, failed)
+        # download_data(cur_ui, named, failed)
 
     grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
     sort_col = 'max_long_E'
     compared_col = 'min_long_W'
     merge_dim = 'longitude'
     combined_long, combined_files_long = combine_data(all_named=all_named, 
-                                               all_named_together='final_ui_named.csv', 
+                                               all_named_together='downloaded_named.csv', 
                                                grp_cols=grp_cols, 
                                                sort_col=sort_col, 
                                                compared_col=compared_col, 
@@ -245,3 +246,5 @@ if __name__ == "__main__":
         delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
 
         print(f'All files in \n\t{combined_files_long}, \n\t{combined_files_time} and \n\t{files_to_delete} have been deleted.')
+    else:
+        print(f'Files to delete in \n\t{combined_files_long}, \n\t{combined_files_time} and \n\t{files_to_delete}.')
