@@ -13,7 +13,7 @@ DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 
 # multiple user interest
 CUR_DATA_D = os.path.join(DATA_D, 'snow_depth')
-DELETE = False
+DELETE = True
 UI_LIST = ["ui_1.csv", "ui_2.csv"]
 METADATA = os.path.join(CUR_DATA_D, 'metadata.csv') # file with metadata
 
