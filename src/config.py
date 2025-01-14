@@ -7,8 +7,8 @@ import os
 # HOME = os.path.expanduser('~')    # makes home directory my private user directory (/home/uribe055)
 TOKEN = "A" # A = Ana, Y = Yuchuan, G = Gehad
 # HOME = "/data/"     # for 513
-# HOME = "/home/uribe055"       # for others
-HOME = "/export/scratch/uribe055"    # for 512
+HOME = "/home/uribe055"       # for others
+# HOME = "/export/scratch/uribe055"    # for 512
 REPO = 'iharp-customized-storage'
 DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 
