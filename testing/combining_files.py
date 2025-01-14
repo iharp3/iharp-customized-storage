@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import csv
 import time
+import xarray as xr
 
 def get_unique_num():
     return int(time.time() * 1000)
@@ -25,6 +26,15 @@ def save_csv(rows, file_path):
         writer.writeheader()
         writer.writerows(rows)
 
+def save_list_to_csv(list, file_path):
+    """
+    Saves csv file from list of strings.
+    """
+    with open(file_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for l in list:
+            writer.writerow([l])
+
 def combine_data(all_named, out):
     df = pd.concat([pd.read_csv(file) for file in all_named], ignore_index=True)
     group_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
@@ -32,8 +42,7 @@ def combine_data(all_named, out):
 
     final_ui_named = []
     list_of_combined_files = []
-    # u = get_unique_num()
-    u = 167
+    u = get_unique_num()
 
     for _, group in grouped:
         if len(group) == 1:
@@ -44,51 +53,49 @@ def combine_data(all_named, out):
             sorted_group = group.sort_values(by='max_long_E', ascending=False)
             # check if consecutive
             consecutive_files = []
-            final_min_long_W = -300
             count = 0
             for i in range(1, len(sorted_group)):
-                count = i
-                # print(f'\ni={i}')
                 prev_row = sorted_group.iloc[i-1].to_dict()
                 cur_row = sorted_group.iloc[i].to_dict()
                 # rows are consecutive
                 if prev_row['min_long_W'] == cur_row['max_long_E']:
                     if (i-1) == 0:
-                        consecutive_files.append(prev_row['file_name'])
+                        consecutive_files.append(prev_row['file_name'])     # add first row to consecutive files
                     consecutive_files.append(cur_row['file_name'])
                     final_min_long_W = cur_row['min_long_W']
-                    print(final_min_long_W)
+                    count = i
                 # rows stop being consecutive
                 else:
+                    if (i-1) == 0:
+                        count = 0
+                    else:
+                        count = i + 1
                     break
                     # TODO: make it so the second and third rows could be merged rather than just the first + others
-            if final_min_long_W != -300:
+
+            if len(consecutive_files) > 1:
                 # combine consecutive files
-                file_paths = consecutive_files  # TODO: check what final file_names are [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
+                file_paths = [os.path.join(out, file) for file in consecutive_files]
                 
-                # datasets = [xr.open_dataset(file) for file in file_paths]
-                # merged_dataset = xr.concat(datasets, dim='longitude')
-                # for ds in datasets:
-                #     ds.close()
+                datasets = [xr.open_dataset(file) for file in file_paths]
+                merged_dataset = xr.concat(datasets, dim='longitude')
+                for ds in datasets:
+                    ds.close()
 
                 # # save concatenation to new file
                 merged_dataset_name = get_raw_file_name(sorted_group.iloc[0]['variable'])
-                # merged_dataset.to_netcdf(os.path.join(out, merged_dataset_name))
+                merged_dataset.to_netcdf(os.path.join(out, merged_dataset_name))
 
                 # add row to final_ui_named
                 merged_row = sorted_group.iloc[0].to_dict()
-                # if final_min_long_W != -300:
-                    # print(final_min_long_W)
-                print(f'final:{final_min_long_W}\n')
                 merged_row['min_long_W'] = final_min_long_W
                 merged_row['file_name'] = merged_dataset_name
-                # print(merged_row)
                 final_ui_named.append(merged_row)
 
                 list_of_combined_files += consecutive_files
 
-            # print(f'prev_row[W]: {prev_row['min_long_W']} \t cur_row[E]: {cur_row['max_long_E']}')
-            if count < len(sorted_group):
+            # if not all rows in sorted group were combined
+            if count < (len(sorted_group)-1):
                 # add the remaining files to final_ui_named
                 for j in range(len(sorted_group) - count):
                     final_ui_named.append(sorted_group.iloc[j + count].to_dict())
@@ -101,7 +108,7 @@ def combine_data(all_named, out):
     # save list of files that were combined and can be deleted
     combined_files_name = sorted_group.iloc[0]['variable'] + f'delete_combined_files_{u}.csv'
     combined_files_path = os.path.join(out, combined_files_name)
-    save_csv(list_of_combined_files, combined_files_path)
+    save_list_to_csv(list_of_combined_files, combined_files_path)
 
     return
 '''
@@ -186,4 +193,4 @@ def combine_data(all_named, folder):
 
     return csv_path, combined_files_path
 '''    
-combine_data(['/home/uribe055/iharp-customized-storage/testing/named_ui_2_temp.csv'], '/home/uribe055/iharp-customized-storage/testing/')
+combine_data(['/data/iharp-customized-storage/testing/named_ui_2_temp.csv'], '/data/iharp-customized-storage/testing/')

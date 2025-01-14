@@ -60,65 +60,80 @@ def download_data(ui, ui_named, ui_failed):
     except Exception as e:
         print(f"An error occurred: {e}.")
 
-def combine_data(all_named, folder):
-    '''TODO: Assumes the variable column is the same for all rows'''
+def combine_data(all_named, out):
     df = pd.concat([pd.read_csv(file) for file in all_named], ignore_index=True)
     group_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
     grouped = df.groupby(group_cols)
 
-    final_ui_named = [] # csv with condensed user interest files
+    final_ui_named = []
     list_of_combined_files = []
     u = get_unique_num()
+
     for _, group in grouped:
-        sorted_group = group.sort_values(by='max_long_E')
-        consecutive_files = []
-        final_min_long_W = 0
-        
-        i = 0
-        for i in range(len(sorted_group)):
-            if i == 0:
-                consecutive_files.add(sorted_group.iloc[i]['file_name'])
-            else:
-                prev_row = sorted_group.iloc[i-1]
-                cur_row = sorted_group.iloc[i]
-                if prev_row['min_long_W'] == cur_row['max_long_E']:
-                    consecutive_files.add(cur_row['file_name'])
-                    final_min_long_W = cur_row['min_long_W']
-                else:
-                    # add the remaining files to final_ui_named
-                    for j in range(len(sorted_group) - i):
-                        final_ui_named.append(sorted_group.iloc[j + i])
-                    break
-        
-        if len(consecutive_files) == 1:     # no consecutive files, add first row to final_ui_named
-            final_ui_named.append(sorted_group.iloc[0])
+        if len(group) == 1:
+            d = group.iloc[0].to_dict()
+            final_ui_named.append(d)
         else:
-            # concatenate consecutive files
-            file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
-            datasets = [xr.open_dataset(file) for file in file_paths]
-            merged_dataset = xr.concat(datasets, dim='longitude')
-            for ds in datasets:
-                ds.close()
-            # save concatenation to new file
-            merged_dataset_name = get_raw_file_name(sorted_group.iloc[0]['variable'])
-            merged_dataset.to_netcdf(merged_dataset_name)
-            # add row to final_ui_named
-            merged_row = sorted_group.iloc[0]
-            merged_row['min_long_W'] = final_min_long_W
-            merged_row['file_name'] = merged_dataset_name
-            final_ui_named.append(merged_row)
+            # order max_long_E
+            sorted_group = group.sort_values(by='max_long_E', ascending=False)
+            # check if consecutive
+            consecutive_files = []
+            count = 0
+            for i in range(1, len(sorted_group)):
+                prev_row = sorted_group.iloc[i-1].to_dict()
+                cur_row = sorted_group.iloc[i].to_dict()
+                # rows are consecutive
+                if prev_row['min_long_W'] == cur_row['max_long_E']:
+                    if (i-1) == 0:
+                        consecutive_files.append(prev_row['file_name'])     # add first row to consecutive files
+                    consecutive_files.append(cur_row['file_name'])
+                    final_min_long_W = cur_row['min_long_W']
+                    count = i
+                # rows stop being consecutive
+                else:
+                    if (i-1) == 0:
+                        count = 0
+                    else:
+                        count = i + 1
+                    break
+                    # TODO: make it so the second and third rows could be merged rather than just the first + others
 
-        list_of_combined_files += consecutive_files
+            if len(consecutive_files) > 1:
+                # combine consecutive files
+                file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
+                
+                datasets = [xr.open_dataset(file) for file in file_paths]
+                merged_dataset = xr.concat(datasets, dim='longitude')
+                for ds in datasets:
+                    ds.close()
 
-        # update final_ui_named csv with each group
-        csv_name = sorted_group.iloc[0]['variable'] + f'_final_user_interest_{u}.csv'
-        csv_path = os.path.join(folder, csv_name)
-        save_csv(final_ui_named, csv_path)
-    
+                # # save concatenation to new file
+                merged_dataset_name = get_raw_file_name(sorted_group.iloc[0]['variable'])
+                merged_dataset.to_netcdf(os.path.join(out, merged_dataset_name))
+
+                # add row to final_ui_named
+                merged_row = sorted_group.iloc[0].to_dict()
+                merged_row['min_long_W'] = final_min_long_W
+                merged_row['file_name'] = merged_dataset_name
+                final_ui_named.append(merged_row)
+
+                list_of_combined_files += consecutive_files
+
+            # if not all rows in sorted group were combined
+            if count < (len(sorted_group)-1):
+                # add the remaining files to final_ui_named
+                for j in range(len(sorted_group) - count):
+                    final_ui_named.append(sorted_group.iloc[j + count].to_dict())
+
+            # update final_ui_named csv with each group
+            csv_name = sorted_group.iloc[0]['variable'] + f'_final_user_interest_{u}.csv'
+            csv_path = os.path.join(out, csv_name)
+            save_csv(final_ui_named, csv_path)
+        
     # save list of files that were combined and can be deleted
     combined_files_name = sorted_group.iloc[0]['variable'] + f'delete_combined_files_{u}.csv'
-    combined_files_path = os.path.join(folder, combined_files_name)
-    save_csv(list_of_combined_files, combined_files_path)
+    combined_files_path = os.path.join(out, combined_files_name)
+    save_list_to_csv(list_of_combined_files, combined_files_path)
 
     return csv_path, combined_files_path
 
@@ -168,9 +183,9 @@ if __name__ == "__main__":
     all_named = []
     for i in config.UI_LIST:
         cur_ui = os.path.join(config.CUR_DATA_D, i)
-        named = 'named_' + cur_ui
+        named = 'named_' + i
         all_named.append(named)
-        failed = 'failed' + cur_ui
+        failed = 'failed' + i
 
         download_data(cur_ui, named, failed)
 
