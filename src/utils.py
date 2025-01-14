@@ -16,7 +16,7 @@ def get_raw_file_name(var):
     Creates file name with unique number based on time.
     """
     u = get_unique_num()
-    file_name = f"{var}_t0_s0_g_{u}.nc"
+    file_name = f"{var}_t0_s0_{config.TOKEN}_{u}.nc"
 
     return file_name
 

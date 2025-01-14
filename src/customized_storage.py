@@ -76,7 +76,9 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
     csv_name = f'combined_user_interest_{u}.csv'
     csv_path = get_data_path(csv_name)
 
+    print(f"\nFound {len(grouped)} groups")
     for _, group in grouped:
+        print(f"\tNew Group:")
         if len(group) == 1:
             d = group.iloc[0].to_dict()
             final_ui_named.append(d)
@@ -119,11 +121,14 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
                     # TODO: make it so the second and third rows could be merged rather than just the first + others
 
             if len(consecutive_files) > 1:
+                print(f"\t\t- {len(consecutive_files)} will be combined...")
                 # combine consecutive files
                 file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
                 
                 datasets = [xr.open_dataset(file) for file in file_paths]
                 merged_dataset = xr.concat(datasets, dim=merge_dim)
+                print(f"\t\t\t finished concatenation.")
+
                 for ds in datasets:
                     ds.close()
 
@@ -213,6 +218,7 @@ if __name__ == "__main__":
 
         # download_data(cur_ui, named, failed)
 
+    print(f"Combining files if longitude values are consecutive.")
     grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
     sort_col = 'max_long_E'
     compared_col = 'min_long_W'
@@ -225,11 +231,11 @@ if __name__ == "__main__":
                                                merge_dim=merge_dim,
                                                t_bool=False)
     
+    print(f"Combining files if time values are consecutive")
     grp_cols_t = ['temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S', 'max_long_E', 'min_long_W']
     sort_col_t = 'start_time'
     compared_col_t = 'end_time'
     merge_dim_t = config.TIME
-
     combined_time, combined_files_time = combine_data(all_named=[combined_long], 
                                                all_named_together=combined_long, 
                                                grp_cols=grp_cols_t, 
@@ -241,6 +247,7 @@ if __name__ == "__main__":
     files_to_delete = aggregate_data(get_data_path(combined_time))
 
     if config.DELETE:
+        print("Starting file deletion.")
         delete_files(filenames=combined_files_long, directory=config.CUR_DATA_D)    # deletes files that were combined in longitude dim
         delete_files(filenames=combined_files_time, directory=config.CUR_DATA_D)    # deletes files that were combined in temporal dim
         delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
