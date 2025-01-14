@@ -35,7 +35,7 @@ def download_data(ui, ui_named, ui_failed):
         for row in user_interest_rows:
             try:
                 raw_file_name = get_raw_file_name(row['variable'])
-                # completed_rows.append(process_row(row, raw_file_name))        #TODO#TODO
+                completed_rows.append(process_row(row, raw_file_name))
                 
                 print(f"\tData downloaded to: {raw_file_name}.")
                 print(completed_rows)
@@ -88,23 +88,16 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
                 prev_row = sorted_group.iloc[i-1].to_dict()
                 cur_row = sorted_group.iloc[i].to_dict()
                 # rows are consecutive
-                # consecutive = False
                 if t_bool == True:
                     compared_date = datetime.strptime(cur_row[compared_col], "%Y-%m-%dT%H:%M")
                     sorted_date = datetime.strptime(prev_row[sort_col], "%Y-%m-%dT%H:%M")
-                    # print(f'sorted: {sorted_date}- \tcompared: {compared_date}')
-                    # if i ==1:       #TODO#TODO
-                    #     print(f'\nprev_row: {prev_row}')
-                    #     print(f'\n\tsorted_date: {sorted_date}')
-                    #     print(f'\ncur_row: {cur_row}')
-                    #     print(f'\n\tcompared_date: {compared_date}')
+
                     if sorted_date - compared_date == timedelta(hours=1):
                         consecutive = True
                     else:
                         consecutive = False
                 else:
                     consecutive = prev_row[compared_col] == cur_row[sort_col]
-                # print(f'consecutive={consecutive}')
                 if consecutive:
                     if (i-1) == 0:
                         consecutive_files.append(prev_row['file_name'])     # add first row to consecutive files
@@ -127,15 +120,14 @@ def combine_data(all_named, all_named_together, grp_cols, sort_col, compared_col
                 # combine consecutive files
                 file_paths = [os.path.join(config.CUR_DATA_D, file) for file in consecutive_files]
                 
-                #TODO#TODO
-                # datasets = [xr.open_dataset(file) for file in file_paths]
-                # merged_dataset = xr.concat(datasets, dim=merge_dim)
-                # for ds in datasets:
-                #     ds.close()
+                datasets = [xr.open_dataset(file) for file in file_paths]
+                merged_dataset = xr.concat(datasets, dim=merge_dim)
+                for ds in datasets:
+                    ds.close()
 
                 # # save concatenation to new file
                 merged_dataset_name = get_raw_file_name(sorted_group.iloc[0]['variable'])
-                # merged_dataset.to_netcdf(get_data_path(merged_dataset_name))    #TODO#TODO
+                merged_dataset.to_netcdf(get_data_path(merged_dataset_name))
 
                 # add row to final_ui_named
                 merged_row = sorted_group.iloc[0].to_dict()
