@@ -216,40 +216,41 @@ if __name__ == "__main__":
 
         all_named.append(named)
 
-        download_data(cur_ui, named, failed)
+        # download_data(cur_ui, named, failed)
 
-    print(f"Combining files if longitude values are consecutive.")
-    grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
-    sort_col = 'max_long_E'
-    compared_col = 'min_long_W'
-    merge_dim = 'longitude'
-    combined_long, combined_files_long = combine_data(all_named=all_named, 
-                                               all_named_together='downloaded_named.csv', 
-                                               grp_cols=grp_cols, 
-                                               sort_col=sort_col, 
-                                               compared_col=compared_col, 
-                                               merge_dim=merge_dim,
-                                               t_bool=False)
-    
-    print(f"Combining files if time values are consecutive")
-    grp_cols_t = ['temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S', 'max_long_E', 'min_long_W']
-    sort_col_t = 'start_time'
-    compared_col_t = 'end_time'
-    merge_dim_t = config.TIME
-    combined_time, combined_files_time = combine_data(all_named=[combined_long], 
-                                               all_named_together=combined_long, 
-                                               grp_cols=grp_cols_t, 
-                                               sort_col=sort_col_t, 
-                                               compared_col=compared_col_t, 
-                                               merge_dim=merge_dim_t,
-                                               t_bool=True)
+    # print(f"Combining files if longitude values are consecutive.")
+    # grp_cols = ['start_time', 'end_time', 'temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S']
+    # sort_col = 'max_long_E'
+    # compared_col = 'min_long_W'
+    # merge_dim = 'longitude'
+    # combined_long, combined_files_long = combine_data(all_named=all_named, 
+    #                                            all_named_together='downloaded_named.csv', 
+    #                                            grp_cols=grp_cols, 
+    #                                            sort_col=sort_col, 
+    #                                            compared_col=compared_col, 
+    #                                            merge_dim=merge_dim,
+    #                                            t_bool=False)
+    # 
+    # print(f"Combining files if time values are consecutive")
+    # grp_cols_t = ['temporal_resolution', 'spatial_resolution', 'max_lat_N', 'min_lat_S', 'max_long_E', 'min_long_W']
+    # sort_col_t = 'start_time'
+    # compared_col_t = 'end_time'
+    # merge_dim_t = config.TIME
+    # combined_time, combined_files_time = combine_data(all_named=[combined_long], 
+    #                                            all_named_together=combined_long, 
+    #                                            grp_cols=grp_cols_t, 
+    #                                            sort_col=sort_col_t, 
+    #                                            compared_col=compared_col_t, 
+    #                                            merge_dim=merge_dim_t,
+    #                                            t_bool=True)
 
+    combined_time = 'combined_user_interest_1736835138425.csv'
     files_to_delete = aggregate_data(get_data_path(combined_time))
 
     if config.DELETE:
         print("Starting file deletion.")
-        delete_files(filenames=combined_files_long, directory=config.CUR_DATA_D)    # deletes files that were combined in longitude dim
-        delete_files(filenames=combined_files_time, directory=config.CUR_DATA_D)    # deletes files that were combined in temporal dim
+        # delete_files(filenames=combined_files_long, directory=config.CUR_DATA_D)    # deletes files that were combined in longitude dim
+        # delete_files(filenames=combined_files_time, directory=config.CUR_DATA_D)    # deletes files that were combined in temporal dim
         delete_files(filenames=files_to_delete, directory=config.CUR_DATA_D)  # deletes files that are too fine-grained
 
         print(f'All files in \n\t{combined_files_long}, \n\t{combined_files_time} and \n\t{files_to_delete} have been deleted.')
