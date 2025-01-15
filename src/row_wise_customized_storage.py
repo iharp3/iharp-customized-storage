@@ -25,12 +25,12 @@ def download_data(row):
         raw_file_name = get_raw_file_name(row['variable'])
         completed_row = process_row(row, raw_file_name)
         print(f"\tDownloaded row: \n\t{completed_row}")
-        save_csv(completed_row, get_data_path(config.EXTRA))
+        save_csv([completed_row], get_data_path(config.EXTRA))
         return completed_row
     except Exception as e:
         print(f"\tError processing row {row}: \n\t{e}")
 
-def aggregate_data(downloaded):
+def aggregate_data(row):
     # Aggregate data and get metadata
     too_fine_list = []
 
@@ -58,6 +58,10 @@ def aggregate_data(downloaded):
     return metadata_list
 
 if __name__ == "__main__":
+
+    new_home = "/export/scratch/uribe055"
+    os.environ["HOME"] = new_home
+
     user_interest = load_csv(get_data_path(config.UI))
     full_metadata_list = []
 
