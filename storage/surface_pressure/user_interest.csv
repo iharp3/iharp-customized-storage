@@ -1,0 +1,11 @@
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
+surface_pressure,90,60,-10,-80,2024-01-01T00:00,2024-12-31T23:00,1H,0.25
+surface_pressure,90,50,180,-180,2020-01-01T00:00,2023-12-31T23:00,1D,0.5
+surface_pressure,90,50,180,-180,2015-01-01T00:00,2019-12-31T23:00,1D,0.5
+surface_pressure,90,50,0,-80,2010-01-01T00:00,2014-12-31T23:00,1D,0.5
+surface_pressure,90,50,180,0,2010-01-01T00:00,2014-12-31T23:00,1ME,0.5
+surface_pressure,90,50,-80,-180,2010-01-01T00:00,2014-12-31T23:00,1ME,0.5
+surface_pressure,90,50,180,-180,2005-01-01T00:00,2009-12-31T23:00,1YE,0.25
+surface_pressure,-70,-90,180,-180,2024-01-01T00:00,2024-12-31T23:00,1H,1
+surface_pressure,-70,-90,180,-180,2019-01-01T00:00,2023-12-31T23:00,1D,1
+surface_pressure,-70,-90,180,-180,2014-01-01T00:00,2018-12-31T23:00,1YE,1

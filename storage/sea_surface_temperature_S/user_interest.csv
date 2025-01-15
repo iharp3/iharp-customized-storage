@@ -1,0 +1,7 @@
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
+sea_surface_temperature,-60,-90,180,-180,2024-01-01T00:00,2024-12-31T23:00,1D,0.5
+sea_surface_temperature,-60,-90,180,-180,2020-01-01T00:00,2023-12-31T23:00,1D,0.5
+sea_surface_temperature,-60,-90,180,-180,2015-01-01T00:00,2019-12-31T23:00,1YE,1
+sea_surface_temperature,-60,-90,180,-180,2010-01-01T00:00,2014-12-31T23:00,1ME,1
+sea_surface_temperature,-60,-90,180,-180,2006-01-01T00:00,2009-12-31T23:00,1Y,1
+sea_surface_temperature,-60,-90,180,-180,2001-01-01T00:00,2005-12-31T23:00,1Y,1
