@@ -7,17 +7,20 @@ import os
 # HOME = os.path.expanduser('~')    # makes home directory my private user directory (/home/uribe055)
 TOKEN = "A" # A = Ana, Y = Yuchuan, G = Gehad
 # HOME = "/data/"     # for 513
-HOME = "/home/uribe055"       # for others
-# HOME = "/export/scratch/uribe055"    # for 512
+# HOME = "/home/uribe055"       # for others
+HOME = "/export/scratch/uribe055"    # for 512
 REPO = 'iharp-customized-storage'
 DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
 
 # multiple user interest
-CUR_DATA_D = os.path.join(DATA_D, 'snow_depth')
+VARIABLE = 'sea_surface_temperature'
+CUR_DATA_D = os.path.join(DATA_D, VARIABLE)
 DELETE = False
 UI_LIST = ["ui_1.csv", "ui_2.csv"]
-METADATA = os.path.join(CUR_DATA_D, 'metadata.csv') # file with metadata
+METADATA = 'metadata.csv' # file with metadata
 
+UI = 'user_interest.csv'
+EXTRA = 'extra.csv'
 # single user interest
 # USER_INTEREST = os.path.join(DATA_D, 'user_interest.csv') # file with user interest
 # USER_INTEREST_NAMED = os.path.join(DATA_D, 'user_interest_named.csv')   # user interest file with names for each raw file

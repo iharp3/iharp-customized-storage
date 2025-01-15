@@ -187,7 +187,7 @@ def aggregate_data(ui_named):
             # Spatial aggregation
             spatial_agg_object = DataAgg(name=d['file_name'], var=row['variable'], t=False, target=row['spatial_resolution'], constant=d['temporal_resolution'])
             spatial_metadata_list, too_fine  = spatial_agg_object.make_spatial_agg_files(cur_t_agg_type=d['temporal_agg_type'])
-            too_fine_list = too_fine
+            too_fine_list += too_fine
             metadata_list = metadata_list + spatial_metadata_list
         
         metadata_list = [{**row_info, **m} for m in metadata_list]

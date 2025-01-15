@@ -5,6 +5,8 @@ import os
 import time
 import re
 import csv
+import subprocess
+import pandas as pd
 
 import config
 
@@ -127,3 +129,54 @@ def get_scale_offset(arr):
     v_min, v_max = get_min_max_of_array(arr)
     scale, offset = compute_scale_and_offset_mm(v_min, v_max)
     return scale, offset, v_min, v_max
+
+def send_folder_to_513(local_folder):
+    # remote destination
+    remote_user = "uribe055"
+    remote_host = "cs-u-spatial-513.cs.umn.edu"
+    remote_path = "/data/iharp-customized-storage/storage"
+
+    # Ensure the local folder exists
+    if not os.path.isdir(local_folder):
+        raise ValueError(f"\tThe folder '{local_folder}' does not exist.")
+    
+    try:
+        # Construct the scp command with the -r flag
+        scp_command = [
+            "scp", "-r",
+            local_folder,
+            f"{remote_user}@{remote_host}:{remote_path}"
+        ]
+        # Execute the scp command
+        subprocess.run(scp_command, check=True)
+        print(f"\tSuccessfully transferred folder: \n\t\t{local_folder} \n\t\tto {remote_user}@{remote_host}:{remote_path}")
+    except subprocess.CalledProcessError as e:
+        print(f"\tError transferring folder: {e}")
+
+def send_files_to_513(csv_file, remote_folder):
+    # remote destination
+    remote_user = "uribe055"
+    remote_host = "cs-u-spatial-513.cs.umn.edu"
+    remote_path = os.path.join("/data/iharp-customized-storage/storage", remote_folder)
+
+    # Read the CSV file
+    df = pd.read_csv(csv_file)
+
+    # Ensure the 'file_name' column exists
+    if 'file_name' not in df.columns:
+        raise ValueError("'file_name' column is missing from the CSV file.")
+
+    # Iterate over the file paths and send each file via scp
+    for file_path in df['file_name']:
+        try:
+            # Construct the scp command
+            scp_command = [
+                "scp",
+                file_path,
+                f"{remote_user}@{remote_host}:{remote_path}"
+            ]
+            # Execute the command
+            subprocess.run(scp_command, check=True)
+            print(f"Successfully transferred: {file_path}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error transferring {file_path}: {e}")
