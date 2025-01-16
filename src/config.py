@@ -34,7 +34,13 @@ NUM_CHUNKS = 1000
 
 # era5 API request settings
 TIME = "valid_time"     # TODO: check this is new value
-VAR_SHORT_N = {"2m_temperature":"t2m"}
+VAR_SHORT_N = {"2m_temperature":"t2m",
+               "total_precipitation":"tp",
+               "snow_depth": "snow_depth",
+               "sea_surface_temperature": "sosst",
+               "10m_u_component_of_wind": "u10",
+               "10m_v_component_of_wind": "v10",
+               "surface_pressure": "surface_pressure"}
 DATASET =  "reanalysis-era5-single-levels"
 PRODUCT_TYPE = ["reanalysis"]
 DATA_FORMAT = "netcdf"
