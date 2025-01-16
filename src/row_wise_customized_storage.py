@@ -85,12 +85,12 @@ if __name__ == "__main__":
             er = 4
         except Exception as e:
             if er == 0:
-                print(f"Error downloading row {row}:\n{e}")
+                print(f"-->Error downloading row {row}:\n{e}")
             elif er == 1:
-                print(f"Error aggregating row {row}:\n{e}")
+                print(f"-->Error aggregating row {row}:\n{e}")
             elif er == 2:
-                print(f"Error sending files for row {row} to 513:\n{e}")
+                print(f"-->Error sending files for row {row} to 513:\n{e}")
             elif er == 3:
-                print(f"Error deleting files for row {row}: \n{e}")
+                print(f"-->Error deleting files for row {row}: \n{e}")
             else:
-                print(f"ERROR ERROR ERROR: \n{e}")
+                print(f"-->ERROR ERROR ERROR: \n{e}")

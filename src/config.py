@@ -40,7 +40,7 @@ VAR_SHORT_N = {"2m_temperature":"t2m",
                "sea_surface_temperature": "sosst",
                "10m_u_component_of_wind": "u10",
                "10m_v_component_of_wind": "v10",
-               "surface_pressure": "surface_pressure"}
+               "surface_pressure": "sp"}
 DATASET =  "reanalysis-era5-single-levels"
 PRODUCT_TYPE = ["reanalysis"]
 DATA_FORMAT = "netcdf"
