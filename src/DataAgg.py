@@ -45,7 +45,7 @@ class DataAgg:
 		file_path = get_data_path(name)
 
 		if c:	# case where file is new and needs to be saved
-			agg.t2m.encoding = e	# new encoding 
+			agg[self.var].encoding = e	# new encoding 
 			agg.to_netcdf(file_path)
 
 		if self.t:	# temporal agg
@@ -86,8 +86,7 @@ class DataAgg:
 		"""
 		
 		"""
-		# TODO: check if this encoding works for all variables not just temperature
-		cur_encoding = dataset.t2m.encoding
+		cur_encoding = dataset[self.var].encoding
 
 		# Get agg file names
 		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
@@ -109,8 +108,7 @@ class DataAgg:
 	def spatial_agg(self, dataset, resolution):
 		"""
 		"""
-		# TODO: check if this encoding works for all variables not just temperature
-		cur_encoding = dataset.t2m.encoding
+		cur_encoding = dataset[self.var].encoding
 
 		# Get agg file names
 		mean_agg_name, min_agg_name, max_agg_name = self.get_all_agg_names()
@@ -152,7 +150,7 @@ class DataAgg:
 			resolution = str(self.all_t[i])
 			if resolution == "1H":	# if you want hourly resolution
 				too_fine = False
-				cur_encoding = ds.t2m.encoding
+				cur_encoding = ds[self.var].encoding
 				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=config.RAW_T_RES, s_res=self.constant, agg_type="none", e=cur_encoding, c=False)
 			else:
 				mean_min_max_metadata_list = self.temporal_agg(ds, resolution)	# This function gets us all agg types (mean, min, max)
@@ -192,7 +190,7 @@ class DataAgg:
 			resolution = float(self.all_s[i])
 			if resolution == 0.25:
 				too_fine = False
-				cur_encoding = ds.t2m.encoding
+				cur_encoding = ds[self.var].encoding
 				mean_min_max_metadata_list = self.compress_save_and_get_dict(agg=ds, name=self.name, t_res=self.constant, s_res=config.RAW_SP_RES, agg_type="none", e=cur_encoding, c=False)
 			else:
 				mean_min_max_metadata_list = self.spatial_agg(ds, resolution)
