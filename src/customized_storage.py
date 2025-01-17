@@ -192,18 +192,18 @@ def aggregate_data(ui_named):
         
         metadata_list = [{**row_info, **m} for m in metadata_list]
         full_metadata_list = full_metadata_list + metadata_list
-        save_csv(full_metadata_list, config.METADATA)
+        save_csv(full_metadata_list, get_data_path(config.METADATA))
 
     print(f"All files temporally and spatially aggregated.")
     # Save metadata
-    save_csv(full_metadata_list, config.METADATA)
-    print(f"All metadata saved to {config.METADATA}")
+    save_csv(full_metadata_list, get_data_path(config.METADATA))
+    print(f"All metadata saved to {get_data_path(config.METADATA)}")
 
     # Save files to delete
     u = get_unique_num()
     too_fine_name = f'delete_too_fine_{u}.csv'
     too_fine_path = get_data_path(too_fine_name)
-    save_csv(too_fine_list, too_fine_path)
+    save_list_to_csv(too_fine_list, too_fine_path)
 
     return too_fine_name
 

@@ -125,3 +125,12 @@ variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_
 2m_temperature,-70,-90,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,max,mean,243.88,280.59,0.1,2m_temperature_t1_s1_1736778960054_max_mean.nc
 2m_temperature,-70,-90,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,max,min,243.53,278.95,0.1,2m_temperature_t1_s1_1736778960054_max_min.nc
 2m_temperature,-70,-90,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,max,max,244.0,282.52,0.1,2m_temperature_t1_s1_1736778960054_max_max.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,mean,mean,243.14,291.52,0.22,2m_temperature_t1_s1_1736740294261_mean_mean.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,mean,min,243.0,291.31,0.22,2m_temperature_t1_s1_1736740294261_mean_min.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,mean,max,243.26,291.78,0.21,2m_temperature_t1_s1_1736740294261_mean_max.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,min,mean,209.43,284.39,0.24,2m_temperature_t1_s1_1736740294261_min_mean.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,min,min,208.13,283.99,0.23,2m_temperature_t1_s1_1736740294261_min_min.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,min,max,210.62,284.73,0.23,2m_temperature_t1_s1_1736740294261_min_max.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,max,mean,265.82,318.05,0.22,2m_temperature_t1_s1_1736740294261_max_mean.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,max,min,265.6,317.51,0.21,2m_temperature_t1_s1_1736740294261_max_min.nc
+2m_temperature,90,40,180,-180,1990-01-01T00:00,1994-12-31T23:00,Y,1.0,max,max,266.06,319.56,0.21,2m_temperature_t1_s1_1736740294261_max_max.nc

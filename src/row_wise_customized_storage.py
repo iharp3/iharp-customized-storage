@@ -53,7 +53,7 @@ def aggregate_data(row):
         
     metadata_list = [{**row_info, **m} for m in metadata_list]
     save_csv(metadata_list, get_data_path(config.METADATA))
-    save_csv(too_fine_list, get_data_path(config.EXTRA))
+    save_list_to_csv(too_fine_list, get_data_path(config.EXTRA))
 
     return metadata_list, too_fine_list
 
@@ -64,33 +64,11 @@ if __name__ == "__main__":
 
     user_interest = load_csv(get_data_path(config.UI))
     full_metadata_list = []
-
-    for row in user_interest:
-        er = 0
-        try:
-        # download one row
+    try:
+        for row in user_interest:
             downloaded_row = download_data(row) # also saved to config.EXTRA
-            er = 1
-
-        # aggregate
             metadata_list, too_fine_list = aggregate_data(downloaded_row)  # also saved to config.METADATA, config.EXTRA
-            er = 2
-
-        # send files in metadata to 513
             send_files_to_513(csv_file=config.METADATA, remote_folder=config.VARIABLE)
-            er = 3
-
-        # delete all other files
             delete_files(filenames=too_fine_list, directory=config.CUR_DATA_D)
-            er = 4
-        except Exception as e:
-            if er == 0:
-                print(f"-->Error downloading row {row}:\n{e}")
-            elif er == 1:
-                print(f"-->Error aggregating row {row}:\n{e}")
-            elif er == 2:
-                print(f"-->Error sending files for row {row} to 513:\n{e}")
-            elif er == 3:
-                print(f"-->Error deleting files for row {row}: \n{e}")
-            else:
-                print(f"-->ERROR ERROR ERROR: \n{e}")
+    except Exception as e:
+        print(f"\n\n\nSomething happened...\n\trow: {row}\n\n\trow type: {type(row)} \n\n\tError:\n{e}")
