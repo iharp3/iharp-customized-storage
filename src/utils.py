@@ -160,19 +160,28 @@ def send_files_to_513(csv_file, remote_folder):
     remote_path = os.path.join("/data/iharp-customized-storage/storage", remote_folder)
 
     # Read the CSV file
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(get_data_path(csv_file))
 
     # Ensure the 'file_name' column exists
     if 'file_name' not in df.columns:
         raise ValueError("'file_name' column is missing from the CSV file.")
 
+    try:
+        scp_command = [
+            "scp",
+            get_data_path(config.METADATA),
+            f"{remote_user}@{remote_host}:{remote_path}"
+        ]
+        print(f"Successfully transfered: {config.METADATA}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error transfering {config.METADATA}: {e}")
     # Iterate over the file paths and send each file via scp
     for file_path in df['file_name']:
         try:
             # Construct the scp command
             scp_command = [
                 "scp",
-                file_path,
+                get_data_path(file_path),
                 f"{remote_user}@{remote_host}:{remote_path}"
             ]
             # Execute the command

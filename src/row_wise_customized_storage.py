@@ -55,7 +55,7 @@ def aggregate_data(row):
     save_csv(metadata_list, get_data_path(config.METADATA))
     save_csv(too_fine_list, get_data_path(config.EXTRA))
 
-    return metadata_list
+    return metadata_list, too_fine_list
 
 if __name__ == "__main__":
 
