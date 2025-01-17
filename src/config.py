@@ -37,7 +37,7 @@ TIME = "valid_time"     # TODO: check this is new value
 VAR_SHORT_N = {"2m_temperature":"t2m",
                "total_precipitation":"tp",
                "snow_depth": "snow_depth",
-               "sea_surface_temperature": "sosst",
+               "sea_surface_temperature": "sst",
                "10m_u_component_of_wind": "u10",
                "10m_v_component_of_wind": "v10",
                "surface_pressure": "sp"}
