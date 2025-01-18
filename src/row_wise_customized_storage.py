@@ -70,5 +70,7 @@ if __name__ == "__main__":
             metadata_list, too_fine_list = aggregate_data(downloaded_row)  # also saved to config.METADATA, config.EXTRA
             send_files_to_513(csv_file=config.METADATA, remote_folder=config.VARIABLE)
             delete_files(filenames=too_fine_list, directory=config.CUR_DATA_D)
+            full_metadata_list += metadata_list
+        save_csv(full_metadata_list, config.METADATA)
     except Exception as e:
         print(f"\n\n\nSomething happened...\n\trow: {row}\n\n\trow type: {type(row)} \n\n\tError:\n{e}")
