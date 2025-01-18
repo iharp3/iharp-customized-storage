@@ -172,6 +172,7 @@ def send_files_to_513(csv_file, remote_folder):
             get_data_path(config.METADATA),
             f"{remote_user}@{remote_host}:{remote_path}"
         ]
+        subprocess.run(scp_command, check=True)
         print(f"Successfully transfered: {config.METADATA}")
     except subprocess.CalledProcessError as e:
         print(f"Error transfering {config.METADATA}: {e}")

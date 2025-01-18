@@ -53,7 +53,7 @@ def aggregate_data(row):
         
     metadata_list = [{**row_info, **m} for m in metadata_list]
     save_csv(metadata_list, get_data_path(config.METADATA))
-    save_list_to_csv(too_fine_list, get_data_path(config.EXTRA))
+    save_list_to_csv(too_fine_list, get_data_path(config.TO_DELETE))
 
     return metadata_list, too_fine_list
 
@@ -63,14 +63,22 @@ if __name__ == "__main__":
     os.environ["HOME"] = new_home
 
     user_interest = load_csv(get_data_path(config.UI))
-    full_metadata_list = []
+    full_metadata_list = [] 
+    full_to_delete_list = []
     try:
+        i = 0
         for row in user_interest:
             downloaded_row = download_data(row) # also saved to config.EXTRA
-            metadata_list, too_fine_list = aggregate_data(downloaded_row)  # also saved to config.METADATA, config.EXTRA
+            metadata_list, too_fine_list = aggregate_data(downloaded_row)  # also saved to config.METADATA, config.TO_DELETE
             send_files_to_513(csv_file=config.METADATA, remote_folder=config.VARIABLE)
             delete_files(filenames=too_fine_list, directory=config.CUR_DATA_D)
+
             full_metadata_list += metadata_list
+            full_to_delete_list += too_fine_list
+            save_csv(full_metadata_list, get_data_path(config.METADATA))
+            save_list_to_csv(full_to_delete_list, get_data_path(config.TO_DELETE))
+
         save_csv(full_metadata_list, config.METADATA)
+        save_list_to_csv(full_to_delete_list, get_data_path(config.TO_DELETE))
     except Exception as e:
         print(f"\n\n\nSomething happened...\n\trow: {row}\n\n\trow type: {type(row)} \n\n\tError:\n{e}")

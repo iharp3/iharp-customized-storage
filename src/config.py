@@ -20,6 +20,7 @@ UI_LIST = ["ui_1.csv", "ui_2.csv"]
 METADATA = 'metadata.csv' # file with metadata
 
 UI = 'user_interest.csv'
+TO_DELETE = "too_fine.csv"
 EXTRA = 'extra.csv'
 # single user interest
 # USER_INTEREST = os.path.join(DATA_D, 'user_interest.csv') # file with user interest
