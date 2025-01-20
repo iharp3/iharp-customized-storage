@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import glob
 import math
+import re
 
 VAR_SHORT_N = {"2m_temperature":"t2m",
                "total_precipitation":"tp",
@@ -32,12 +33,12 @@ def calculate_temporal_resolution(valid_time):
 
     # Display the unique differences
     unique_diffs = pd.Series(time_diffs).value_counts()
-    print("Unique time differences and their counts:")
-    print(unique_diffs)
+    # print("Unique time differences and their counts:")
+    # print(unique_diffs)
     
     # Classify the time differences
     classifications = []
-    t = ""
+    t = "NULL"
     # i = 0
     for diff in time_diffs:
         # if i%10==0:
@@ -59,7 +60,7 @@ def calculate_temporal_resolution(valid_time):
             t = "Y"
         else:
             classifications.append(f"{diff}")
-            t = ":("
+            t = "NULL"
 
         # if i%10==0:
         #     print(f"\nclassifications list: {classifications}")
@@ -87,10 +88,34 @@ def make_list_of_files(directory, var_name, token, n):
     # Define the pattern
     pattern = os.path.join(directory, var_name + "_t*_s*_" + token + "_" + n + "*.nc")
 
+
     # Get the list of matching files
     file_list = glob.glob(pattern)
 
     return file_list
+
+def get_agg_types(f, t_res):
+
+    pattern = r"_(mean|max|min)_(mean|max|min)\.nc$"
+    match = re.search(pattern, f)
+    if match:
+        t_agg, s_agg = match.groups()
+    else:
+
+        pattern = r"_(mean|max|min).nc$"
+        match = re.search(pattern, f)
+        if match:
+            if t_res == "H":
+                t_agg = "none"
+                s_agg = match.group()
+            else:
+                t_agg = match.group()
+                s_agg = "none"
+        else:
+            t_agg = s_agg = "none"
+
+    return t_agg, s_agg
+
 
 def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path, output_csv):
     """
@@ -114,8 +139,8 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                 # Extract valid_time dimension range
                 if 'valid_time' in ds:
                     valid_time = pd.to_datetime(ds['valid_time'].values)
-                    valid_time_start = valid_time.min().strftime('%Y-%m-%d %H:%M:%S')
-                    valid_time_end = valid_time.max().strftime('%Y-%m-%d %H:%M:%S')
+                    valid_time_start = valid_time.min().strftime('%Y-%m-%dT%H:%M')
+                    valid_time_end = valid_time.max().strftime('%Y-%m-%dT%H:%M')
                     t_res = calculate_temporal_resolution(valid_time)
                 else:
                     valid_time_start = valid_time_end = t_res = None
@@ -139,6 +164,9 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                 # Extract min and max of values
                 v_min, v_max = get_min_max_of_array(arr=ds[VAR_SHORT_N[var_name]])
 
+                # Get aggregation (mean, min, max) type
+                t_agg, s_agg = get_agg_types(file_name, t_res=t_res)
+
                 # Append the metadata to the list
                 metadata.append({
                     'variable': var_name,
@@ -150,6 +178,8 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                     'end_time': valid_time_end,
                     'temporal_resolution': t_res,
                     'spatial_resolution': s_res,
+                    'temporal_agg_type': t_agg,
+                    'spatial_agg_type': s_agg,
                     'min': v_min,
                     'max': v_max,
                     'file_size': file_size,
