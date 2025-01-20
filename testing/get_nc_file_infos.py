@@ -139,8 +139,8 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                 # Extract valid_time dimension range
                 if 'valid_time' in ds:
                     valid_time = pd.to_datetime(ds['valid_time'].values)
-                    valid_time_start = valid_time.min().strftime('%Y-%m-%dT%H:%M')
-                    valid_time_end = valid_time.max().strftime('%Y-%m-%dT%H:%M')
+                    valid_time_start = valid_time.min().strftime('%Y-01-01T00:00')
+                    valid_time_end = valid_time.max().strftime('%Y-12-31T23:00')
                     t_res = calculate_temporal_resolution(valid_time)
                 else:
                     valid_time_start = valid_time_end = t_res = None
@@ -183,7 +183,7 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                     'min': v_min,
                     'max': v_max,
                     'file_size': file_size,
-                    'file_name': file_name
+                    'file_name': os.path.basename(file_name)
                 })
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
