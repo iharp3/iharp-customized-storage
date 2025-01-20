@@ -107,9 +107,9 @@ def get_agg_types(f, t_res):
         if match:
             if t_res == "H":
                 t_agg = "none"
-                s_agg = match.group()
+                s_agg = match.group(1)
             else:
-                t_agg = match.group()
+                t_agg = match.group(1)
                 s_agg = "none"
         else:
             t_agg = s_agg = "none"
@@ -201,7 +201,7 @@ folder_path = '/data/iharp-customized-storage/storage/sea_surface_temperature_N'
 output_csv = '/data/iharp-customized-storage/testing/' + var_name + '_meta.csv'
 
 # Get the list of files that don't have metadata:
-num ="1736975614487"
+num ="1736979894617"
 need_metadata_list = make_list_of_files(directory=folder_path, var_name=var_name, token="Y", n=num)
 extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path, output_csv)
 
