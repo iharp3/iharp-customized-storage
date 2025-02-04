@@ -46,21 +46,18 @@ def calculate_temporal_resolution(valid_time):
             # print(f"\npd.Timedelta(hours=1): {pd.Timedelta(hours=1)}")
         # i+=1
 
-        if diff >= pd.Timedelta(hours=0.5) and diff <= pd.Timedelta(hours=5):
-            classifications.append("H")
-            t = "H"
-        elif diff >= pd.Timedelta(days=0.5) and diff <= pd.Timedelta(days=3):
-            classifications.append("D")
-            t = "D"
-        elif diff >= pd.Timedelta(days=27) and diff < pd.Timedelta(days=32):
-            classifications.append("M")
-            t = "M"
-        elif diff >= pd.Timedelta(days=364) and diff <= pd.Timedelta(days=367):
-            classifications.append("Y")
-            t = "Y"
+        if diff >= pd.Timedelta(hours=0.5) and diff <= pd.Timedelta(hours=11):
+            classifications.append("1H")
+            t = "1H"
+        elif diff >= pd.Timedelta(days=0.5) and diff <= pd.Timedelta(days=25):
+            classifications.append("1D")
+            t = "1D"
+        elif diff >= pd.Timedelta(days=26) and diff < pd.Timedelta(days=32):
+            classifications.append("1ME")
+            t = "1ME"
         else:
-            classifications.append(f"{diff}")
-            t = "NULL"
+            classifications.append("1YE")
+            t = "1YE"
 
         # if i%10==0:
         #     print(f"\nclassifications list: {classifications}")
@@ -105,7 +102,7 @@ def get_agg_types(f, t_res):
         pattern = r"_(mean|max|min).nc$"
         match = re.search(pattern, f)
         if match:
-            if t_res == "H":
+            if t_res == "1H":
                 t_agg = "none"
                 s_agg = match.group(1)
             else:
