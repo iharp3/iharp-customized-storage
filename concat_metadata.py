@@ -2,6 +2,9 @@ import pandas as pd
 import argparse
 import os
 
+"""
+python concat_metadata.py -S /data/iharp-customized-storage/storage
+"""
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-S", "--storage_folder", type=str, help="Path to storage folder.")

@@ -127,6 +127,7 @@ The minimum number of files we can have for a certain region is when we need the
 
 #### Aggregating temporal data
 We first aggregate all the data temporally, calculating the daily minimum, maximum, and mean from the raw (hourly) data, then the monthly minimum, maximum, and mean aggregation from the daily resolution, and finally the same statistics for the yearly resolution.
+In CDS: "Monthly mean data are also available, in two forms: monthly means (of daily means) and monthly means for each hour of the day (synoptic monthly means)"
 
 **Currently:**
 Each aggregation is saved in a separate file with the following naming convention:

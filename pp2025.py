@@ -34,7 +34,7 @@ if __name__ == "__main__":
     )
     # change literal conversion
     df_meta["temporal_resolution"] = df_meta["temporal_resolution"].map(
-        {"H": "hour", "D": "day", "M": "month", "Y": "year"}
+        {"H": "hour", "D": "day", "M": "month", "Y": "year", "1H": "hour"}
     )
     df_meta.to_csv(data_folder + "/0_post_metadata.csv", index=False)
     print(f"Done. New metadata {data_folder}/0_post_metadata.csv")
