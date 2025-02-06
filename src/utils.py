@@ -190,3 +190,43 @@ def send_files_to_513(csv_file, remote_folder):
             print(f"Successfully transferred: {file_path}")
         except subprocess.CalledProcessError as e:
             print(f"Error transferring {file_path}: {e}")
+
+def send_files_to_514(csv_file):
+    # remote destination
+    remote_user = "uribe055"
+    remote_host = "cs-u-spatial-514.cs.umn.edu"
+    remote_path = "/data/era5/agg/2m_temperature"
+
+    # Read the CSV file
+    df = pd.read_csv(get_data_path(csv_file))
+
+    # Ensure the 'file_name' column exists
+    if 'file_name' not in df.columns:
+        raise ValueError("'file_name' column is missing from the CSV file.")
+
+    try:
+        scp_command = [
+            "scp",
+            "/data/iharp-customized-storage/storage/514_agg/metadata.csv",
+            f"{remote_user}@{remote_host}:{remote_path}"
+        ]
+        subprocess.run(scp_command, check=True)
+        print(f"Successfully transfered: metadata.csv")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error transfering metadata.csv: {e}")
+        
+    # Iterate over the file paths and send each file via scp
+    for file_path in df['file_path']:
+        try:
+            # Construct the scp command
+            scp_command = [
+                "scp",
+                file_path,
+                f"{remote_user}@{remote_host}:{remote_path}"
+            ]
+            # Execute the command
+            subprocess.run(scp_command, check=True)
+            print(f"Successfully transferred: {file_path}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error transferring {file_path}: {e}")

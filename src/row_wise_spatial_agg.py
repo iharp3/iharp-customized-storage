@@ -4,8 +4,8 @@ import pandas as pd
 import xarray as xr
 import subprocess
 
-from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_data_path, delete_files, send_files_to_513
-from DataAgg import DataAgg
+from utils import load_csv, save_csv, save_list_to_csv, get_raw_file_name, get_data_path, delete_files, send_files_to_513, send_files_to_514
+from DataAggBaseStats import DataAgg
 from ApiGenerator import API_Call
 
 import config
@@ -69,6 +69,8 @@ if __name__ == "__main__":
     try:
         for row in temp_agg_metadata:
             metadata_list, too_fine_list = aggregate_data(row)  # also saved to config.METADATA, config.TO_DELETE
+            send_files_to_514(csv_file=metadata_list)
+
             full_metadata_list += metadata_list
             full_to_delete_list += too_fine_list
             save_csv(full_metadata_list, get_data_path(config.METADATA))
