@@ -22,11 +22,7 @@ METADATA = 'metadata.csv' # file with metadata
 UI = 'user_interest.csv'
 TO_DELETE = "too_fine.csv"
 EXTRA = 'extra.csv'
-# single user interest
-# USER_INTEREST = os.path.join(DATA_D, 'user_interest.csv') # file with user interest
-# USER_INTEREST_NAMED = os.path.join(DATA_D, 'user_interest_named.csv')   # user interest file with names for each raw file
-# FAILED_ROWS = os.path.join(DATA_D, 'failed_rows.csv')   # list of rows that didn't run
-
+T_AGG_META = 'temporal_agg_metadata.csv'
 
 #  
 RAW_SP_RES = 0.25

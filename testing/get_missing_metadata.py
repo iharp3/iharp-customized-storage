@@ -59,10 +59,6 @@ def calculate_temporal_resolution(valid_time):
             classifications.append("1YE")
             t = "1YE"
 
-        # if i%10==0:
-        #     print(f"\nclassifications list: {classifications}")
-        #     print(f"\nt: {t}")
-
     if len(classifications) > 0:
         return classifications[0]
     else:
@@ -102,7 +98,7 @@ def get_agg_types(f, t_res):
         pattern = r"_(mean|max|min).nc$"
         match = re.search(pattern, f)
         if match:
-            if t_res == "1H":
+            if t_res == "1H ":
                 t_agg = "none"
                 s_agg = match.group(1)
             else:
@@ -113,6 +109,16 @@ def get_agg_types(f, t_res):
 
     return t_agg, s_agg
 
+def get_agg_types_Y(f):
+
+    pattern = r"2m_temperature-(day|month|year)-(mean|max|min)\.nc"
+    match = re.match(pattern, f)
+    
+    if match:
+        t_agg, agg_type = match.groups()
+        return t_agg, agg_type, "none"
+    else:
+        return None, None, None
 
 def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path, output_csv):
     """
@@ -165,8 +171,13 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                 v_min, v_max = get_min_max_of_array(arr=ds[VAR_SHORT_N[var_name]])
 
                 # Get aggregation (mean, min, max) type
-                t_agg, s_agg = get_agg_types(file_name, t_res=t_res)
-
+                # t_agg, s_agg = get_agg_types(file_name, t_res=t_res)    # for file names with template: "*_(mean|max|min)_(mean|max|min)\.nc$"
+                t_agg, t_agg_type, s_agg = get_agg_types_Y(file_name)    # for file names with template: "2m_temperature-(day|month|year)-(mean|max|min)\.nc"
+                
+                if t_agg != t_res:
+                    print(f"\tt_agg {t_agg} != t_res {t_res}")
+                    t_res = t_agg
+                
                 # Append the metadata to the list
                 metadata.append({
                     'variable': var_name,
@@ -178,12 +189,13 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                     'end_time': valid_time_end,
                     'temporal_resolution': t_res,
                     'spatial_resolution': s_res,
-                    'temporal_agg_type': t_agg,
+                    'temporal_agg_type': t_agg_type,
                     'spatial_agg_type': s_agg,
                     'min': v_min,
                     'max': v_max,
                     'file_size': file_size,
-                    'file_name': os.path.basename(file_name)
+                    'file_name': os.path.basename(file_name),
+                    'file_path': file_path
                 })
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
@@ -196,11 +208,21 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
 
 
 # Get info for sea_surface_temp_N that didn't save :/
-var_name = 'sea_surface_temperature'
-folder_path = '/data/iharp-customized-storage/storage/sea_surface_temperature_N'
-output_csv = '/data/iharp-customized-storage/testing/' + var_name + '_meta.csv'
+# var_name = 'sea_surface_temperature'
+# folder_path = '/data/iharp-customized-storage/storage/sea_surface_temperature_N'
+# output_csv = '/data/iharp-customized-storage/testing/' + var_name + '_meta.csv'
 
 # Get the list of files that don't have metadata:
-num = "1736996221069" # "1736987215787" # "1736983441536"    # "1736979894617" # "1736975614487"
-need_metadata_list = make_list_of_files(directory=folder_path, var_name=var_name, token="Y", n=num)
+# num = "1736996221069" # "1736987215787" # "1736983441536"    # "1736979894617" # "1736975614487"
+# need_metadata_list = make_list_of_files(directory=folder_path, var_name=var_name, token="Y", n=num)
+
+# Get metadata for aggregated 2m_temp from Y in 514
+var_name = "2m_temperature"
+folder_path = '/data/era5/agg/2m_temperature'
+output_csv = "temporal_agg_metadata.csv"
+
+need_metadata_list = ["2m_temperature-day-max.nc", "2m_temperature-day-mean.nc", "2m_temperature-day-min.nc", 
+                      "2m_temperature-month-max.nc", "2m_temperature-month-mean.nc", "2m_temperature-month-min.nc",
+                      "2m_temperature-year-max.nc", "2m_temperature-year-mean.nc", "2m_temperature-year-min.nc"]
+
 extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path, output_csv)
