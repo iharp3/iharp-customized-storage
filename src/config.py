@@ -6,15 +6,15 @@ import os
 # File paths
 # HOME = os.path.expanduser('~')    # makes home directory my private user directory (/home/uribe055)
 TOKEN = "A" # A = Ana, Y = Yuchuan, G = Gehad
-# HOME = "/data/"     # for 513
+HOME = "/data/"     # for 513
 # HOME = "/home/uribe055"       # for others
 # HOME = "/export/scratch/uribe055"    # for 512
-HOME = "/data/era5"  # for 514
+# HOME = "/data/era5"  # for 514
 
 REPO = 'iharp-customized-storage' 
-# DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
+DATA_D = os.path.join(HOME, REPO, 'storage', "514_agg")  # dir for data
 
-DATA_D = os.path.join(HOME, "agg")  # for 514
+# DATA_D = os.path.join(HOME, "agg")  # for 514
 
 # multiple user interest
 VARIABLE = '2m_temperature'   #'sea_surface_temperature'

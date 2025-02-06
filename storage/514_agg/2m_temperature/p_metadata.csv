@@ -1,0 +1,7 @@
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution,temporal_agg_type,spatial_agg_type,min,max,file_size,file_name
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.25,max,none,191.93,326.91,28932.1,2m_temperature-day-max.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.5,max,max,193.13,326.91,7223.09,2m_temperature-day-max_max.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,1.0,max,max,194.44,326.91,1805.86,2m_temperature-day-max_max.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.25,mean,none,191.29,319.41,28932.1,2m_temperature-day-mean.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.5,mean,mean,191.39,319.16,7223.09,2m_temperature-day-mean_mean.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,1.0,mean,mean,191.62,318.65,1805.86,2m_temperature-day-mean_mean.nc

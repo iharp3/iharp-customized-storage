@@ -207,15 +207,15 @@ def send_files_to_514(csv_file):
     try:
         scp_command = [
             "scp",
-            "/data/iharp-customized-storage/storage/514_agg/metadata.csv",
+            "/data/iharp-customized-storage/storage/514_agg/temporal_agg_metadata.csv",
             f"{remote_user}@{remote_host}:{remote_path}"
         ]
         subprocess.run(scp_command, check=True)
-        print(f"Successfully transfered: metadata.csv")
+        print(f"Successfully transfered: temporal_agg_metadata.csv")
 
     except subprocess.CalledProcessError as e:
         print(f"Error transfering metadata.csv: {e}")
-        
+
     # Iterate over the file paths and send each file via scp
     for file_path in df['file_path']:
         try:

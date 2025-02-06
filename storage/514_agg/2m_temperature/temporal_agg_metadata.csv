@@ -1,0 +1,10 @@
+variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution,temporal_agg_type,spatial_agg_type,min,max,file_size,file_name,file_path
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.25,max,none,,,28932.1,2m_temperature-day-max.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-day-max.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.25,mean,none,,,28932.1,2m_temperature-day-mean.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-day-mean.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1D,0.25,min,none,,,28932.1,2m_temperature-day-min.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-day-min.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1ME,0.25,max,none,,,950.56,2m_temperature-month-max.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-month-max.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1ME,0.25,mean,none,,,950.56,2m_temperature-month-mean.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-month-mean.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1ME,0.25,min,none,,,950.56,2m_temperature-month-min.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-month-min.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1YE,0.25,max,none,,,79.23,2m_temperature-year-max.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-year-max.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1YE,0.25,mean,none,,,79.23,2m_temperature-year-mean.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-year-mean.nc
+2m_temperature,90,-90,180,-180,1984-01-01T00:00,2023-12-31T23:00,1YE,0.25,min,none,,,79.23,2m_temperature-year-min.nc,/data/iharp-customized-storage/storage/514_agg/2m_temperature/2m_temperature-year-min.nc

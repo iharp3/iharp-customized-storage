@@ -138,9 +138,12 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
         file_path = os.path.join(folder_path, filename)
         try:
             # get file size
+            print('\n1')
             file_size = get_file_size(file_path=file_path)
+            print('\n2')
             # Open the NetCDF file using xarray
             with xr.open_dataset(file_path) as ds:
+                print('\n3')
                 file_name = filename
                 # Extract valid_time dimension range
                 if 'valid_time' in ds:
@@ -148,9 +151,14 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                     valid_time_start = valid_time.min().strftime('%Y-01-01T00:00')
                     valid_time_end = valid_time.max().strftime('%Y-12-31T23:00')
                     t_res = calculate_temporal_resolution(valid_time)
+                elif 'time' in ds:
+                    valid_time = pd.to_datetime(ds['time'].values)
+                    valid_time_start = valid_time.min().strftime('%Y-01-01T00:00')
+                    valid_time_end = valid_time.max().strftime('%Y-12-31T23:00')
+                    t_res = calculate_temporal_resolution(valid_time)
                 else:
                     valid_time_start = valid_time_end = t_res = None
-
+                print('\n4')
                 # Extract latitude range
                 if 'latitude' in ds:
                     latitude_min = math.floor(float(ds['latitude'].min()))
@@ -159,17 +167,19 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                     s_res = calculate_spatial_resolution(latitude)
                 else:
                     latitude_min = latitude_max = s_res = None
-
+                print('\n5')
                 # Extract longitude range
                 if 'longitude' in ds:
                     longitude_min = math.floor(float(ds['longitude'].min()))
                     longitude_max = math.ceil(float(ds['longitude'].max()))
                 else:
                     longitude_min = longitude_max = None
-
+                print('\n6')
                 # Extract min and max of values
-                v_min, v_max = get_min_max_of_array(arr=ds[VAR_SHORT_N[var_name]])
-
+                # v_min, v_max = get_min_max_of_array(arr=ds[VAR_SHORT_N[var_name]]) TODO: figure out how to get min/max for these
+                v_min = None
+                v_max = None
+                print('\n7')
                 # Get aggregation (mean, min, max) type
                 # t_agg, s_agg = get_agg_types(file_name, t_res=t_res)    # for file names with template: "*_(mean|max|min)_(mean|max|min)\.nc$"
                 t_agg, t_agg_type, s_agg = get_agg_types_Y(file_name)    # for file names with template: "2m_temperature-(day|month|year)-(mean|max|min)\.nc"
@@ -177,7 +187,7 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                 if t_agg != t_res:
                     print(f"\tt_agg {t_agg} != t_res {t_res}")
                     t_res = t_agg
-                
+                print('\n8')
                 # Append the metadata to the list
                 metadata.append({
                     'variable': var_name,
@@ -197,14 +207,16 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
                     'file_name': os.path.basename(file_name),
                     'file_path': file_path
                 })
+                print('\n9')
         except Exception as e:
             print(f"Error processing file {filename}: {e}")
 
     # Create a DataFrame from the metadata
     metadata_df = pd.DataFrame(metadata)
-
+    print('\n10')
     # Save the DataFrame to a CSV file
     metadata_df.to_csv(output_csv, index=False)
+    print('\n11')
 
 
 # Get info for sea_surface_temp_N that didn't save :/
@@ -218,7 +230,7 @@ def extract_netcdf_metadata_from_list(need_metadata_list, var_name, folder_path,
 
 # Get metadata for aggregated 2m_temp from Y in 514
 var_name = "2m_temperature"
-folder_path = '/data/era5/agg/2m_temperature'
+folder_path = '/data/iharp-customized-storage/storage/514_agg/2m_temperature'
 output_csv = "temporal_agg_metadata.csv"
 
 need_metadata_list = ["2m_temperature-day-max.nc", "2m_temperature-day-mean.nc", "2m_temperature-day-min.nc", 
