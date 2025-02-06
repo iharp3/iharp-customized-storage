@@ -8,12 +8,16 @@ import os
 TOKEN = "A" # A = Ana, Y = Yuchuan, G = Gehad
 # HOME = "/data/"     # for 513
 # HOME = "/home/uribe055"       # for others
-HOME = "/export/scratch/uribe055"    # for 512
-REPO = 'iharp-customized-storage'
-DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
+# HOME = "/export/scratch/uribe055"    # for 512
+HOME = "/data/era5/"  # for 514
+
+REPO = 'iharp-customized-storage' 
+# DATA_D = os.path.join(HOME, REPO, 'storage')  # dir for data
+
+DATA_D = os.path.join(HOME, "agg")  # for 514
 
 # multiple user interest
-VARIABLE = 'sea_surface_temperature'
+VARIABLE = '2m_temperature'   #'sea_surface_temperature'
 CUR_DATA_D = os.path.join(DATA_D, VARIABLE)
 DELETE = False
 UI_LIST = ["ui_1.csv", "ui_2.csv"]
