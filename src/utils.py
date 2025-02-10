@@ -41,6 +41,11 @@ def modify_filename(cur_file_name, agg_type):
     """
     return cur_file_name.replace('.nc', agg_type)
 
+def modify_filename_unique(cur_file_name, agg_type):
+    u = get_unique_num()
+    unique_filename = f"{cur_file_name}_{agg_type}_{u}.nc"
+    return unique_filename
+
 def get_data_path(file_name):
 
     return os.path.join(config.CUR_DATA_D, file_name)
