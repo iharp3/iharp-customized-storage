@@ -4,6 +4,9 @@ data/agg
 other_data/
 storage/*.nc
 test_data/
+storage/experiments_tdb/*
+experiments_tdb/__commits/*
+experiments_tdb/__schema/*
 
 # raw data files
 *.nc
