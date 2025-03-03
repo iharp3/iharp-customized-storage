@@ -1,7 +1,0 @@
-variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution
-snow_depth,90,70,180,-180,2020,2024,1H,0.25
-snow_depth,70,50,180,-180,2020,2023,1H,0.5
-snow_depth,-60,-90,-90,-180,2020,2024,1D,0.5
-snow_depth,-60,-90,0,-90,2020,2023,1D,0.25
-snow_depth,-60,-90,180,0,2020,2023,1D,0.5
-snow_depth,70,50,180,-180,2024,2024,1H,0.25

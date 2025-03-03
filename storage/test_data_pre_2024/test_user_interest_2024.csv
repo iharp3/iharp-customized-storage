@@ -1,2 +1,0 @@
-variable,max_lat_N,min_lat_S,max_long_E,min_long_W,start_time,end_time,temporal_resolution,spatial_resolution,file_name
-2m_temperature,10,0,15,5,2020-01-01T00:00,2020-12-31T23:00,1YE,0.5,2m_temperature_t0_s0_1733635806997.nc
